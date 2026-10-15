@@ -1,0 +1,21 @@
+// Traductions anglaises de src/components/RideCard.jsx
+export default {
+  'Chaque semaine · {n} date à venir': 'Every week · {n} upcoming date',
+  'Chaque semaine · {n} dates à venir': 'Every week · {n} upcoming dates',
+  'Itinéraire': 'Route',
+  'par': 'by',
+  'toi': 'you',
+  'Modifier': 'Edit',
+  'Annuler cette sortie ? Les participants seront prévenus.': 'Cancel this ride? Participants will be notified.',
+  'Annuler la sortie': 'Cancel the ride',
+  'Me désinscrire': 'Leave',
+  'Complet': 'Full',
+  'Je viens !': 'I’m in!',
+  'Toutes les semaines': 'Every week',
+  'Salut {name}, à propos de « {title} »… ': 'Hi {name}, about “{title}”… ',
+  'Contacter': 'Contact',
+  'Annuler les {n} dates à venir de cette série ? Les participants seront prévenus.': 'Cancel the {n} upcoming dates in this series? Participants will be notified.',
+  'Annuler toute la série': 'Cancel the whole series',
+  'Météo prévue': 'Forecast',
+  'Pense au manteau de pluie 🧥': 'Remember the raincoat 🧥',
+};

@@ -1,0 +1,18 @@
+// Traductions néerlandaises de src/components/ReportDialog.jsx
+export default {
+  'Signaler {name}': '{name} melden',
+  'Signaler ta conversation avec {name}': 'Je gesprek met {name} melden',
+  'Signaler cette publication': 'Dit bericht melden',
+  'Signaler ce commentaire': 'Deze reactie melden',
+  'Signaler cette sortie': 'Deze fietstocht melden',
+  'Signaler cette annonce': 'Dit zoekertje melden',
+  'Merci ! L’équipe va examiner ton signalement. Tu seras prévenu quand il sera traité.': 'Bedankt! Het team bekijkt je melding. Je hoort het zodra ze behandeld is.',
+  'Les 15 derniers messages de cette conversation seront transmis à l’équipe de modération.': 'De laatste 15 berichten van dit gesprek worden doorgestuurd naar het moderatieteam.',
+  'Détails (facultatif)': 'Details (optioneel)',
+  'Annuler': 'Annuleren',
+  'Envoi…': 'Versturen…',
+  'Signaler': 'Melden',
+  'Signaler la photo de profil de {name}': 'De profielfoto van {name} melden',
+  'Signaler cet objet': 'Dit voorwerp melden',
+  'Signaler ce message': 'Dit bericht melden',
+};

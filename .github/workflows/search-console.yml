@@ -1,0 +1,153 @@
+# Statistiques Google (Search Console) : clics, affichages, recherches et pages des 28 derniers jours,
+# rangés dans la base pour l'onglet « Statistiques » de l'administration. Chaque jour à 6 h, ou à la demande.
+#
+# Mise en place (une seule fois) :
+#   1. Google Cloud : créer un compte de service, activer « Google Search Console API », créer une clé JSON.
+#   2. Search Console : Paramètres → Utilisateurs et autorisations → ajouter l'adresse du compte de service
+#      (autorisation « Restreinte » suffit).
+#   3. GitHub : secret GSC_SERVICE_ACCOUNT_JSON = contenu du fichier JSON.
+#      Facultatif : secret GSC_SITE (par défaut « sc-domain:cyclami.com » ; sinon « https://cyclami.com/ »).
+name: Statistiques Google
+
+on:
+  schedule:
+    - cron: '7 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Récupérer les chiffres de Google
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_SITE: ${{ secrets.GSC_SITE }}
+        run: |
+          if [ -z "$GSC_SERVICE_ACCOUNT_JSON" ]; then
+            echo "::notice::Secret GSC_SERVICE_ACCOUNT_JSON absent : statistiques Google pas encore configurées."
+            exit 0
+          fi
+          pip install --quiet google-auth requests
+          python3 - <<'PY'
+          import datetime, json, os
+          import requests
+          from google.oauth2 import service_account
+          from google.auth.transport.requests import Request
+
+          def read_key(raw):
+              # tolère les erreurs de copier-coller courantes (espaces, guillemets ou ``` autour, contenu en base64)
+              s = raw.strip().strip("`").strip()
+              # copie depuis Notes / un téléphone : guillemets typographiques remis droits
+              s = s.replace("\u201c", '"').replace("\u201d", '"')
+              if s[:1] in "'\"" and s[-1:] == s[:1]:
+                  s = s[1:-1].strip()
+              if not s.startswith("{"):
+                  try:
+                      import base64
+                      decoded = base64.b64decode(s, validate=False).decode("utf-8").strip()
+                      if decoded.startswith("{"):
+                          s = decoded
+                  except Exception:
+                      pass
+              try:
+                  return json.loads(s)
+              except Exception:
+                  pass
+              # copie depuis un aperçu qui affiche « clé: "valeur" » (sans accolades) : une ligne par champ
+              import re
+              fields = {}
+              for line in s.splitlines():
+                  m = re.match(r'^\s*"?([A-Za-z0-9_]+)"?\s*[:=]?\s*"(.*)"\s*,?\s*$', line)
+                  if m:
+                      try:
+                          fields[m.group(1)] = json.loads('"' + m.group(2) + '"')
+                      except Exception:
+                          fields[m.group(1)] = m.group(2).replace("\\n", "\n")
+              if "client_email" in fields and "private_key" in fields:
+                  print("Clé lue au format « champ: valeur » (sans accolades).")
+                  return fields
+              try:
+                  return json.loads(s)
+              except Exception:
+                  # aucun contenu de la clé n'est affiché : seulement des indices
+                  first = s[:1]
+                  hint = first if first in "{}[]\"'`<" else ("lettre/chiffre" if first.isalnum() else "autre")
+                  raise SystemExit(
+                      "Le secret GSC_SERVICE_ACCOUNT_JSON n'est pas un fichier JSON valide. "
+                      "Indices : %d caractères, commence par « %s », contient \"private_key\" : %s, contient \"client_email\" : %s, "
+                      "mot service_account : %s, guillemets droits : %d, guillemets typographiques : %d, accolades : %d, "
+                      "BEGIN PRIVATE KEY : %s, lignes : %d. "
+                      "Il faut coller TOUT le contenu du fichier .json téléchargé (de la première { à la dernière })."
+                      % (len(s), hint, '"private_key"' in s, '"client_email"' in s, 'service_account' in s,
+                         s.count('"'), sum(s.count(c) for c in '\u201c\u201d\u00ab\u00bb'), s.count('{') + s.count('}'),
+                         'BEGIN PRIVATE KEY' in s, s.count('\n') + 1))
+
+          info = read_key(os.environ["GSC_SERVICE_ACCOUNT_JSON"])
+          for k in ("client_email", "private_key"):
+              if k not in info:
+                  raise SystemExit("Le fichier JSON ne contient pas « %s » : ce n'est pas une clé de compte de service." % k)
+          print("Compte de service :", info["client_email"])
+          creds = service_account.Credentials.from_service_account_info(
+              info, scopes=["https://www.googleapis.com/auth/webmasters.readonly"])
+          creds.refresh(Request())
+          site = (os.environ.get("GSC_SITE") or "sc-domain:cyclami.com").strip()
+          url = "https://searchconsole.googleapis.com/webmasters/v3/sites/%s/searchAnalytics/query" % requests.utils.quote(site, safe="")
+          end = datetime.date.today() - datetime.timedelta(days=2)  # Google publique les chiffres avec ~2 jours de retard
+          start = end - datetime.timedelta(days=27)
+
+          def query(dimensions, limit):
+              r = requests.post(url, headers={"Authorization": "Bearer " + creds.token}, timeout=30, json={
+                  "startDate": start.isoformat(), "endDate": end.isoformat(), "dimensions": dimensions, "rowLimit": limit})
+              if r.status_code != 200:
+                  raise SystemExit("Search Console a refusé la demande (%s) : %s" % (r.status_code, r.text[:300]))
+              return r.json().get("rows", [])
+
+          q = lambda s: "'" + str(s).replace("'", "''")[:300] + "'"
+          sql = ["begin;"]
+          for row in query(["date"], 100):
+              sql.append("insert into private.search_console_days (day, clicks, impressions, position) values (%s, %d, %d, %f) "
+                         "on conflict (day) do update set clicks = excluded.clicks, impressions = excluded.impressions, position = excluded.position;"
+                         % (q(row["keys"][0]), row["clicks"], row["impressions"], row["position"]))
+          sql.append("delete from private.search_console_top;")
+          for kind, dim in (("query", "query"), ("page", "page")):
+              for row in query([dim], 25):
+                  sql.append("insert into private.search_console_top (kind, key, clicks, impressions, position) values (%s, %s, %d, %d, %f);"
+                             % (q(kind), q(row["keys"][0]), row["clicks"], row["impressions"], row["position"]))
+          sql.append("insert into private.settings (key, value) values ('search_console_updated', %s) "
+                     "on conflict (key) do update set value = excluded.value;" % q(datetime.datetime.utcnow().isoformat() + "Z"))
+          sql.append("commit;")
+          open("/tmp/gsc.sql", "w").write("\n".join(sql))
+          print("Lignes préparées :", len(sql) - 4)
+          PY
+
+      - name: Enregistrer dans la base
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          [ -f /tmp/gsc.sql ] || exit 0
+          command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+          eval "$(python3 - <<'PY'
+          import os, shlex
+          from urllib.parse import unquote
+          url = os.environ["SUPABASE_DB_URL"].strip()
+          for prefix in ("postgresql://", "postgres://"):
+              if url.startswith(prefix):
+                  url = url[len(prefix):]
+                  break
+          creds, _, rest = url.rpartition("@")
+          user, _, password = creds.partition(":")
+          if password.startswith("[") and password.endswith("]"):
+              password = password[1:-1]
+          hostport, _, db = rest.partition("/")
+          host, _, port = hostport.partition(":")
+          print("echo ::add-mask::" + shlex.quote(password))
+          for k, v in {"PGUSER": unquote(user), "PGPASSWORD": password, "PGHOST": host,
+                       "PGPORT": port or "5432", "PGDATABASE": db.split("?")[0] or "postgres",
+                       "PGSSLMODE": "require"}.items():
+              print(f"export {k}={shlex.quote(v)}")
+          PY
+          )"
+          export PGCONNECT_TIMEOUT=20
+          psql -X -q -v ON_ERROR_STOP=1 -f /tmp/gsc.sql
+          echo "Statistiques Google enregistrées."

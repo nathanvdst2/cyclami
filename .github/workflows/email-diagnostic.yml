@@ -1,0 +1,84 @@
+# Diagnostic des e-mails de notification (lancement manuel uniquement).
+# Lit la file d'e-mails et les réponses du service Cloudflare, sans rien modifier
+# (les adresses e-mail sont masquées dans le journal).
+name: Diagnostic e-mails
+
+on:
+  workflow_dispatch:
+    inputs:
+      send_test:
+        description: "Envoyer un e-mail de test à l'administrateur"
+        type: boolean
+        default: false
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Vérifier la clé partagée avec le service Cloudflare
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+        run: |
+          KEY=$(printf '%s' "$BREVO_API_KEY" | tr -d '[:space:]')
+          [ -n "$KEY" ] || { echo "::error::Secret BREVO_API_KEY absent"; exit 0; }
+          NOTIFY_SECRET=$(printf 'cyclami-notify:%s' "$KEY" | sha256sum | cut -d' ' -f1)
+          echo "::add-mask::$NOTIFY_SECRET"
+          # message volontairement incomplet : 400 = clé acceptée (aucun e-mail envoyé), 401 = clé refusée
+          curl -sS -X POST https://cyclami-photos.nathanbarbaraytb.workers.dev/notify \
+            -H "Authorization: Bearer $NOTIFY_SECRET" -H 'Content-Type: application/json' \
+            -d '{}' -w '\nHTTP %{http_code}\n'
+
+      - name: Lire la file d'e-mails et les réponses HTTP
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+          eval "$(python3 - <<'PY'
+          import os, shlex
+          from urllib.parse import unquote
+          url = os.environ["SUPABASE_DB_URL"].strip()
+          for prefix in ("postgresql://", "postgres://"):
+              if url.startswith(prefix):
+                  url = url[len(prefix):]
+                  break
+          creds, _, rest = url.rpartition("@")
+          user, _, password = creds.partition(":")
+          if password.startswith("[") and password.endswith("]"):
+              password = password[1:-1]
+          hostport, _, db = rest.partition("/")
+          host, _, port = hostport.partition(":")
+          print("echo ::add-mask::" + shlex.quote(password))
+          for k, v in {"PGUSER": unquote(user), "PGPASSWORD": password, "PGHOST": host,
+                       "PGPORT": port or "5432", "PGDATABASE": db.split("?")[0] or "postgres",
+                       "PGSSLMODE": "require"}.items():
+              print(f"export {k}={shlex.quote(v)}")
+          PY
+          )"
+          export PGCONNECT_TIMEOUT=20
+          if [ "${{ inputs.send_test }}" = "true" ]; then
+            psql -X -q -v ON_ERROR_STOP=1 <<'SQL'
+          insert into private.email_outbox (user_id, kind, ref, email, name, subject, body, link)
+          select u.id, 'test', '', u.email, coalesce(p.name, ''), 'Test des notifications Cyclami',
+                 'Si tu lis ceci, les e-mails de notification d''Cyclami fonctionnent 🎉', '/'
+          from auth.users u join public.profiles p on p.id = u.id
+          where lower(u.email) = 'nathanbarbaraytb@gmail.com';
+          SQL
+            echo "📨 E-mail de test mis en file, attente de la réponse…"
+            sleep 15
+          fi
+          psql -X -P pager=off <<'SQL'
+          \echo '--- Réglages présents'
+          select key, case when key = 'notify_secret' then '(présent)' else value end as value from private.settings;
+          \echo '--- Extension pg_net'
+          select extname, extversion from pg_extension where extname = 'pg_net';
+          \echo '--- Derniers e-mails mis en file (adresse masquée)'
+          select created_at, kind, '***@' || split_part(email, '@', 2) as dest, left(subject, 60) as subject
+          from private.email_outbox order by created_at desc limit 10;
+          \echo '--- Dernières réponses HTTP reçues par pg_net'
+          select created, status_code, error_msg, timed_out,
+                 regexp_replace(left(content, 300), '[^@\s"]+@', '***@', 'g') as content
+          from net._http_response order by created desc limit 10;
+          \echo '--- Requêtes en attente'
+          select count(*) from net.http_request_queue;
+          SQL

@@ -1,0 +1,55 @@
+# Ancienne adresse Netlify et www → domaine principal (une seule adresse = une seule session de connexion)
+https://cyclami.netlify.app/*  https://cyclami.com/:splat  301!
+https://www.cyclami.com/*      https://cyclami.com/:splat  301!
+
+# Pages publiques avec une vraie adresse (écran de connexion Google, liens partagés)
+/confidentialite   /index.html  200
+/conditions        /index.html  200
+/mentions-legales  /index.html  200
+
+# Liens partagés (sortie, annonce, forum, alerte, groupe) : même application ; l'aperçu
+# pour WhatsApp & co est ajouté par netlify/edge-functions/share.js
+/b/*  /index.html  200
+/a/*  /index.html  200
+/f/*  /index.html  200
+/p/*  /index.html  200
+/g/*  /index.html  200
+
+# Pages publiques (sans compte, trouvables sur Google) ; le contenu est aussi ajouté par le serveur
+/adoptions   /index.html  200
+/adoptions/*   /index.html  200
+/sorties     /index.html  200
+/sorties/*   /index.html  200
+/perdus      /index.html  200
+/perdus/*    /index.html  200
+/refuge/*    /index.html  200
+/refuges     /index.html  200
+
+# Les mêmes pages publiques en néerlandais (/nl) et en anglais (/en)
+/nl              /index.html  200
+/en              /index.html  200
+/nl/adoptions    /index.html  200
+/en/adoptions    /index.html  200
+/nl/adoptions/*  /index.html  200
+/en/adoptions/*  /index.html  200
+/nl/sorties      /index.html  200
+/nl/refuges      /index.html  200
+/en/refuges      /index.html  200
+/en/sorties      /index.html  200
+/nl/sorties/*    /index.html  200
+/en/sorties/*    /index.html  200
+/nl/perdus       /index.html  200
+/en/perdus       /index.html  200
+/nl/perdus/*     /index.html  200
+/en/perdus/*     /index.html  200
+/nl/refuge/*     /index.html  200
+/en/refuge/*     /index.html  200
+/nl/a/*          /index.html  200
+/en/a/*          /index.html  200
+/nl/b/*          /index.html  200
+/en/b/*          /index.html  200
+/nl/p/*          /index.html  200
+/en/p/*          /index.html  200
+
+# Toute autre adresse : l'application affiche sa page 404 illustrée (code HTTP 404 pour les moteurs de recherche)
+/*  /index.html  404

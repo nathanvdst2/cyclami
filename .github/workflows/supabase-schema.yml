@@ -1,0 +1,127 @@
+# Applique automatiquement supabase/schema.sql à la base Supabase
+# à chaque modification du fichier sur main (le script peut être relancé sans risque).
+# Nécessite le secret GitHub SUPABASE_DB_URL (chaîne de connexion « Session pooler »).
+name: Base de données Supabase
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - supabase/schema.sql
+      - supabase/test/**
+      - .github/workflows/supabase-schema.yml
+  workflow_dispatch:
+
+concurrency:
+  group: supabase-schema
+  cancel-in-progress: false
+
+jobs:
+  apply-schema:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # base PostgreSQL vierge pour tester le script avant de toucher la vraie base
+    services:
+      testdb:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: test
+        ports: ['5433:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 5s --health-retries 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Installer le client PostgreSQL
+        run: command -v psql || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+
+      # Le script est appliqué deux fois sur une base neuve, chaque fois en tout-ou-rien :
+      # une erreur ici arrête tout, la vraie base n'est jamais touchée par un script cassé.
+      - name: Tester le script sur une base vierge
+        env:
+          PGHOST: localhost
+          PGPORT: '5433'
+          PGUSER: postgres
+          PGPASSWORD: test
+          PGDATABASE: postgres
+        run: |
+          psql -v ON_ERROR_STOP=1 -q -f supabase/test/stubs.sql
+          for run in 1 2; do
+            psql -v ON_ERROR_STOP=1 -q --single-transaction -f supabase/schema.sql
+            echo "✅ Passage $run réussi"
+          done
+
+      - name: Vérifier la présence du secret
+        id: secret
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::warning::Secret SUPABASE_DB_URL absent : le script SQL n'a pas été appliqué (voir README)."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Appliquer supabase/schema.sql
+        if: steps.secret.outputs.ok == 'true'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+        # Le mot de passe peut contenir @, :, / ou # : on découpe l'adresse nous-mêmes
+        # (au dernier @) au lieu de laisser psql l'interpréter.
+        # Instruction par instruction (pas de transaction unique) : chaque verrou ne dure que
+        # quelques millisecondes, le site reste utilisable pendant la mise à jour.
+        # Le script a été testé juste avant sur une base vierge et peut être rejoué sans risque :
+        # si une table est occupée (verrou > 5 s), on attend un peu et on recommence (3 essais).
+        run: |
+          eval "$(python3 - <<'PY'
+          import os, shlex, sys
+          from urllib.parse import unquote
+          url = os.environ["SUPABASE_DB_URL"].strip()
+          for prefix in ("postgresql://", "postgres://"):
+              if url.startswith(prefix):
+                  url = url[len(prefix):]
+                  break
+          creds, _, rest = url.rpartition("@")
+          user, _, password = creds.partition(":")
+          if password.startswith("[") and password.endswith("]"):
+              password = password[1:-1]
+          hostport, _, db = rest.partition("/")
+          db = db.split("?")[0] or "postgres"
+          host, _, port = hostport.partition(":")
+          if not (user and password and host):
+              sys.exit("SUPABASE_DB_URL invalide : attendu postgresql://utilisateur:motdepasse@hote:port/base")
+          print("echo ::add-mask::" + shlex.quote(password))
+          for k, v in {"PGUSER": unquote(user), "PGPASSWORD": password, "PGHOST": host,
+                       "PGPORT": port or "5432", "PGDATABASE": db, "PGSSLMODE": "require"}.items():
+              print(f"export {k}={shlex.quote(v)}")
+          PY
+          )"
+          # délais max : connexion 20 s, attente d'un verrou 5 s (pour ne jamais bloquer les membres
+          # longtemps), instruction 2 min
+          export PGCONNECT_TIMEOUT=20 PGOPTIONS="-c lock_timeout=5s -c statement_timeout=120s"
+          echo "Connexion à $PGHOST:$PGPORT en tant que $PGUSER"
+          for attempt in 1 2 3; do
+            start=$(date +%s)
+            if psql -v ON_ERROR_STOP=1 -q -f supabase/schema.sql; then
+              echo "✅ Base de données à jour en $(( $(date +%s) - start )) s (essai $attempt)"
+              break
+            fi
+            if [ "$attempt" = 3 ]; then echo "::error::Mise à jour impossible après 3 essais"; exit 1; fi
+            echo "::warning::Essai $attempt interrompu (table occupée ?), nouvel essai dans 20 s"
+            sleep 20
+          done
+          # e-mails : clé partagée avec le service Cloudflare, dérivée de la clé Brevo
+          KEY=$(printf '%s' "$BREVO_API_KEY" | tr -d '[:space:]')
+          if [ -n "$KEY" ]; then
+            NOTIFY_SECRET=$(printf 'cyclami-notify:%s' "$KEY" | sha256sum | cut -d' ' -f1)
+            echo "::add-mask::$NOTIFY_SECRET"
+            psql -v ON_ERROR_STOP=1 -q -v secret="$NOTIFY_SECRET" <<'SQL'
+          insert into private.settings (key, value) values ('notify_secret', :'secret')
+          on conflict (key) do update set value = excluded.value;
+          SQL
+            echo "✅ E-mails de notification activés"
+          else
+            echo "::warning::Secret BREVO_API_KEY absent : les e-mails de notification ne sont pas activés."
+          fi

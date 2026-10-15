@@ -1,0 +1,74 @@
+# Sauvegarde chiffrée de la base de données, chaque nuit (l'offre gratuite de Supabase n'en fait pas).
+# Le fichier est chiffré (GPG, AES-256) puis gardé 30 jours dans les « artefacts » du workflow.
+# Phrase secrète : secret GitHub BACKUP_PASSPHRASE (sinon dérivée de SUPABASE_DB_URL).
+# Restauration : voir README, section « Sauvegardes ».
+name: Sauvegarde base de données
+
+on:
+  schedule:
+    - cron: '43 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Sauvegarder et chiffrer
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          [ -n "$SUPABASE_DB_URL" ] || { echo "::error::Secret SUPABASE_DB_URL absent"; exit 1; }
+          eval "$(python3 - <<'PY'
+          import os, shlex
+          from urllib.parse import unquote
+          url = os.environ["SUPABASE_DB_URL"].strip()
+          for prefix in ("postgresql://", "postgres://"):
+              if url.startswith(prefix):
+                  url = url[len(prefix):]
+                  break
+          creds, _, rest = url.rpartition("@")
+          user, _, password = creds.partition(":")
+          if password.startswith("[") and password.endswith("]"):
+              password = password[1:-1]
+          hostport, _, db = rest.partition("/")
+          host, _, port = hostport.partition(":")
+          print("echo ::add-mask::" + shlex.quote(password))
+          for k, v in {"PGUSER": unquote(user), "PGPASSWORD": password, "PGHOST": host,
+                       "PGPORT": port or "5432", "PGDATABASE": db.split("?")[0] or "postgres",
+                       "PGSSLMODE": "require"}.items():
+              print(f"export {k}={shlex.quote(v)}")
+          PY
+          )"
+          export PGCONNECT_TIMEOUT=20
+          # client PostgreSQL de la même version majeure que le serveur
+          sudo apt-get install -y -q postgresql-common >/dev/null
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y >/dev/null
+          MAJOR=$(psql -X -At -c "show server_version_num" | cut -c1-2)
+          echo "Serveur PostgreSQL $MAJOR"
+          sudo apt-get install -y -q "postgresql-client-$MAJOR" >/dev/null
+          PG_DUMP="/usr/lib/postgresql/$MAJOR/bin/pg_dump"
+          STAMP=$(date -u +%Y-%m-%d)
+          # données des membres : schémas public, private et comptes (auth), stockage (métadonnées)
+          "$PG_DUMP" --no-owner --no-privileges --schema=public --schema=private --schema=auth --schema=storage \
+            --format=custom --file="cyclami-$STAMP.dump"
+          ls -lh "cyclami-$STAMP.dump"
+          PASS="$BACKUP_PASSPHRASE"
+          if [ -z "$PASS" ]; then
+            echo "::warning::Secret BACKUP_PASSPHRASE absent : phrase secrète dérivée de SUPABASE_DB_URL (à garder si le mot de passe change)."
+            PASS=$(printf 'cyclami-backup:%s' "$SUPABASE_DB_URL" | sha256sum | cut -d' ' -f1)
+          fi
+          echo "::add-mask::$PASS"
+          printf '%s' "$PASS" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 \
+            --symmetric --cipher-algo AES256 -o "cyclami-$STAMP.dump.gpg" "cyclami-$STAMP.dump"
+          rm "cyclami-$STAMP.dump"
+          echo "STAMP=$STAMP" >> "$GITHUB_ENV"
+
+      - name: Garder 30 jours
+        uses: actions/upload-artifact@v4
+        with:
+          name: sauvegarde-${{ env.STAMP }}
+          path: cyclami-${{ env.STAMP }}.dump.gpg
+          retention-days: 30
+          if-no-files-found: error

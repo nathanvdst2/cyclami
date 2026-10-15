@@ -1,0 +1,41 @@
+# Vérifie chaque modification : le site doit se construire et toutes les pages
+# doivent s'afficher sans erreur (test dans un vrai navigateur, base simulée).
+name: Vérification du site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Tester le service photos (Cloudflare)
+        run: node cloudflare/photos-worker/test/worker.test.mjs
+      - name: Aperçu des liens partagés
+        run: node tests/share-preview.test.mjs
+      - name: Construire le site
+        run: npm run build
+      - name: Installer Chromium
+        run: npx playwright-core install --with-deps chromium
+      - name: Tester la photo de profil réservée
+        run: node tests/reserved-avatar.test.mjs
+      - name: Tester toutes les pages
+        run: npm run test:smoke
+        env:
+          SHOTS_DIR: shots
+      - name: Garder les captures d'écran en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: captures
+          path: shots

@@ -1,0 +1,39 @@
+# Contrôle du site vu de l'extérieur, comme Google : robots.txt, plan du site (sitemap.xml) et quelques pages publiques.
+# À lancer à la demande (Actions → « Contrôle du site » → Run workflow), par exemple si Search Console
+# indique « Impossible de récupérer le sitemap ».
+name: Contrôle du site
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Interroger le site comme Googlebot
+        run: |
+          UA='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+          fail=0
+          for u in https://cyclami.com/robots.txt https://cyclami.com/sitemap.xml https://cyclami.com/ https://cyclami.com/adoptions https://www.cyclami.com/sitemap.xml; do
+            echo "::group::$u"
+            curl -sS -A "$UA" -o /tmp/body -D /tmp/head -w 'HTTP %{http_code} — %{size_download} octets — %{time_total}s\n' --max-time 30 "$u" || fail=1
+            cat /tmp/head
+            head -c 800 /tmp/body; echo
+            # texte écrit pour Google : masqué pour les visiteurs pendant le chargement ?
+            if grep -q 'id="ssr"' /tmp/body; then grep -q 'js #ssr{visibility:hidden}' /tmp/body && echo "Texte pour Google : masqué ✅" || echo "Texte pour Google : VISIBLE ❌"; fi
+            echo "::endgroup::"
+          done
+          curl -sS -A "$UA" --max-time 30 -o /tmp/sitemap.xml -w '%{http_code}' https://cyclami.com/sitemap.xml > /tmp/code || true
+          echo "Code du plan du site : $(cat /tmp/code)"
+          python3 - <<'PY' || fail=1
+          import xml.etree.ElementTree as ET
+          root = ET.parse("/tmp/sitemap.xml").getroot()
+          ns = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
+          locs = [e.text for e in root.iter(ns + "loc")]
+          print("XML valide :", len(locs), "adresses")
+          print("\n".join(locs[:10]))
+          assert locs, "aucune adresse dans le plan du site"
+          PY
+          [ "$(cat /tmp/code)" = 200 ] || fail=1
+          exit $fail

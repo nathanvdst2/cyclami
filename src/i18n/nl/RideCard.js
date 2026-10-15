@@ -1,0 +1,21 @@
+// Traductions néerlandaises de src/components/RideCard.jsx
+export default {
+  'Chaque semaine · {n} date à venir': 'Elke week · {n} geplande datum',
+  'Chaque semaine · {n} dates à venir': 'Elke week · {n} geplande data',
+  'Itinéraire': 'Route',
+  'par': 'door',
+  'toi': 'jou',
+  'Modifier': 'Bewerken',
+  'Annuler cette sortie ? Les participants seront prévenus.': 'Deze fietstocht annuleren? De deelnemers krijgen een bericht.',
+  'Annuler la sortie': 'Fietstocht annuleren',
+  'Me désinscrire': 'Uitschrijven',
+  'Complet': 'Volzet',
+  'Je viens !': 'Ik kom!',
+  'Toutes les semaines': 'Elke week',
+  'Salut {name}, à propos de « {title} »… ': 'Hoi {name}, over “{title}”… ',
+  'Contacter': 'Contacteren',
+  'Annuler les {n} dates à venir de cette série ? Les participants seront prévenus.': 'De {n} geplande data van deze reeks annuleren? De deelnemers krijgen een bericht.',
+  'Annuler toute la série': 'Hele reeks annuleren',
+  'Météo prévue': 'Weersverwachting',
+  'Pense au manteau de pluie 🧥': 'Denk aan het regenjasje 🧥',
+};

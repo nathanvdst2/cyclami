@@ -1,0 +1,21 @@
+// Traductions néerlandaises de src/components/UserActions.jsx
+export default {
+  'Bloquer {name} ? Vous ne pourrez plus vous écrire et vous ne verrez plus ses contenus.': '{name} blokkeren? Jullie kunnen elkaar dan geen berichten meer sturen en je ziet de inhoud van deze persoon niet meer.',
+  'Plus d’options': 'Meer opties',
+  'Signaler la conversation': 'Gesprek melden',
+  'Signaler le profil': 'Profiel melden',
+  'Bloquer': 'Blokkeren',
+  'Avertissement envoyé.': 'Waarschuwing verstuurd.',
+  'Suspendre {name} pendant combien de jours ? (1 à 365)': 'Hoeveel dagen {name} schorsen? (1 tot 365)',
+  'Membre suspendu.': 'Lid geschorst.',
+  'Suspension levée.': 'Schorsing opgeheven.',
+  'Dernière confirmation : bannir {name} ? Cette action est irréversible.': 'Laatste bevestiging: {name} verbannen? Dit kan niet ongedaan worden gemaakt.',
+  'Membre banni.': 'Lid verbannen.',
+  'Suspendre…': 'Schorsen…',
+  'Bannir définitivement': 'Definitief verbannen',
+  'Signaler la photo de profil': 'Profielfoto melden',
+  'Supprimer le compte de {name} ?\n\nSon profil, ses animaux, publications, messages et photos seront effacés. Contrairement au bannissement, cette adresse pourra se réinscrire.': 'Het account van {name} verwijderen?\n\nZijn profiel, dieren, berichten, publicaties en foto\'s worden gewist. In tegenstelling tot een verbanning kan dit adres zich opnieuw inschrijven.',
+  'Dernière confirmation : supprimer définitivement le compte de {name} ?': 'Laatste bevestiging: het account van {name} definitief verwijderen?',
+  'Compte supprimé.': 'Account verwijderd.',
+  'Supprimer le compte': 'Account verwijderen',
+};

@@ -1,0 +1,21 @@
+// Traductions anglaises de src/components/UserActions.jsx
+export default {
+  'Bloquer {name} ? Vous ne pourrez plus vous écrire et vous ne verrez plus ses contenus.': 'Block {name}? You won’t be able to message each other any more and you won’t see their content.',
+  'Plus d’options': 'More options',
+  'Signaler la conversation': 'Report conversation',
+  'Signaler le profil': 'Report profile',
+  'Bloquer': 'Block',
+  'Avertissement envoyé.': 'Warning sent.',
+  'Suspendre {name} pendant combien de jours ? (1 à 365)': 'Suspend {name} for how many days? (1 to 365)',
+  'Membre suspendu.': 'Member suspended.',
+  'Suspension levée.': 'Suspension lifted.',
+  'Dernière confirmation : bannir {name} ? Cette action est irréversible.': 'Final confirmation: ban {name}? This can’t be undone.',
+  'Membre banni.': 'Member banned.',
+  'Suspendre…': 'Suspend…',
+  'Bannir définitivement': 'Ban permanently',
+  'Signaler la photo de profil': 'Report profile picture',
+  'Supprimer le compte de {name} ?\n\nSon profil, ses animaux, publications, messages et photos seront effacés. Contrairement au bannissement, cette adresse pourra se réinscrire.': 'Delete {name}’s account?\n\nTheir profile, pets, posts, messages and photos will be erased. Unlike a ban, this address will be able to sign up again.',
+  'Dernière confirmation : supprimer définitivement le compte de {name} ?': 'Final confirmation: permanently delete {name}’s account?',
+  'Compte supprimé.': 'Account deleted.',
+  'Supprimer le compte': 'Delete account',
+};

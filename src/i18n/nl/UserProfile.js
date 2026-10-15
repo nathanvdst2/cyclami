@@ -1,0 +1,20 @@
+// Traductions néerlandaises de src/pages/UserProfile.jsx
+export default {
+  'Ce profil n’est pas disponible.': 'Dit profiel is niet beschikbaar.',
+  'Retour': 'Terug',
+  'à {distance}': 'op {distance}',
+  'Membre depuis {date}': 'Lid sinds {date}',
+  '{score}% compatible avec {name}': '{score}% compatibel met {name}',
+  'Modifier mon profil': 'Mijn profiel bewerken',
+  'Salut {name} ! Ça te dirait une sortie entre {myPet} et {pets} ? 🚴': 'Hoi {name}! Zin in een fietstocht met {myPet} en {pets}? 🚴',
+  'Proposer une sortie': 'Een fietstocht voorstellen',
+  'Message': 'Bericht',
+  'Ses animaux': 'Zijn of haar dieren',
+  'Son animal': 'Zijn of haar dier',
+  'Sorties à venir': 'Komende fietstochten',
+  'Publications': 'Berichten',
+  'abonnés': 'volgers',
+  'abonnements': 'volgend',
+  'Te suit': 'Volgt jou',
+  'mon animal': 'mijn dier',
+};

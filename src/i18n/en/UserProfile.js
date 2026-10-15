@@ -1,0 +1,20 @@
+// Traductions anglaises de src/pages/UserProfile.jsx
+export default {
+  'Ce profil n’est pas disponible.': 'This profile isn’t available.',
+  'Retour': 'Back',
+  'à {distance}': '{distance} away',
+  'Membre depuis {date}': 'Member since {date}',
+  '{score}% compatible avec {name}': '{score}% compatible with {name}',
+  'Modifier mon profil': 'Edit my profile',
+  'Salut {name} ! Ça te dirait une sortie entre {myPet} et {pets} ? 🚴': 'Hi {name}! Fancy a ride with {myPet} and {pets}? 🚴',
+  'Proposer une sortie': 'Suggest a ride',
+  'Message': 'Message',
+  'Ses animaux': 'Their pets',
+  'Son animal': 'Their pet',
+  'Sorties à venir': 'Upcoming rides',
+  'Publications': 'Posts',
+  'abonnés': 'followers',
+  'abonnements': 'following',
+  'Te suit': 'Follows you',
+  'mon animal': 'my pet',
+};
