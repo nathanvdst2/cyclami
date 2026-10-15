@@ -1,8 +1,9 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useApp } from '../context/AppContext.jsx';
+import { LEVELS, RIDE_TYPES, levelInfo, rideType } from '../data/constants.js';
 import { formatDate } from '../utils/geo.js';
-import RideCard from '../components/RideCard.jsx';
+import RideCard, { formatRideDuration } from '../components/RideCard.jsx';
 import ViewToggle from '../components/ViewToggle.jsx';
 import RideForm from '../components/RideForm.jsx';
 import { ReviewPrompts } from '../components/Reviews.jsx';
@@ -14,11 +15,34 @@ import InviteNeighbors from '../components/InviteNeighbors.jsx';
 
 const MapView = lazy(() => import('../components/MapView.jsx'));
 
+// Filtre de distance : [id, libellé, min (km), max (km)]
+const DISTANCES = [
+  ['short', t('Moins de 40 km'), 0, 40],
+  ['mid', t('40 à 80 km'), 40, 80],
+  ['long', t('80 à 120 km'), 80, 120],
+  ['xl', t('Plus de 120 km'), 120, Infinity],
+];
+const NO_FILTERS = { type: '', level: '', noDrop: false, dist: '' };
+
+const matches = (w, f) => {
+  if (f.type && w.type !== f.type) return false;
+  if (f.level && w.level !== f.level) return false;
+  if (f.noDrop && !w.noDrop) return false;
+  if (f.dist) {
+    const [, , min, max] = DISTANCES.find((d) => d[0] === f.dist) || [];
+    if (w.distanceKm == null || w.distanceKm < min || w.distanceKm >= max) return false;
+  }
+  return true;
+};
+
 export default function Rides({ go, params = {} }) {
   const { rides: allRides, currentUser, actions } = useApp();
   const [tab, setTab] = usePageState('rides:tab', 'all');
   const [view, setView] = usePageState('rides:view', 'list');
   const [creating, setCreating] = usePageState('rides:creating', false);
+  const [filters, setFilters] = usePageState('rides:filters', NO_FILTERS);
+  const filtering = filters.type || filters.level || filters.noDrop || filters.dist;
+  const setFilter = (k, v) => setFilters((f) => ({ ...f, [k]: v }));
   // « Proposer une sortie ici » depuis un lieu de la carte (ici ou depuis Découvrir)
   const [preset, setPreset] = useState(params.newRideAt || null);
   useEffect(() => { if (params.newRideAt) { setPreset(params.newRideAt); setCreating(true); } }, [params.newRideAt]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -27,13 +51,14 @@ export default function Rides({ go, params = {} }) {
   const me = currentUser.id;
   // sortie choisie (lien partagé, bulle de la carte) : on l'affiche en tête de la liste
   useEffect(() => {
-    if (params.rideId) { setView('list'); setTab('all'); }
+    if (params.rideId) { setView('list'); setTab('all'); setFilters(NO_FILTERS); }
   }, [params.rideId]);
 
   const now = Date.now();
   const rides = allRides
     .filter((w) => new Date(w.date).getTime() > now - 3600_000)
-    .filter((w) => tab === 'all' || w.participants.includes(me))
+    .filter((w) => tab === 'all' || w.participants.includes(me) || w.hostId === me)
+    .filter((w) => w.id === params.rideId || matches(w, filters))
     .sort((a, b) => a.date.localeCompare(b.date))
     // sortie ouverte depuis un lien partagé : en premier
     .sort((a, b) => (b.id === params.rideId) - (a.id === params.rideId));
@@ -62,6 +87,32 @@ export default function Rides({ go, params = {} }) {
         <ViewToggle view={view} setView={setView} calendar />
       </div>
 
+      <div className="space-y-2">
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t('Type de sortie')}>
+          {[['', t('Tous les types'), ''], ...RIDE_TYPES.map((x) => [x.id, x.label, x.emoji])].map(([id, label, emoji]) => (
+            <button key={id || 'all'} onClick={() => setFilter('type', id)} aria-pressed={filters.type === id}
+              className={`chip ${filters.type === id ? 'bg-teal-500 text-white ring-teal-500' : 'bg-white text-stone-600 ring-emerald-200'}`}>
+              {emoji && `${emoji} `}{label}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <select className="input w-auto py-1 text-sm" value={filters.level} onChange={(e) => setFilter('level', e.target.value)} aria-label={t('Niveau')}>
+            <option value="">{t('Tous les niveaux')}</option>
+            {LEVELS.map((l) => <option key={l.id} value={l.id}>{l.emoji} {l.label}</option>)}
+          </select>
+          <select className="input w-auto py-1 text-sm" value={filters.dist} onChange={(e) => setFilter('dist', e.target.value)} aria-label={t('Distance')}>
+            <option value="">{t('Toutes les distances')}</option>
+            {DISTANCES.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+          </select>
+          <button onClick={() => setFilter('noDrop', !filters.noDrop)} aria-pressed={filters.noDrop}
+            className={`chip ${filters.noDrop ? 'bg-teal-500 text-white ring-teal-500' : 'bg-white text-stone-600 ring-emerald-200'}`}>
+            🤝 {t('Pas de lâchage')}
+          </button>
+          {filtering && <button className="text-xs text-stone-500 underline" onClick={() => setFilters(NO_FILTERS)}>{t('Effacer les filtres')}</button>}
+        </div>
+      </div>
+
       <p className="rounded-xl bg-emerald-100/60 px-3 py-2 text-xs text-stone-600">
         🛡️ {t('Donne rendez-vous dans un lieu public et préviens un proche.')}{' '}
         <button className="underline" onClick={() => go('legal', { doc: 'safety', back: 'rides' })}>{t('Conseils de sécurité')}</button>
@@ -82,15 +133,22 @@ export default function Rides({ go, params = {} }) {
         />
       )}
 
-      {rides.length === 0 && view === 'list' && (
+      {rides.length === 0 && filtering && (
+        <div className="card space-y-2 text-center text-sm text-stone-500">
+          <p>{t('Aucune sortie ne correspond à tes filtres.')}</p>
+          <button className="btn-ghost mx-auto" onClick={() => setFilters(NO_FILTERS)}>{t('Effacer les filtres')}</button>
+        </div>
+      )}
+
+      {rides.length === 0 && !filtering && view === 'list' && (
         <>
-          <EmptyState name="sorties-vide">{t('Aucune sortie prévue. Lance-toi et organise la première ! 🌳')}</EmptyState>
-          <InviteNeighbors go={go} shareText={t('Je cherche des compagnons de sortie pour mon animal près de chez moi, rejoins-moi sur Cyclami 🚴')} />
+          <EmptyState name="sorties-vide">{t('Aucune sortie prévue. Lance-toi et organise la première ! 🚴')}</EmptyState>
+          <InviteNeighbors go={go} shareText={t('Je cherche des cyclistes de mon niveau près de chez moi pour rouler ensemble. Rejoins-moi sur Cyclami 🚴')} />
         </>
       )}
 
-      {view === 'map' && rides.length === 0 && (
-        <p className="text-sm text-stone-500">{t('Aucune sortie prévue. Lance-toi et organise la première ! 🌳')}</p>
+      {view === 'map' && rides.length === 0 && !filtering && (
+        <p className="text-sm text-stone-500">{t('Aucune sortie prévue. Lance-toi et organise la première ! 🚴')}</p>
       )}
 
       {view === 'map' && (
@@ -105,12 +163,13 @@ export default function Rides({ go, params = {} }) {
             markers={onMap.map((w) => ({
               id: w.id,
               coords: w.coords,
-              emoji: '🌳',
+              emoji: rideType(w.type).emoji,
               highlight: w.participants.includes(me),
               popup: (
                 <div className="space-y-1 text-sm">
                   <button type="button" className="block text-left font-bold hover:underline" onClick={() => go('rides', { rideId: w.id })}>{w.title}</button>
                   <div className="text-stone-500">{formatDate(w.date)} · {w.participants.length}/{w.maxParticipants}</div>
+                  <div className="text-stone-500">{rideSummary(w)}</div>
                   <button type="button" className="block text-left text-stone-500 underline decoration-dotted hover:text-teal-600"
                     onClick={() => go('rides', { rideId: w.id })}>{w.place}</button>
                   <button type="button" className="font-semibold text-teal-600" onClick={() => go('rides', { rideId: w.id })}>
@@ -126,12 +185,22 @@ export default function Rides({ go, params = {} }) {
         </Suspense>
       )}
 
-      {view === 'list' && tab === 'all' && !creating && <ExampleRide onCreate={() => { setCreating(true); window.scrollTo(0, 0); }} />}
+      {view === 'list' && tab === 'all' && !creating && !filtering && <ExampleRide onCreate={() => { setCreating(true); window.scrollTo(0, 0); }} />}
       {sharedMissing && <div className="card text-center text-sm text-stone-500">{t('Cette sortie est terminée ou a été annulée.')}</div>}
       {view === 'list' && rides.map((w) => <RideCard key={w.id} ride={w} go={go} highlight={w.id === params.rideId} />)}
       {view === 'calendar' && <RideCalendar rides={rides} me={me} onOpen={(id) => { setView('list'); go('rides', { rideId: id }); }} />}
     </div>
   );
+}
+
+// « Intermédiaire · 62 km · 23 km/h · 🤝 »
+function rideSummary(w) {
+  return [
+    levelInfo(w.level)?.label,
+    w.distanceKm != null && `${Number(w.distanceKm).toLocaleString(locale(), { maximumFractionDigits: 1 })} km`,
+    w.avgSpeed != null && `${Number(w.avgSpeed).toLocaleString(locale(), { maximumFractionDigits: 1 })} km/h`,
+    w.noDrop && '🤝',
+  ].filter(Boolean).join(' · ');
 }
 
 // Vue calendrier : les sorties à venir regroupées par jour.
@@ -160,7 +229,7 @@ function RideCalendar({ rides, me, onOpen }) {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-semibold text-stone-800">{w.title}</span>
-                <span className="block truncate text-xs text-stone-500">📍 {w.place} · {w.duration} min</span>
+                <span className="block truncate text-xs text-stone-500">{rideType(w.type).emoji} {rideSummary(w)} · 📍 {w.place} · {formatRideDuration(w.duration)}</span>
               </span>
               <span className="shrink-0 text-xs text-stone-500">
                 {w.participants.includes(me) || w.hostId === me ? '✅ ' : ''}{w.participants.length}/{w.maxParticipants}

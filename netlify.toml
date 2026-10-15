@@ -1,0 +1,72 @@
+# Configuration Netlify de Cyclami (lue automatiquement à chaque déploiement).
+# Les secrets (clé Brevo, etc.) ne sont JAMAIS ici : Netlify → Site configuration →
+# Environment variables (voir README, « Mise en ligne pas à pas »).
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Fonctions serveur (e-mails, notifications push, lieux utiles…), servies sous /api/*.
+# Chaque fichier déclare son adresse (export const config = { path: '/api/…' }).
+[functions]
+  directory = "netlify/functions"
+
+# Fonction « edge » d'aperçu des liens partagés : netlify/edge-functions/share.js.
+# Ses adresses sont déclarées dans le fichier lui-même (export const config = { path: [...] }).
+# Les règles de réécriture (pages publiques, 404) sont dans public/_redirects.
+
+# ---- En-têtes de sécurité (toutes les pages) ----
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    # position (carte, suivi GPS), caméra et micro (vérification du profil, messages vocaux) : ce site uniquement
+    Permissions-Policy = "geolocation=(self), camera=(self), microphone=(self), payment=(), usb=(), interest-cohort=()"
+    Cross-Origin-Opener-Policy = "same-origin-allow-popups"
+
+# ---- Cache ----
+# Fichiers du site construits par Vite : leur nom change à chaque modification → cache d'un an.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Service worker et manifeste : toujours revérifiés (mise à jour rapide de l'application installée).
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+    Service-Worker-Allowed = "/"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+# Logos, icônes et illustrations : une semaine (changer le ?v= dans le code quand une image est retouchée).
+[[headers]]
+  for = "/illustrations/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
