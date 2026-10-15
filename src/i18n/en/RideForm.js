@@ -39,7 +39,7 @@ export default {
   'Répéter chaque semaine': 'Repeat every week',
   'Nombre de semaines': 'Number of weeks',
   'pendant {n} semaines': 'for {n} weeks',
-  'La sortie (titre, lieu, date, niveau, parcours, description) est aussi visible sans compte sur cyclami.com/sorties, sans ton nom ni celui des participants.': 'The ride (title, place, date, level, route, description) is also visible without an account at cyclami.com/sorties, without your name or the participants’ names.',
+  'La sortie (titre, lieu, date, niveau, parcours, description) est aussi visible sans compte sur la page publique « Sorties », sans ton nom ni celui des participants.': 'The ride (title, place, date, level, route, description) is also visible without an account on the public “Rides” page, without your name or the participants’ names.',
   'Enregistrement…': 'Saving…',
   'Enregistrer (cette date uniquement)': 'Save (this date only)',
   'Enregistrer les modifications': 'Save changes',

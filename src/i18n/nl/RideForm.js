@@ -39,7 +39,7 @@ export default {
   'Répéter chaque semaine': 'Elke week herhalen',
   'Nombre de semaines': 'Aantal weken',
   'pendant {n} semaines': 'gedurende {n} weken',
-  'La sortie (titre, lieu, date, niveau, parcours, description) est aussi visible sans compte sur cyclami.com/sorties, sans ton nom ni celui des participants.': 'De fietstocht (titel, plaats, datum, niveau, route, beschrijving) is ook zonder account zichtbaar op cyclami.com/sorties, zonder jouw naam of die van de deelnemers.',
+  'La sortie (titre, lieu, date, niveau, parcours, description) est aussi visible sans compte sur la page publique « Sorties », sans ton nom ni celui des participants.': 'De fietstocht (titel, plaats, datum, niveau, route, beschrijving) is ook zonder account zichtbaar op de openbare pagina « Ritten », zonder jouw naam of die van de deelnemers.',
   'Enregistrement…': 'Opslaan…',
   'Enregistrer (cette date uniquement)': 'Opslaan (alleen deze datum)',
   'Enregistrer les modifications': 'Wijzigingen opslaan',

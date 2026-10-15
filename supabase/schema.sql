@@ -335,10 +335,7 @@ drop policy if exists "déposer ses photos" on storage.objects;
 create policy "déposer ses photos" on storage.objects
   for insert to authenticated
   with check (bucket_id = 'photos' and (storage.foldername(name))[1] = auth.uid()::text);
-drop policy if exists "supprimer ses photos" on storage.objects;
-create policy "supprimer ses photos" on storage.objects
-  for delete to authenticated
-  using (bucket_id = 'photos' and owner_id = auth.uid()::text);
+-- (suppression : règle plus bas, après public.is_staff)
 
 -- ---------- Temps réel (messagerie) -----------------------------------
 
@@ -769,6 +766,18 @@ create policy "admins suppriment les commentaires" on public.comments
 drop policy if exists "admins suppriment les sorties" on public.rides;
 create policy "admins suppriment les sorties" on public.rides
   for delete to authenticated using (public.is_staff());
+
+-- Photos publiques (Supabase Storage) : chacun liste son dossier (suppression de son compte),
+-- l'administration liste n'importe quel dossier (compte supprimé) ; l'équipe peut effacer
+-- une photo retirée par la modération.
+drop policy if exists "lister ses photos" on storage.objects;
+create policy "lister ses photos" on storage.objects
+  for select to authenticated
+  using (bucket_id = 'photos' and ((storage.foldername(name))[1] = auth.uid()::text or public.is_admin()));
+drop policy if exists "supprimer ses photos" on storage.objects;
+create policy "supprimer ses photos" on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'photos' and (owner_id = auth.uid()::text or (storage.foldername(name))[1] = auth.uid()::text or public.is_staff()));
 
 -- Nommer (role = 'moderator') ou retirer (role = null) un modérateur : admin uniquement.
 create or replace function public.admin_set_moderator(target uuid, make_moderator boolean)

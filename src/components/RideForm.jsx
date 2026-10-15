@@ -317,7 +317,7 @@ export default function RideForm({ center, initial, preset, onClose, onSubmit })
       )}
       {error && <p className="text-sm text-red-600">{error}</p>}
       {!editing && <CooldownNote kind="ride" />}
-      <p className="text-xs text-stone-500">🌍 {t('La sortie (titre, lieu, date, niveau, parcours, description) est aussi visible sans compte sur cyclami.com/sorties, sans ton nom ni celui des participants.')}</p>
+      <p className="text-xs text-stone-500">🌍 {t('La sortie (titre, lieu, date, niveau, parcours, description) est aussi visible sans compte sur la page publique « Sorties », sans ton nom ni celui des participants.')}</p>
       <button className="btn-primary w-full" disabled={saving}>{saving ? t('Enregistrement…') : editing ? (initial.seriesId ? t('Enregistrer (cette date uniquement)') : t('Enregistrer les modifications')) : form.repeatWeeks > 1 ? t('Publier les {n} sorties', { n: form.repeatWeeks }) : t('Publier la sortie')}</button>
     </form>
   );
