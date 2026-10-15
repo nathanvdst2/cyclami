@@ -1,8 +1,8 @@
 // Traductions néerlandaises de src/pages/Public.jsx (pages publiques)
 export default {
-  'Aucune sortie prévue pour le moment : organise la première !': 'Nog geen rit gepland: organiseer de eerste!',
+  'Aucune sortie prévue pour le moment : organise la première !': 'Momenteel geen fietstochten gepland: organiseer de eerste!',
   'Cette sortie est terminée ou n’existe plus.': 'Deze rit is voorbij of bestaat niet meer.',
-  'Toutes les sorties': 'Alle ritten',
+  'Toutes les sorties': 'Alle fietstochten',
   'Participer (inscription gratuite)': 'Meerijden (gratis inschrijving)',
   'Questions fréquentes': 'Veelgestelde vragen',
   'Cette page n’existe pas.': 'Deze pagina bestaat niet.',
@@ -14,7 +14,7 @@ export default {
   'Rejoins les cyclistes de ta région': 'Sluit je aan bij de fietsers uit je regio',
   'Trouve des cyclistes de ton niveau et rejoins des sorties de groupe près de chez toi : c’est gratuit.': 'Vind fietsers van jouw niveau en rij mee in groepsritten bij jou in de buurt: het is gratis.',
   'Voir les sorties à venir': 'Komende ritten bekijken',
-  'Sorties à venir': 'Komende ritten',
+  'Sorties à venir': 'Komende fietstochten',
   'Conseils de sécurité': 'Veiligheidstips',
   '{n} km/h': '{n} km/u',
   'Pas de lâchage': 'Niemand wordt gelost',

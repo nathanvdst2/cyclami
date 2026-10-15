@@ -20,6 +20,6 @@ export default {
   'Motif de refus': 'Rejection reason',
   'Motif de refus (si refus)…': 'Rejection reason (if rejecting)…',
   'Vérifier le profil': 'Verify profile',
-  'Refuser': 'Reject',
+  'Refuser': 'Decline',
   'La vidéo est supprimée dès ta décision.': 'The video is deleted as soon as you decide.',
 };

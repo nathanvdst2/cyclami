@@ -47,7 +47,11 @@ export default function Rides({ go, params = {} }) {
   const [preset, setPreset] = useState(params.newRideAt || null);
   useEffect(() => { if (params.newRideAt) { setPreset(params.newRideAt); setCreating(true); } }, [params.newRideAt]); // eslint-disable-line react-hooks/exhaustive-deps
   // « Organiser une sortie » depuis l'accueil : le formulaire s'ouvre directement
-  useEffect(() => { if (params.create) setCreating(true); }, [params.create]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!params.create) return;
+    if (params.groupId) setPreset({ groupId: params.groupId });
+    setCreating(true);
+  }, [params.create, params.groupId]); // eslint-disable-line react-hooks/exhaustive-deps
   const me = currentUser.id;
   // sortie choisie (lien partagé, bulle de la carte) : on l'affiche en tête de la liste
   useEffect(() => {

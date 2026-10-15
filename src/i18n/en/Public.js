@@ -1,6 +1,6 @@
 // Traductions anglaises de src/pages/Public.jsx (pages publiques)
 export default {
-  'Aucune sortie prévue pour le moment : organise la première !': 'No ride planned yet: organise the first one!',
+  'Aucune sortie prévue pour le moment : organise la première !': 'No rides planned yet: organise the first one!',
   'Cette sortie est terminée ou n’existe plus.': 'This ride is over or no longer exists.',
   'Toutes les sorties': 'All rides',
   'Participer (inscription gratuite)': 'Join (free sign-up)',
@@ -18,7 +18,7 @@ export default {
   'Conseils de sécurité': 'Safety tips',
   '{n} km/h': '{n} km/h',
   'Pas de lâchage': 'No-drop',
-  'Type de sortie': 'Ride type',
+  'Type de sortie': 'Type of ride',
   'Toutes': 'All',
   'Cyclami n’organise pas les sorties : chacun roule sous sa propre responsabilité. Casque recommandé et code de la route de rigueur.': 'Cyclami does not organise the rides: everyone rides at their own risk. Helmets recommended; the rules of the road always apply.',
   'Sorties vélo à venir': 'Upcoming bike rides',

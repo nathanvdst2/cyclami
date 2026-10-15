@@ -61,9 +61,12 @@ export default function RideForm({ center, initial, preset, onClose, onSubmit })
   const [coords, setCoords, clearCoords] = useDraft(`ride:${initial?.id || 'new'}:coords`, initial?.coords || null);
   useEffect(() => {
     if (!preset) return;
+    // « Organiser une sortie du groupe » : le groupe est choisi d'avance
+    if (preset.groupId) setForm((f) => ({ ...f, groupId: preset.groupId }));
+    if (!Number.isFinite(preset.lat)) return;
     setCoords({ lat: preset.lat, lng: preset.lng });
     if (preset.name) setForm((f) => ({ ...f, place: preset.name.slice(0, 150) }));
-  }, [preset?.lat, preset?.lng]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [preset?.lat, preset?.lng, preset?.groupId]); // eslint-disable-line react-hooks/exhaustive-deps
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [saving, setSaving] = useState(false);
