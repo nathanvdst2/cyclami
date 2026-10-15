@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext.jsx';
 import ReportDialog from './ReportDialog.jsx';
 import { t } from '../i18n/index.js';
 
-// Petit drapeau pour signaler un contenu (publication, commentaire, sortie).
+// Petit drapeau pour signaler un contenu (publication, commentaire, sortie, danger…).
 export function ReportButton({ type, id, userId, size = 16, className = '' }) {
   const { ownerId } = useApp();
   const [open, setOpen] = useState(false);

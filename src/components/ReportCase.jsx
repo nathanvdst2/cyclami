@@ -6,11 +6,12 @@ import { t } from '../i18n/index.js';
 import ConversationSnapshot from './ConversationSnapshot.jsx';
 
 const TYPE_LABEL = {
-  user: t('Profil'), post: t('Publication'), comment: t('Commentaire'), ride: t('Sortie'), conversation: t('Conversation privée'), listing: t('Annonce'),
-  forum_topic: t('Sujet du forum'), forum_reply: t('Réponse du forum'), group: t('Groupe'), group_message: t('Message de groupe'), avatar: t('Photo de profil'), gear: t('Matériel entre voisins'), chat_message: t('Message du tchat général'),
+  user: t('Profil'), post: t('Publication'), comment: t('Commentaire'), ride: t('Sortie'), conversation: t('Conversation privée'),
+  forum_topic: t('Sujet du forum'), forum_reply: t('Réponse du forum'), group: t('Club ou groupe'), group_message: t('Message de groupe'), avatar: t('Photo de profil'),
+  chat_message: t('Message du tchat général'), hazard: t('Danger signalé'),
 };
 const CATEGORY_LABEL = Object.fromEntries(REPORT_CATEGORIES);
-const SERIOUS = new Set(['maltraitance', 'danger', 'harcelement']);
+const SERIOUS = new Set(['danger', 'harcelement', 'conduite_dangereuse']);
 
 // Un « dossier » : tous les signalements qui visent le même contenu (ou le même profil).
 export default function ReportCase({ reports, memberName, member, go, onDone }) {
@@ -25,7 +26,7 @@ export default function ReportCase({ reports, memberName, member, go, onDone }) 
   const { target_type: type, target_id: targetId, reported_id: authorId } = first;
   const categories = [...new Set(reports.map((r) => r.category))];
   const canSanction = authorId && authorId !== currentUser.id && !staffRoles[authorId];
-  const isContent = ['post', 'comment', 'ride', 'listing', 'forum_topic', 'forum_reply', 'group', 'group_message', 'chat_message'].includes(type);
+  const isContent = ['post', 'comment', 'ride', 'forum_topic', 'forum_reply', 'group', 'group_message', 'chat_message', 'hazard'].includes(type);
 
   const run = async (fn, { close } = {}) => {
     setBusy(true);
@@ -67,7 +68,7 @@ export default function ReportCase({ reports, memberName, member, go, onDone }) 
   return (
     <div className={`card space-y-3 ${isOpen ? '' : 'opacity-60'} ${isOpen && categories.some((c) => SERIOUS.has(c)) ? 'ring-2 ring-red-200' : ''}`}>
       <div className="flex flex-wrap items-center gap-2 text-xs">
-        <span className="rounded-full bg-stone-800 px-2 py-0.5 font-semibold text-white">{TYPE_LABEL[type]}</span>
+        <span className="rounded-full bg-stone-800 px-2 py-0.5 font-semibold text-white">{TYPE_LABEL[type] || type}</span>
         {categories.map((c) => (
           <span key={c} className={`rounded-full px-2 py-0.5 font-semibold ${SERIOUS.has(c) ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-800'}`}>
             {CATEGORY_LABEL[c] || c}
@@ -109,12 +110,6 @@ export default function ReportCase({ reports, memberName, member, go, onDone }) 
 
       {isOpen ? (
         <div className="flex flex-wrap gap-2">
-          {type === 'gear' && targetId && (
-            <button className="btn-ghost !px-3 !py-1.5 text-sm text-red-600" disabled={busy}
-              onClick={() => window.confirm(t('Retirer cet objet ?')) && run(() => actions.gear.remove({ id: targetId }), { close: t('Objet retiré') })}>
-              <Trash2 size={14} /> {t('Retirer')}
-            </button>
-          )}
           {type === 'avatar' && (
             <button className="btn-ghost !px-3 !py-1.5 text-sm text-red-600" disabled={busy}
               onClick={() => window.confirm(t('Retirer la photo de profil de {name} ? Il sera prévenu.', { name: memberName(authorId) }))

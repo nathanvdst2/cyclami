@@ -7,39 +7,39 @@ import { t } from '../i18n/index.js';
 export default function ExampleTopic({ onCreate }) {
   const [open, setOpen] = useState(false);
   const replies = [
-    { who: 'Sophie', pet: '🐕', text: t('Même souci avec ma border ! Ce qui a marché chez nous : s’arrêter net dès que la laisse se tend, et repartir seulement quand elle revient à côté. Les deux premières semaines sont longues, mais ça paie.') },
-    { who: 'Marc', pet: '🦮', text: t('Je conseille aussi un harnais avec anneau devant plutôt qu’un collier : il tire beaucoup moins et c’est plus doux pour sa nuque. Et des sorties plus courtes mais plus souvent au début.') },
-    { who: 'Léa', pet: '🐶', text: t('Nous avons pris deux séances avec une éducatrice canine en méthode positive, ça nous a beaucoup aidés. Si tu es du côté de Namur, je peux t’envoyer son contact en message privé.') },
+    { who: 'Sophie', emoji: '🚴‍♀️', text: t('J’étais exactement dans ton cas l’an dernier ! Commence par des sorties « pas de lâchage » de niveau débutant : le groupe attend tout le monde au sommet des côtes. Et reste dans les roues, on se fatigue beaucoup moins à l’abri.') },
+    { who: 'Marc', emoji: '🚴', text: t('Dans les côtes, mouline : petit plateau, grand pignon, et garde une cadence régulière plutôt que de te mettre en danseuse dès le pied. Mange un petit quelque chose toutes les 45 minutes, même sans faim.') },
+    { who: 'Léa', emoji: '🚵‍♀️', text: t('Préviens l’organisateur en t’inscrivant que tu débutes, la plupart adaptent l’allure. Si tu es du côté de Namur, on fait une sortie tranquille le dimanche matin à 22 km/h, tu es la bienvenue !') },
   ];
   const tips = [
     t('Un titre clair qui résume la question'),
     t('La bonne catégorie, pour être lu par les bonnes personnes'),
-    t('Le contexte : âge, race, ce qui a déjà été essayé'),
+    t('Le contexte : ton niveau, ton vélo, ce que tu as déjà essayé'),
     t('Une question précise, à laquelle on peut répondre'),
     t('Des réponses bienveillantes, basées sur l’expérience'),
   ];
   return (
     <article className="card space-y-3 ring-2 ring-teal-300">
       <button className="flex w-full items-start gap-3 text-left" onClick={() => setOpen(!open)} aria-expanded={open}>
-        <span className="text-2xl">🎓</span>
+        <span className="text-2xl">🌱</span>
         <span className="min-w-0 flex-1">
           <span className="flex flex-wrap items-center gap-1 font-bold text-stone-800">
             <span className="rounded-full bg-teal-500 px-2 py-0.5 text-xs font-bold text-white">📌 {t('Exemple')}</span>
-            {t('Mon chiot de 6 mois tire en laisse : vos astuces ?')}
+            {t('Je débute : comment suivre un groupe sans me faire lâcher dans les côtes ?')}
           </span>
-          <span className="block truncate text-xs text-stone-500">{t('Éducation & comportement')} · Thomas</span>
+          <span className="block truncate text-xs text-stone-500">{t('Débutants')} · Thomas</span>
         </span>
         <span className="flex shrink-0 items-center gap-1 text-sm text-stone-500"><MessageSquare size={14} /> {replies.length}</span>
       </button>
       {open && (
         <>
           <p className="whitespace-pre-line text-sm text-stone-700">
-            {t('Bonjour à tous ! Mon chiot, un berger australien de 6 mois, tire très fort en laisse dès qu’il voit un autre chien. On a essayé les friandises, sans grand succès.\n\nComment avez-vous fait avec le vôtre ? Harnais, méthode, cours d’éducation… Merci pour vos conseils !')}
+            {t('Bonjour à tous ! Je roule seul depuis trois mois sur un vélo de route d’occasion, environ 50 km à 22 km/h de moyenne. J’aimerais rejoindre des sorties de groupe, mais j’ai peur de ralentir tout le monde dans les montées.\n\nComment avez-vous fait à vos débuts ? Allure, braquet, alimentation… Merci pour vos conseils !')}
           </p>
           <div className="space-y-2">
             {replies.map((r) => (
               <div key={r.who} className="rounded-xl bg-emerald-50 px-3 py-2 text-sm">
-                <div className="font-semibold text-stone-800">{r.pet} {r.who}</div>
+                <div className="font-semibold text-stone-800">{r.emoji} {r.who}</div>
                 <p className="text-stone-600">{r.text}</p>
               </div>
             ))}

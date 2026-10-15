@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  ArrowLeft, BadgeCheck, Ban, BarChart3, Bug, CheckCircle2, Flag, Home, Mail, MessageCircle, MessageSquareHeart, RefreshCw, ScrollText, Send,
-  ShieldCheck, Trash2, TrendingDown, TrendingUp, UserMinus, UserPlus, Users, X,
+  BadgeCheck, Ban, BarChart3, Bug, CheckCircle2, Flag, MessageSquareHeart, RefreshCw, ScrollText,
+  ShieldCheck, Trash2, TrendingDown, TrendingUp, UserMinus, UserPlus, Users,
 } from 'lucide-react';
 import { useApp, friendlyError } from '../context/AppContext.jsx';
 import { timeAgo } from '../utils/geo.js';
 import StaffBadge from '../components/StaffBadge.jsx';
 import ReportCase from '../components/ReportCase.jsx';
 import { locale, t } from '../i18n/index.js';
-import { useDraft, usePageState } from '../lib/persist.js';
+import { usePageState } from '../lib/persist.js';
 import { DonationSettings } from '../components/SupportCyclami.jsx';
-import { emailQuota } from '../lib/supabase.js';
+import { API, supabase } from '../lib/supabase.js';
 import AdminVerifications from '../components/AdminVerifications.jsx';
-import AddressPicker from '../components/AddressPicker.jsx';
 
 // Actions du journal de modération (enregistrées en français par la base), traduites à l'affichage.
 const actionLabel = (action) => {
@@ -79,7 +78,7 @@ export default function Admin({ go, params = {} }) {
 
   const ban = async (member) => {
     const reason = window.prompt(
-      t('Bannir {name} ({email}) ?\n\nSon compte, ses animaux, publications et messages seront supprimés, et son adresse ne pourra plus servir à s’inscrire.\n\nRaison (facultatif) :', { name: member.name, email: member.email }),
+      t('Bannir {name} ({email}) ?\n\nSon compte, ses vélos, publications, sorties et messages seront supprimés, et son adresse ne pourra plus servir à s’inscrire.\n\nRaison (facultatif) :', { name: member.name, email: member.email }),
     );
     if (reason === null) return;
     const err = await actions.admin.banUser(member.id, reason);
@@ -88,7 +87,7 @@ export default function Admin({ go, params = {} }) {
   };
 
   const deleteMember = async (member) => {
-    if (!window.confirm(t('Supprimer le compte de {name} ({email}) ?\n\nSon profil, ses animaux, publications, messages et photos seront effacés. Contrairement au bannissement, cette adresse pourra se réinscrire.', { name: member.name, email: member.email }))) return;
+    if (!window.confirm(t('Supprimer le compte de {name} ({email}) ?\n\nSon profil, ses vélos, publications, sorties, messages et photos seront effacés. Contrairement au bannissement, cette adresse pourra se réinscrire.', { name: member.name, email: member.email }))) return;
     if (!window.confirm(t('Dernière confirmation : supprimer définitivement le compte de {name} ?', { name: member.name }))) return;
     const err = await actions.admin.deleteUser(member.id, '');
     if (err) setError(err);
@@ -148,7 +147,6 @@ export default function Admin({ go, params = {} }) {
             ['stats', t('Statistiques'), BarChart3, 0],
             ['feedback', t('Retours'), MessageSquareHeart, stats?.feedback_new || 0],
             ['verifications', t('Vérifications'), BadgeCheck, verifCount],
-            ['shelters', t('Refuges'), Home, (stats?.shelters_pending || 0) + (stats?.shelter_changes || 0) + (stats?.shelter_replies || 0)],
             ['members', t('Membres ({n})', { n: members.length }), Users, 0],
             ['team', t('Équipe ({n})', { n: Object.keys(staffRoles).length }), ShieldCheck, 0],
             ['errors', t('Erreurs'), Bug, stats?.errors_24h || 0],
@@ -166,7 +164,6 @@ export default function Admin({ go, params = {} }) {
       {tab === 'stats' && isAdmin && <Traffic />}
       {tab === 'stats' && isAdmin && <SearchStats />}
       {tab === 'stats' && isAdmin && <DonationSettings />}
-      {tab === 'shelters' && isAdmin && <Shelters go={go} thread={params.thread} />}
       {tab === 'feedback' && isAdmin && <FeedbackList go={go} />}
       {tab === 'verifications' && isAdmin && <AdminVerifications go={go} onCount={setVerifCount} />}
       {tab === 'errors' && isAdmin && <ClientErrors />}
@@ -217,7 +214,7 @@ export default function Admin({ go, params = {} }) {
                 </div>
                 <div className="truncate text-xs text-stone-500">{m.email} · {m.city || '—'}</div>
                 <div className="text-xs text-stone-400">
-                  {t('Inscrit {when}', { when: timeAgo(m.created_at) })} · {t(m.pets > 1 ? '{n} animaux' : '{n} animal', { n: m.pets })} · {t(m.posts > 1 ? '{n} publications' : '{n} publication', { n: m.posts })}
+                  {t('Inscrit {when}', { when: timeAgo(m.created_at) })} · {t(m.bikes > 1 ? '{n} vélos' : '{n} vélo', { n: m.bikes || 0 })} · {t(m.posts > 1 ? '{n} publications' : '{n} publication', { n: m.posts })}
                   {m.last_sign_in_at && <> · {t('vu {when}', { when: timeAgo(m.last_sign_in_at) })}</>}
                 </div>
               </button>
@@ -295,251 +292,11 @@ export default function Admin({ go, params = {} }) {
 
 const PAGE_LABELS = {
   landing: t('Accueil (visiteurs)'), login: t('Connexion'), signup: t('Inscription'), discover: t('Découvrir'), rides: t('Sorties'),
-  feed: t('Fil'), messages: t('Messages'), profile: t('Profil'), user: t('Profils publics'), listings: t('Annonces'), listing: t('Détail annonce'),
-  notifications: t('Notifications'), lost: t('Animaux perdus'), sitting: t('Garde'), health: t('Carnet de santé'), legal: t('Pages légales'),
+  feed: t('Fil'), messages: t('Messages'), profile: t('Profil'), user: t('Profils publics'), notifications: t('Notifications'),
+  forum: t('Forum'), groups: t('Clubs et groupes'), chat: t('Tchat général'), hazards: t('Dangers de la route'), tracker: t('Suivi GPS'),
+  legal: t('Pages légales'),
 };
 
-// Statut des demandes de refuge.
-const SHELTER_STATUS = { pending: t('À vérifier'), verified: t('Vérifié'), rejected: t('Refusé') };
-// demandes à vérifier en premier, puis refuges vérifiés, puis refusés (plus récents d'abord dans chaque groupe)
-const SHELTER_ORDER = { pending: 0, verified: 1, rejected: 2 };
-const SHELTER_FIELDS = { name: t('Nom'), approval_number: t('Numéro d’agrément'), region: t('Région'), contact: t('Contact'), address: t('Adresse') };
-
-// Refuges : seuls les refuges vérifiés publient des adoptions. Vérifier le numéro d'agrément
-// (listes officielles de la Région, site du refuge) avant de valider.
-// Fiche d'un refuge (nom, agrément, région, adresse, e-mail, téléphone, site) : l'administration la modifie directement.
-const SHELTER_REGIONS = [['wallonie', 'Wallonie'], ['bruxelles', 'Bruxelles'], ['flandre', 'Flandre'], ['france', 'France'], ['autre', 'Autre']];
-function ShelterEditor({ shelter: r, onSaved }) {
-  const { actions } = useApp();
-  const [editing, setEditing] = useState(false);
-  const blank = () => ({
-    name: r.name || '', approval_number: r.approval_number || '', region: r.region || 'wallonie',
-    address: r.address || '', coords: r.lat != null ? { lat: r.lat, lng: r.lng } : null,
-    email: r.email || '', phone: r.phone || '', website: r.website || '',
-  });
-  const [form, setForm] = useState(blank);
-  const [error, setError] = useState(null);
-  const save = async (e) => {
-    e.preventDefault();
-    const err = await actions.shelters.update(r.user_id, form);
-    if (err) return setError(err);
-    setEditing(false);
-    onSaved();
-  };
-  if (!editing) {
-    const items = [r.email && `✉️ ${r.email}`, r.phone && `📞 ${r.phone}`, r.website && `🌐 ${r.website.replace(/^https?:\/\//, '')}`].filter(Boolean);
-    return (
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
-        {items.length ? items.map((x) => <span key={x} className="break-all">{x}</span>) : <span className="text-emerald-700">{t('Aucune coordonnée')}</span>}
-        {r.contact && !items.length && <span className="break-all">({r.contact})</span>}
-        <button className="font-semibold text-teal-600" onClick={() => { setForm(blank()); setEditing(true); }}>{t('Modifier la fiche')}</button>
-      </div>
-    );
-  }
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
-  return (
-    <form onSubmit={save} className="space-y-1 rounded-xl bg-emerald-50 p-2">
-      <input className="input !py-1 text-sm" required minLength={2} maxLength={120} placeholder={t('Nom du refuge')} value={form.name} onChange={set('name')} aria-label={t('Nom du refuge')} />
-      <input className="input !py-1 text-sm" required minLength={3} maxLength={60} placeholder={t('Numéro d’agrément')} value={form.approval_number} onChange={set('approval_number')} aria-label={t('Numéro d’agrément')} />
-      <select className="input !py-1 text-sm" value={form.region} onChange={set('region')} aria-label={t('Région')}>
-        {SHELTER_REGIONS.map(([id, label]) => <option key={id} value={id}>{t(label)}</option>)}
-      </select>
-      <AddressPicker value={{ address: form.address, coords: form.coords }} placeholder={t('Adresse du refuge')}
-        onChange={(v) => setForm((f) => { const next = typeof v === 'function' ? v({ address: f.address, coords: f.coords }) : v; return { ...f, ...next }; })} />
-      <input className="input !py-1 text-sm" type="email" maxLength={120} placeholder={t('E-mail du refuge')} value={form.email} onChange={set('email')} aria-label={t('E-mail du refuge')} />
-      <input className="input !py-1 text-sm" type="tel" maxLength={40} placeholder={t('Téléphone du refuge')} value={form.phone} onChange={set('phone')} aria-label={t('Téléphone du refuge')} />
-      <input className="input !py-1 text-sm" inputMode="url" maxLength={200} placeholder={t('Site web (ex : www.mon-refuge.be)')} value={form.website} onChange={set('website')} aria-label={t('Site web du refuge')} />
-      {r.contact && <p className="break-all text-[11px] text-stone-500">{t('Ancien contact : {text}', { text: r.contact })}</p>}
-      {error && <p className="text-xs text-red-600">{error}</p>}
-      <div className="flex gap-2">
-        <button className="btn-primary !py-1 text-xs">{t('Enregistrer')}</button>
-        <button type="button" className="btn-ghost !py-1 text-xs" onClick={() => setEditing(false)}>{t('Annuler')}</button>
-      </div>
-    </form>
-  );
-}
-
-function Shelters({ go, thread }) {
-  const { actions } = useApp();
-  const [rows, setRows] = useState(null);
-  const [error, setError] = useState(null);
-  const load = () => actions.shelters.list().then(setRows).catch((e) => setError(friendlyError(e)));
-  useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  const review = async (r, accept) => {
-    const err = await actions.shelters.reviewChanges(r.user_id, accept);
-    if (err) setError(err); else load();
-  };
-  const decide = async (r, status) => {
-    const note = status === 'rejected' ? window.prompt(t('Motif du refus (visible par le demandeur) :'), '') : '';
-    if (note === null) return;
-    const err = await actions.shelters.decide(r.user_id, status, note || '');
-    if (err) setError(err); else load();
-  };
-  if (!rows) return error ? <p className="text-sm text-red-600">{error}</p> : <div className="card h-32 animate-pulse" />;
-  return (
-    <div className="space-y-2">
-      <ShelterThreads initial={thread} />
-      <ShelterInvite />
-      <p className="text-xs text-stone-500">{t('Vérifie le numéro d’agrément du refuge (listes officielles de la Région, site du refuge) avant de valider : un refuge validé peut publier des adoptions.')}</p>
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {rows.length === 0 && <div className="card text-center text-stone-500">{t('Aucune demande de refuge.')}</div>}
-      {[...rows].sort((a, b) => (a.pending_changes ? -1 : SHELTER_ORDER[a.status] ?? 9) - (b.pending_changes ? -1 : SHELTER_ORDER[b.status] ?? 9)).map((r) => (
-        <div key={r.user_id} className="card space-y-1 !p-3 text-sm">
-          <div className="flex items-center justify-between gap-2">
-            <button className="font-bold text-stone-800" onClick={() => go('user', { userId: r.user_id })}>{r.name}</button>
-            <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${r.status === 'verified' ? 'bg-green-100 text-green-700' : r.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-800'}`}>
-              {SHELTER_STATUS[r.status]}
-            </span>
-          </div>
-          <div className="text-xs text-stone-500">
-            {t('Agrément {number}', { number: r.approval_number })} · {r.region} · {t('compte : {name}', { name: r.member?.name || '—' })}
-            {r.address && <div className="truncate text-xs text-stone-500">📍 {r.address}</div>}
-          </div>
-          <ShelterEditor shelter={r} onSaved={load} />
-          {r.note && <div className="text-xs text-red-600">{r.note}</div>}
-          {r.pending_changes && (
-            <div className="space-y-1 rounded-xl bg-emerald-50 px-3 py-2 text-xs text-emerald-800 ring-1 ring-emerald-200">
-              <p className="font-semibold">⏳ {t('Modification demandée')}</p>
-              {Object.entries(SHELTER_FIELDS).filter(([k]) => k in r.pending_changes).map(([k, label]) => (
-                <div key={k}>{label} : <s className="text-stone-400">{r[k] || '—'}</s> → <strong>{r.pending_changes[k] || '—'}</strong></div>
-              ))}
-              <div className="flex gap-2 pt-1">
-                <button className="btn-primary !py-1 text-xs" onClick={() => review(r, true)}>{t('Accepter les changements')}</button>
-                <button className="btn-ghost !py-1 text-xs" onClick={() => review(r, false)}>{t('Refuser')}</button>
-              </div>
-            </div>
-          )}
-          <div className="flex gap-2 pt-1">
-            {r.status !== 'verified' && <button className="btn-primary !py-1 text-xs" onClick={() => decide(r, 'verified')}>{t('Valider')}</button>}
-            {r.status !== 'rejected' && <button className="btn-ghost !py-1 text-xs" onClick={() => decide(r, 'rejected')}>{t('Refuser')}</button>}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Discussions avec les refuges : leurs réponses aux propositions arrivent ici, et on leur répond par e-mail.
-function ShelterThreads({ initial }) {
-  const { actions } = useApp();
-  const [threads, setThreads] = useState(null);
-  const [open, setOpen] = usePageState('admin:thread', initial || null);
-  const [showWaiting, setShowWaiting] = usePageState('admin:threads-waiting', false);
-  const [domain, setDomain] = useState(null);
-  const [error, setError] = useState(null);
-  const load = () => actions.shelters.threads().then(setThreads).catch((e) => setError(friendlyError(e)));
-  useEffect(() => {
-    load();
-    actions.shelters.inboundDomain().then(setDomain).catch(() => setDomain(''));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  const toggleInbound = async () => {
-    const next = domain ? '' : 'reply.cyclami.com';
-    if (!window.confirm(next
-      ? t('Activer la réception des réponses sur le site ? Le DNS de reply.cyclami.com doit déjà pointer vers Brevo, sinon les réponses seront perdues.')
-      : t('Désactiver la réception sur le site ? Les réponses iront de nouveau à contact@cyclami.com.'))) return;
-    const err = await actions.shelters.setInboundDomain(next);
-    if (err) setError(err); else setDomain(next);
-  };
-  // supprime les messages ; l'historique des propositions (et les « STOP ») est gardé
-  const remove = async (th) => {
-    if (!window.confirm(t('Supprimer la discussion avec {name} ? Tous ses messages seront effacés.', { name: th.shelter_name || th.email }))) return;
-    const err = await actions.shelters.deleteThread(th.email);
-    if (err) setError(err); else setThreads((list) => list.filter((x) => x.email !== th.email));
-  };
-  // réponses reçues en tête ; propositions sans réponse repliées pour garder la liste courte
-  const replied = (threads || []).filter((th) => th.replies > 0 || th.last_direction === 'in')
-    .sort((a, b) => (b.unread > 0) - (a.unread > 0));
-  const waiting = (threads || []).filter((th) => !(th.replies > 0 || th.last_direction === 'in'));
-  const renderThread = (th) => (
-    <div key={th.email} className="flex items-center gap-1 rounded-xl hover:bg-emerald-50">
-      <button className="flex min-w-0 flex-1 items-center gap-2 p-2 text-left" onClick={() => setOpen(th.email)}>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-semibold text-stone-800">{th.shelter_name || th.email}</span>
-          <span className="block truncate text-xs text-stone-500">{th.last_direction === 'out' ? `${t('Toi')} : ` : ''}{th.last_excerpt}</span>
-        </span>
-        <span className="shrink-0 text-xs text-stone-400">{timeAgo(th.last_at)}</span>
-        {th.unread > 0 && <span className="shrink-0 rounded-full bg-red-500 px-2 text-xs font-bold text-white">{th.unread}</span>}
-      </button>
-      <button className="shrink-0 p-2 text-stone-400 hover:text-red-600" onClick={() => remove(th)}
-        aria-label={t('Supprimer la discussion avec {name}', { name: th.shelter_name || th.email })}>
-        <Trash2 size={16} />
-      </button>
-    </div>
-  );
-  if (open) return <ShelterThread email={open} onBack={() => { setOpen(null); load(); }} />;
-  return (
-    <section className="card space-y-2">
-      <div className="flex items-center gap-2 font-bold text-stone-800"><MessageCircle size={18} className="text-teal-500" /> {t('Discussions avec les refuges')}</div>
-      {domain !== null && (
-        <div className={`flex flex-wrap items-center gap-2 rounded-xl px-3 py-2 text-xs ${domain ? 'bg-green-50 text-green-700' : 'bg-emerald-50 text-emerald-800'}`}>
-          <span className="min-w-0 flex-1">
-            {domain
-              ? t('Réception activée : les réponses arrivent ici ({domain}).', { domain })
-              : t('Réception sur le site désactivée : les réponses vont à contact@cyclami.com. Active-la une fois le DNS de reply.cyclami.com configuré.')}
-          </span>
-          <button className="underline" onClick={toggleInbound}>{domain ? t('Désactiver') : t('Activer')}</button>
-        </div>
-      )}
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {threads?.length === 0 && <p className="text-sm text-stone-500">{t('Aucune discussion pour l’instant.')}</p>}
-      {replied.length > 0 && <div className="text-xs font-semibold text-stone-500">{t('Réponses reçues ({n})', { n: replied.length })}</div>}
-      {replied.map(renderThread)}
-      {waiting.length > 0 && (
-        <button className="flex w-full items-center justify-between rounded-xl px-2 py-1.5 text-left text-xs font-semibold text-stone-500 hover:bg-emerald-50"
-          onClick={() => setShowWaiting((v) => !v)} aria-expanded={showWaiting}>
-          <span>{t('En attente de réponse ({n})', { n: waiting.length })}</span>
-          <span className="text-teal-600">{showWaiting ? t('Masquer') : t('Afficher')}</span>
-        </button>
-      )}
-      {showWaiting && waiting.map(renderThread)}
-    </section>
-  );
-}
-
-function ShelterThread({ email, onBack }) {
-  const { actions } = useApp();
-  const [messages, setMessages] = useState(null);
-  const [text, setText] = useDraft(`shelter-reply:${email}`, '');
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState(null);
-  const load = () => actions.shelters.thread(email).then(setMessages).catch((e) => setError(friendlyError(e)));
-  useEffect(() => { load(); }, [email]); // eslint-disable-line react-hooks/exhaustive-deps
-  const send = async (e) => {
-    e.preventDefault();
-    if (!text.trim()) return;
-    setSending(true);
-    const err = await actions.shelters.reply(email, text);
-    setSending(false);
-    if (err) setError(err); else { setText(''); load(); }
-  };
-  return (
-    <section className="card space-y-3">
-      <button className="flex items-center gap-1 text-sm text-stone-500" onClick={onBack}><ArrowLeft size={16} /> {t('Discussions')}</button>
-      <div className="break-all font-bold text-stone-800">{email}</div>
-      {!messages && !error && <div className="h-24 animate-pulse rounded-xl bg-emerald-50" />}
-      <div className="space-y-2">
-        {messages?.map((m) => (
-          <div key={m.id} className={`flex ${m.direction === 'out' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${m.direction === 'out' ? 'bg-teal-500 text-white' : 'bg-emerald-50 text-stone-800 ring-1 ring-emerald-100'}`}>
-              <div className={`mb-1 text-[11px] ${m.direction === 'out' ? 'text-teal-100' : 'text-stone-500'}`}>
-                {m.direction === 'out' ? (m.sent_by || 'Cyclami') : (m.from_name || email)} · {new Date(m.created_at).toLocaleString(locale(), { dateStyle: 'short', timeStyle: 'short' })}
-                {m.subject && ` · ${m.subject}`}
-              </div>
-              <div className="whitespace-pre-line break-words">{m.body}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      <form onSubmit={send} className="space-y-2">
-        <textarea className="input" rows="3" maxLength={5000} placeholder={t('Ta réponse (envoyée par e-mail au refuge)…')} value={text} onChange={(e) => setText(e.target.value)} />
-        <button className="btn-primary w-full" disabled={sending || !text.trim()}><Send size={16} /> {sending ? t('Envoi…') : t('Répondre par e-mail')}</button>
-      </form>
-    </section>
-  );
-}
-
-// Proposer à un refuge de rejoindre Cyclami : e-mail professionnel envoyé par le serveur.
 // Crédits d'e-mails Brevo : la formule gratuite permet environ 300 e-mails par jour pour tout le site.
 const FREE_DAILY_EMAILS = 300;
 // Tableau de bord : ce qui attend une action, puis les chiffres (avec la tendance de la semaine).
@@ -549,9 +306,6 @@ function Dashboard({ stats: s, openCount, isAdmin, setTab, verifCount = 0 }) {
     [openCount, t(openCount > 1 ? '{n} signalements à traiter' : '{n} signalement à traiter', { n: openCount }), Flag, 'reports'],
     [s.feedback_new || 0, t(s.feedback_new > 1 ? '{n} retours de membres à lire' : '{n} retour de membre à lire', { n: s.feedback_new }), MessageSquareHeart, 'feedback'],
     [verifCount, t(verifCount > 1 ? '{n} vidéos de vérification à regarder' : '{n} vidéo de vérification à regarder', { n: verifCount }), BadgeCheck, 'verifications'],
-    [s.shelters_pending || 0, t(s.shelters_pending > 1 ? '{n} refuges à vérifier' : '{n} refuge à vérifier', { n: s.shelters_pending }), Home, 'shelters'],
-    [s.shelter_changes || 0, t(s.shelter_changes > 1 ? '{n} modifications de refuge à valider' : '{n} modification de refuge à valider', { n: s.shelter_changes }), Home, 'shelters'],
-    [s.shelter_replies || 0, t(s.shelter_replies > 1 ? '{n} réponses de refuges non lues' : '{n} réponse de refuge non lue', { n: s.shelter_replies }), Mail, 'shelters'],
     [s.errors_24h || 0, t(s.errors_24h > 1 ? '{n} erreurs du site ces dernières 24 h' : '{n} erreur du site ces dernières 24 h', { n: s.errors_24h }), Bug, 'errors'],
   ].filter(([n, , , tab]) => n > 0 && (isAdmin || tab === 'reports'));
   const trend = s.members_7d - (s.members_prev_7d ?? s.members_7d);
@@ -595,7 +349,7 @@ function Dashboard({ stats: s, openCount, isAdmin, setTab, verifCount = 0 }) {
               {t('+{n} cette semaine', { n: s.members_7d })}
             </span>} />
           <Metric value={s.active_7d} label={t('Actifs (7 j)')} sub={s.members ? t('{p} % des membres', { p: Math.round((100 * s.active_7d) / s.members) }) : null} />
-          <Metric value={s.pets} label={t('Animaux')} />
+          <Metric value={s.bikes} label={t('Vélos présentés')} />
           <Metric value={s.online} label={t('En ligne maintenant')} />
         </div>
         {days.length > 0 && (
@@ -626,17 +380,24 @@ function Dashboard({ stats: s, openCount, isAdmin, setTab, verifCount = 0 }) {
           </div>
         </section>
         <section className="card space-y-2">
-          <h2 className="font-bold text-stone-800">{t('Entraide et adoptions')}</h2>
+          <h2 className="font-bold text-stone-800">{t('Sur la route')}</h2>
           <div className="grid grid-cols-2 gap-2">
-            <Metric value={s.lost_active} label={t('Alertes animal perdu')} />
-            <Metric value={s.listings_active} label={t('Animaux à adopter')} />
-            <Metric value={s.shelters_verified} label={t('Refuges vérifiés')} tab={isAdmin ? 'shelters' : null} />
+            <Metric value={s.hazards_active} label={t('Dangers signalés en cours')} />
+            <Metric value={s.tracks_7d} label={t('Parcours GPS (7 j)')} />
+            <Metric value={s.groups} label={t('Clubs et groupes')} />
             <Metric value={s.reports_open} label={t('Signalements ouverts')} tab="reports" />
           </div>
         </section>
       </div>
     </div>
   );
+}
+
+// Crédits d'e-mails Brevo restants (administrateurs) : { type, credits }, via la fonction Netlify /api/email-quota.
+async function emailQuota() {
+  const { data } = await supabase.auth.getSession();
+  const res = await fetch(`${API}/email-quota`, { headers: { Authorization: `Bearer ${data.session?.access_token || ''}` } });
+  return res.ok ? res.json() : null;
 }
 
 function EmailQuota() {
@@ -652,134 +413,9 @@ function EmailQuota() {
         ? t('E-mails restants aujourd’hui : {n} / {max}', { n: quota.credits, max: FREE_DAILY_EMAILS })
         : t('Crédits d’e-mails restants : {n}', { n: quota.credits })}
       {empty
-        ? ` — ${t('Limite atteinte : plus aucun e-mail ne part avant demain (notifications et propositions comprises).')}`
+        ? ` — ${t('Limite atteinte : plus aucun e-mail ne part avant demain (notifications comprises).')}`
         : low && ` — ${t('Bientôt à court : garde-en pour les notifications des membres.')}`}
     </div>
-  );
-}
-
-function ShelterInvite() {
-  const { actions } = useApp();
-  const empty = { email: '', name: '', lang: 'fr', note: '' };
-  const [form, setForm] = useDraft('shelter-invite', empty);
-  const [sending, setSending] = useState(false);
-  const [status, setStatus] = useState(null); // { ok, text }
-  const [history, setHistory] = useState(null);
-  // historique replié : les 3 plus récentes, le reste sur demande
-  const [showHistory, setShowHistory] = usePageState('admin:invites-all', false);
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
-  const loadHistory = () => actions.shelters.invites().then(setHistory).catch(() => setHistory([]));
-  const removeInvite = async (h) => {
-    if (!window.confirm(t('Retirer la proposition envoyée à {email} de l’historique ?', { email: h.email }))) return;
-    const err = await actions.shelters.removeInvite(h.id);
-    if (err) setStatus({ ok: false, text: err }); else setHistory((list) => list.filter((x) => x.id !== h.id));
-  };
-  useEffect(() => { loadHistory(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const send = async (e) => {
-    e.preventDefault();
-    if (!window.confirm(t('Envoyer la proposition à {email} ?', { email: form.email.trim() }))) return;
-    setSending(true);
-    setStatus(null);
-    const err = await actions.shelters.invite(form);
-    setSending(false);
-    if (err) setStatus({ ok: false, text: err });
-    else {
-      setStatus({ ok: true, text: t('Proposition envoyée à {email} ✔', { email: form.email.trim() }) });
-      setForm(empty);
-      loadHistory();
-    }
-  };
-  // e-mail de test : même contenu, objet « [TEST] », n'entre pas dans l'historique
-  const sendTest = async () => {
-    if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(form.email.trim())) return setStatus({ ok: false, text: t('Adresse e-mail invalide.') });
-    setSending(true);
-    setStatus(null);
-    const err = await actions.shelters.invite(form, true);
-    setSending(false);
-    setStatus(err ? { ok: false, text: err } : { ok: true, text: t('E-mail de test envoyé à {email} ✔', { email: form.email.trim() }) });
-  };
-  const toRelaunch = (history || []).filter((h) => h.can_relaunch).length;
-  const relaunch = async () => {
-    const n = Math.min(toRelaunch, 20);
-    if (!window.confirm(t('Envoyer un court rappel à {n} refuge(s) qui n’ont ni répondu ni créé de compte depuis au moins 14 jours ? Chaque refuge n’est relancé qu’une seule fois.', { n }))) return;
-    setSending(true);
-    setStatus(null);
-    try {
-      const r = await actions.shelters.relaunch(20);
-      setStatus({ ok: true, text: t('{n} rappel(s) envoyé(s) ✔', { n: r?.sent ?? 0 }) + (r?.remaining ? ` ${t('Encore {n} à relancer (20 par envoi).', { n: r.remaining })}` : '') });
-      loadHistory();
-    } catch (e) {
-      setStatus({ ok: false, text: friendlyError(e) });
-    }
-    setSending(false);
-  };
-  const optOut = async (email) => {
-    if (!window.confirm(t('Ne plus jamais écrire à {email} ?', { email }))) return;
-    const err = await actions.shelters.optOut(email);
-    if (err) setStatus({ ok: false, text: err }); else loadHistory();
-  };
-
-  return (
-    <section className="card space-y-3">
-      <div className="flex items-center gap-2 font-bold text-stone-800"><Mail size={18} className="text-teal-500" /> {t('Proposer Cyclami à un refuge')}</div>
-      <p className="text-xs text-stone-500">{t('Un e-mail professionnel présente le projet et explique comment inscrire le refuge (gratuit, adoptions réservées aux refuges vérifiés). Les réponses arrivent dans les discussions ci-dessus.')}</p>
-      <EmailQuota />
-      <form onSubmit={send} className="space-y-2">
-        <input className="input" type="email" required placeholder={t('Adresse e-mail du refuge')} value={form.email} onChange={set('email')} />
-        <div className="flex gap-2">
-          <input className="input min-w-0 flex-1" maxLength={100} placeholder={t('Nom du refuge (facultatif)')} value={form.name} onChange={set('name')} />
-          <select className="input w-auto" value={form.lang} onChange={set('lang')} aria-label={t('Langue de l’e-mail')}>
-            <option value="fr">FR</option><option value="nl">NL</option><option value="en">EN</option>
-          </select>
-        </div>
-        <textarea className="input" rows="2" maxLength={1000} placeholder={t('Message personnel ajouté à l’e-mail (facultatif)')} value={form.note} onChange={set('note')} />
-        {status && <p className={`text-sm ${status.ok ? 'text-green-700' : 'text-red-600'}`}>{status.text}</p>}
-        <div className="flex gap-2">
-          <button type="button" className="btn-ghost" disabled={sending} onClick={sendTest}>{t('Envoyer un test')}</button>
-          <button className="btn-primary flex-1" disabled={sending}><Send size={16} /> {sending ? t('Envoi…') : t('Envoyer la proposition')}</button>
-        </div>
-        <p className="text-xs text-stone-400">{t('Le test envoie le même e-mail (objet « [TEST] ») sans bloquer l’adresse ni l’ajouter à l’historique : utile pour l’envoyer à ta propre adresse.')}</p>
-      </form>
-      {history?.length > 0 && (
-        <div className="space-y-2 border-t border-emerald-100 pt-2 text-xs text-stone-600">
-          <p>
-            {t('{n} propositions · {joined} refuges inscrits · {replied} ont répondu', {
-              n: history.length, joined: history.filter((h) => h.joined).length, replied: history.filter((h) => h.replied).length,
-            })}
-          </p>
-          {toRelaunch > 0 && (
-            <button type="button" className="btn-ghost w-full !py-1.5 text-sm" disabled={sending} onClick={relaunch}>
-              🔁 {t('Relancer les refuges sans réponse ({n})', { n: toRelaunch })}
-            </button>
-          )}
-        </div>
-      )}
-      {history?.length > 0 && (
-        <div className="space-y-1 border-t border-emerald-100 pt-2">
-          <button type="button" className="flex w-full items-center justify-between text-left text-xs font-semibold text-stone-500"
-            onClick={() => setShowHistory((v) => !v)} aria-expanded={showHistory}>
-            <span>{t('Propositions envoyées ({n})', { n: history.length })}</span>
-            {history.length > 3 && <span className="text-teal-600">{showHistory ? t('Masquer') : t('Tout afficher')}</span>}
-          </button>
-          {(showHistory ? history : history.slice(0, 3)).map((h) => (
-            <div key={h.id} className="flex items-center gap-2 text-xs text-stone-600">
-              <span className="min-w-0 flex-1 truncate">
-                {h.joined && <span title={t('Refuge inscrit sur Cyclami')}>✅ </span>}
-                {h.replied && !h.joined && <span title={t('A répondu')}>💬 </span>}
-                {h.shelter_name ? `${h.shelter_name} · ` : ''}{h.email} · {h.lang.toUpperCase()} · {timeAgo(h.created_at)}{h.sent_by ? ` · ${h.sent_by}` : ''}
-                {h.relaunched_at && ` · ${t('relancé {when}', { when: timeAgo(h.relaunched_at) })}`}
-              </span>
-              {h.opted_out
-                ? <span className="rounded-full bg-stone-100 px-2 text-stone-500">{t('ne plus contacter')}</span>
-                : <button className="underline" onClick={() => optOut(h.email)}>{t('A dit STOP')}</button>}
-              <button className="shrink-0 p-1 text-stone-400 hover:text-red-600" onClick={() => removeInvite(h)}
-                aria-label={t('Retirer la proposition envoyée à {email}', { email: h.email })}><X size={14} /></button>
-            </div>
-          ))}
-        </div>
-      )}
-    </section>
   );
 }
 

@@ -1,4 +1,4 @@
-// Météo des sorties : prévisions horaires Open-Meteo (gratuit, sans clé).
+// Météo et vent au départ des sorties : prévisions horaires Open-Meteo (gratuit, sans clé).
 // Position arrondie à 0,1° pour partager les requêtes ; cache mémoire + localStorage (1 h).
 const TTL = 3600e3;
 const MAX_AHEAD = 15 * 86400e3;
@@ -31,11 +31,12 @@ const writeCache = (key, data) => {
 };
 
 async function load(lat, lng) {
-  const key = `cyclami:meteo:${lat},${lng}`;
+  const key = `cyclami:meteo2:${lat},${lng}`;
   const cached = readCache(key);
   if (cached) return cached;
   const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}`
-    + '&hourly=temperature_2m,precipitation_probability,weather_code&timezone=auto&forecast_days=16');
+    + '&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m'
+    + '&wind_speed_unit=kmh&timezone=auto&forecast_days=16');
   if (!res.ok) throw new Error(`open-meteo ${res.status}`);
   const j = await res.json();
   const h = j.hourly;
@@ -47,6 +48,9 @@ async function load(lat, lng) {
     temp: h.temperature_2m,
     rain: h.precipitation_probability,
     code: h.weather_code,
+    wind: h.wind_speed_10m,
+    gusts: h.wind_gusts_10m,
+    dir: h.wind_direction_10m,
   };
   writeCache(key, data);
   return data;
@@ -61,7 +65,14 @@ function forecast(lat, lng) {
   return pending.get(k);
 }
 
-// { emoji, temp, rain } pour l'heure la plus proche, ou null (passé, trop loin, échec)
+// Direction d'où vient le vent (degrés) → point cardinal en français (N, NE, E, SE, S, SO, O, NO)
+const COMPASS = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+export const compass = (deg) => (Number.isFinite(deg) ? COMPASS[Math.round((((deg % 360) + 360) % 360) / 45) % 8] : null);
+
+const num = (x) => (Number.isFinite(x) ? Math.round(x) : null);
+
+// { emoji, temp, rain, wind, gusts, windDir } pour l'heure la plus proche, ou null (passé, trop loin, échec).
+// wind et gusts en km/h, windDir : point cardinal d'où vient le vent.
 export async function weatherAt(lat, lng, date) {
   if (lat == null || lng == null) return null;
   const when = new Date(date).getTime();
@@ -79,5 +90,12 @@ export async function weatherAt(lat, lng, date) {
   const temp = data.temp?.[best];
   const code = data.code?.[best];
   if (temp == null || code == null) return null;
-  return { emoji: weatherEmoji(code), temp: Math.round(temp), rain: data.rain?.[best] ?? null };
+  return {
+    emoji: weatherEmoji(code),
+    temp: Math.round(temp),
+    rain: data.rain?.[best] ?? null,
+    wind: num(data.wind?.[best]),
+    gusts: num(data.gusts?.[best]),
+    windDir: compass(data.dir?.[best]),
+  };
 }

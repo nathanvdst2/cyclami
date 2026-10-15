@@ -10,6 +10,7 @@
     "test:smoke": "node tests/smoke.mjs dist"
   },
   "dependencies": {
+    "@netlify/blobs": "^11.1.3",
     "@supabase/supabase-js": "^2.117.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.468.0",

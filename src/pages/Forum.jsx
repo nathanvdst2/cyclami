@@ -12,15 +12,16 @@ import CooldownNote from '../components/CooldownNote.jsx';
 import { useDraft, usePageState } from '../lib/persist.js';
 import ExampleTopic from '../components/ExampleTopic.jsx';
 
-// Catégories (mêmes identifiants que la contrainte en base, voir supabase/schema.sql v22)
+// Catégories (mêmes identifiants que la contrainte forum_topics.category en base, voir supabase/schema.sql)
 export const FORUM_CATEGORIES = [
   { id: 'general', emoji: '💬', label: t('Discussions générales') },
-  { id: 'sante', emoji: '🩺', label: t('Santé & alimentation') },
-  { id: 'education', emoji: '🎓', label: t('Éducation & comportement') },
-  { id: 'sorties', emoji: '🌳', label: t('Sorties & lieux') },
-  { id: 'nac', emoji: '🐹', label: t('NAC & animaux particuliers') },
-  { id: 'adoption', emoji: '🏡', label: t('Adoption & conseils') },
-  { id: 'entraide', emoji: '🤝', label: t('Entraide entre voisins') },
+  { id: 'materiel', emoji: '🚲', label: t('Matériel & équipement') },
+  { id: 'entrainement', emoji: '📈', label: t('Entraînement & nutrition') },
+  { id: 'itineraires', emoji: '🗺️', label: t('Itinéraires & parcours') },
+  { id: 'securite', emoji: '🦺', label: t('Sécurité routière') },
+  { id: 'mecanique', emoji: '🔧', label: t('Mécanique & entretien') },
+  { id: 'debutants', emoji: '🌱', label: t('Débutants') },
+  { id: 'entraide', emoji: '🤝', label: t('Entraide entre cyclistes') },
 ];
 const categoryOf = (id) => FORUM_CATEGORIES.find((c) => c.id === id) || FORUM_CATEGORIES[0];
 
@@ -55,7 +56,7 @@ function TopicList({ go, back }) {
           <Plus size={16} /> {t('Nouveau sujet')}
         </button>
       </div>
-      <p className="text-sm text-stone-500">{t('Pose tes questions, partage tes astuces et aide les autres propriétaires.')}</p>
+      <p className="text-sm text-stone-500">{t('Pose tes questions, partage tes astuces et aide les autres cyclistes.')}</p>
 
       <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); setQuery(search); }}>
         <div className="relative flex-1">
@@ -82,7 +83,7 @@ function TopicList({ go, back }) {
       )}
 
       <div className="space-y-2">
-        {topics && !query && ['all', 'education'].includes(category) && (
+        {topics && !query && ['all', 'debutants'].includes(category) && (
           <ExampleTopic onCreate={() => go('forum', { new: true, category: category === 'all' ? 'general' : category })} />
         )}
         {topics?.map((topic) => {
@@ -111,7 +112,7 @@ function TopicList({ go, back }) {
         })}
       </div>
       <p className="text-xs text-stone-500">
-        🛡️ {t('Reste bienveillant. Pour un souci de santé, le forum ne remplace pas l’avis d’un vétérinaire.')}
+        🛡️ {t('Reste bienveillant. Pour une douleur ou une blessure, le forum ne remplace pas l’avis d’un médecin.')}
       </p>
     </div>
   );
@@ -149,7 +150,7 @@ function TopicForm({ go, back, category, topic }) {
         <select className="input" value={form.category} onChange={(e) => set('category', e.target.value)} aria-label={t('Catégorie')}>
           {FORUM_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.emoji} {c.label}</option>)}
         </select>
-        <input className="input" required minLength={3} maxLength={120} placeholder={t('Titre (ex : Mon chiot tire en laisse, des conseils ?)')}
+        <input className="input" required minLength={3} maxLength={120} placeholder={t('Titre (ex : Quel braquet pour débuter en côte ?)')}
           value={form.title} onChange={(e) => set('title', e.target.value)} />
         <textarea className="input" rows="7" maxLength={5000} placeholder={t('Explique ta question ou partage ton expérience…')}
           value={form.body} onChange={(e) => set('body', e.target.value)} />

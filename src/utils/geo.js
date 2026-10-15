@@ -15,21 +15,39 @@ export function formatDistance(km) {
   return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
 }
 
-// Score de compatibilité (0–100) entre deux animaux pour une sortie commune.
-export function compatibility(a, b) {
-  if (!a || !b) return 0;
-  let score = 40;
-  if (a.species === b.species) score += 20;
-  score += 20 - Math.abs((a.energy ?? 3) - (b.energy ?? 3)) * 5;
-  const sizes = ['petit', 'moyen', 'grand'];
-  const sizeGap = Math.abs(sizes.indexOf(a.size) - sizes.indexOf(b.size));
-  score += sizeGap === 0 ? 10 : sizeGap === 1 ? 5 : 0;
-  const shared = (a.traits || []).filter((t) => (b.traits || []).includes(t)).length;
-  score += Math.min(shared * 5, 10);
-  if ((b.traits || []).includes('Sociable')) score += 5;
-  if ((b.traits || []).includes('Timide') || (a.traits || []).includes('Timide')) score -= 5;
-  return Math.max(0, Math.min(100, score));
+// Compatibilité (0–100) entre deux cyclistes pour rouler ensemble : niveau, vitesse habituelle,
+// disciplines communes, disponibilités communes et distance entre les deux.
+//   a, b : membres { level, usualSpeed, disciplines, availability, coords }
+export function compatibilityDetails(a, b) {
+  if (!a || !b) return { score: 0, km: null, sharedDisciplines: [], sharedSlots: [], levelGap: null, speedGap: null };
+  const order = ['debutant', 'intermediaire', 'confirme', 'sportif'];
+  const ra = order.indexOf(a.level);
+  const rb = order.indexOf(b.level);
+  const levelGap = ra >= 0 && rb >= 0 ? Math.abs(ra - rb) : null;
+  const speedGap = a.usualSpeed && b.usualSpeed ? Math.abs(a.usualSpeed - b.usualSpeed) : null;
+  const sharedDisciplines = (a.disciplines || []).filter((d) => (b.disciplines || []).includes(d));
+  const sharedSlots = (a.availability || []).filter((s) => (b.availability || []).includes(s));
+  const km = a.coords && b.coords ? distanceKm(a.coords, b.coords) : null;
+
+  let score = 0;
+  // niveau : 35 points
+  score += levelGap == null ? 15 : [35, 20, 5, 0][levelGap];
+  // vitesse moyenne habituelle : 25 points (inconnue : on se fie au niveau)
+  if (speedGap == null) score += levelGap == null ? 10 : [20, 10, 0, 0][levelGap];
+  else score += speedGap <= 2 ? 25 : speedGap <= 4 ? 18 : speedGap <= 7 ? 10 : speedGap <= 10 ? 4 : 0;
+  // disciplines : 20 points
+  if (!(a.disciplines || []).length || !(b.disciplines || []).length) score += 10;
+  else score += sharedDisciplines.length ? 20 : 0;
+  // disponibilités : 10 points
+  if (!(a.availability || []).length || !(b.availability || []).length) score += 5;
+  else score += Math.min(sharedSlots.length * 4, 10);
+  // distance : 10 points
+  score += km == null ? 3 : km <= 5 ? 10 : km <= 15 ? 7 : km <= 30 ? 4 : 0;
+
+  return { score: Math.max(0, Math.min(100, Math.round(score))), km, sharedDisciplines, sharedSlots, levelGap, speedGap };
 }
+
+export const compatibility = (a, b) => compatibilityDetails(a, b).score;
 
 export function formatDate(iso) {
   return new Date(iso).toLocaleString(locale(), {

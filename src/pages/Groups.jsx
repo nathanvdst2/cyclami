@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Camera, Footprints, LogIn, LogOut, MapPin, Pencil, Plus, Search, Send, Trash2, Users, X } from 'lucide-react';
+import { ArrowLeft, Bike, Camera, LogIn, LogOut, MapPin, Pencil, Plus, Search, Send, Trash2, Users, X } from 'lucide-react';
 import { useApp, friendlyError } from '../context/AppContext.jsx';
 import { distanceKm, formatDate, formatDistance, timeAgo } from '../utils/geo.js';
 import UserAvatar from '../components/UserAvatar.jsx';
@@ -12,8 +12,10 @@ import CooldownNote from '../components/CooldownNote.jsx';
 import { EmptyState } from '../components/Illustration.jsx';
 import { useDraft, usePageState } from '../lib/persist.js';
 import InviteNeighbors from '../components/InviteNeighbors.jsx';
+import { levelInfo, rideType } from '../data/constants.js';
 
-const EMOJIS = ['🚴', '🐕', '🦮', '🐩', '🐈', '🐇', '🐴', '🌳', '🏃', '❤️'];
+// Emoji du club ou du groupe
+const EMOJIS = ['🚴', '🚵', '🚲', '⛰️', '🏁', '🌲', '☕', '🌅', '⚡', '❤️'];
 
 export default function Groups({ go, back, params }) {
   if (params.groupId) return <GroupView key={params.groupId} groupId={params.groupId} go={go} back={back} />;
@@ -52,17 +54,17 @@ function GroupList({ go, back }) {
         <ArrowLeft size={16} /> {t('Retour')}
       </button>
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-extrabold text-stone-800">{t('Groupes')}</h1>
+        <h1 className="text-2xl font-extrabold text-stone-800">{t('Clubs et groupes')}</h1>
         <button className="btn-primary shrink-0" onClick={() => go('groups', { new: true })}>
           <Plus size={16} /> {t('Créer un groupe')}
         </button>
       </div>
-      <p className="text-sm text-stone-500">{t('Retrouve les propriétaires de ton quartier ou de ta race préférée : sorties en groupe, conseils et entraide.')}</p>
+      <p className="text-sm text-stone-500">{t('Ton club cycliste, ta bande de copains du dimanche ou les vététistes de ta région : un mur pour discuter, des sorties rien que pour le groupe.')}</p>
 
       <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); setQuery(search); }}>
         <div className="relative flex-1">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
-          <input className="input pl-9" placeholder={t('Chercher un groupe, une ville…')} value={search}
+          <input className="input pl-9" placeholder={t('Chercher un club, un groupe, une ville…')} value={search}
             onChange={(e) => { setSearch(e.target.value); if (!e.target.value) setQuery(''); }} />
         </div>
         <button className="btn-ghost">{t('Chercher')}</button>
@@ -143,10 +145,10 @@ function GroupForm({ go, back, initial = null, onSaved }) {
             </button>
           ))}
         </div>
-        <input className="input" required minLength={3} maxLength={60} placeholder={t('Nom (ex : Bergers australiens de Namur)')}
+        <input className="input" required minLength={3} maxLength={60} placeholder={t('Nom (ex : Les Rouleurs du Condroz)')}
           value={form.name} onChange={(e) => set('name', e.target.value)} />
         <input className="input" maxLength={80} placeholder={t('Ville ou quartier')} value={form.city} onChange={(e) => set('city', e.target.value)} />
-        <textarea className="input" rows="5" maxLength={1000} placeholder={t('Présente le groupe : pour qui, quelles activités, à quel rythme…')}
+        <textarea className="input" rows="5" maxLength={1000} placeholder={t('Présente le groupe : club ou bande d’amis, route ou VTT, niveau, jours de sortie…')}
           value={form.description} onChange={(e) => set('description', e.target.value)} />
         {!initial && <p className="text-xs text-stone-500">📍 {t('Le groupe est placé à ta position approximative, pour que les voisins le trouvent.')}</p>}
       </section>
@@ -206,7 +208,7 @@ function GroupView({ groupId, go, back }) {
     return (
       <div className="card space-y-3 text-center text-stone-500">
         <p>{error || t('Ce groupe n’existe plus.')}</p>
-        <button className="btn-ghost" onClick={() => go('groups')}>{t('Voir les groupes')}</button>
+        <button className="btn-ghost" onClick={() => go('groups')}>{t('Voir les clubs et groupes')}</button>
       </div>
     );
   }
@@ -256,7 +258,7 @@ function GroupView({ groupId, go, back }) {
   return (
     <div className="space-y-4 pb-4">
       <button onClick={() => back('groups')} className="flex items-center gap-1 text-sm text-stone-500">
-        <ArrowLeft size={16} /> {t('Groupes')}
+        <ArrowLeft size={16} /> {t('Clubs et groupes')}
       </button>
 
       <article className="card space-y-3">
@@ -296,22 +298,24 @@ function GroupView({ groupId, go, back }) {
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <section className="space-y-2">
-        <h2 className="flex items-center gap-2 font-bold text-stone-800"><Footprints size={18} /> {t('Prochaines sorties du groupe')}</h2>
+        <h2 className="flex items-center gap-2 font-bold text-stone-800"><Bike size={18} /> {t('Prochaines sorties du groupe')}</h2>
         {rides.length === 0 ? (
           <p className="card text-sm text-stone-500">
             {myRole ? t('Aucune sortie prévue. Organise-en une et choisis ce groupe dans le formulaire !') : t('Aucune sortie prévue pour l’instant.')}
           </p>
         ) : rides.map((w) => (
-          <button key={w.id} className="card flex w-full items-center gap-3 text-left" onClick={() => go('rides')}>
-            <span className="text-2xl">🌳</span>
+          <button key={w.id} className="card flex w-full items-center gap-3 text-left" onClick={() => go('rides', { rideId: w.id })}>
+            <span className="text-2xl">{rideType(w.ride_type)?.emoji || '🚴'}</span>
             <span className="min-w-0 flex-1">
               <span className="block truncate font-semibold text-stone-800">{w.title}</span>
-              <span className="block truncate text-xs text-stone-500">{formatDate(w.starts_at)} · {w.place}</span>
+              <span className="block truncate text-xs text-stone-500">
+                {[formatDate(w.starts_at), w.place, levelInfo(w.level)?.label, w.distance_km && `${Number(w.distance_km)} km`].filter(Boolean).join(' · ')}
+              </span>
             </span>
           </button>
         ))}
         {myRole && (
-          <button className="btn-ghost w-full" onClick={() => go('rides')}><Plus size={16} /> {t('Organiser une sortie')}</button>
+          <button className="btn-ghost w-full" onClick={() => go('rides', { create: true, groupId: group.id })}><Plus size={16} /> {t('Organiser une sortie du groupe')}</button>
         )}
       </section>
 

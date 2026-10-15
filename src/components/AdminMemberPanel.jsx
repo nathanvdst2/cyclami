@@ -60,9 +60,9 @@ function lookupIp(ip) {
 }
 
 const COUNT_LABELS = [
-  ['pets', 'Animaux'], ['posts', 'Publications'], ['comments', 'Commentaires'], ['rides_hosted', 'Sorties organisées'],
-  ['rides_joined', 'Sorties rejointes'], ['messages_sent', 'Messages envoyés'], ['listings', 'Annonces'],
-  ['forum_topics', 'Sujets du forum'], ['groups', 'Groupes'], ['reports_made', 'Signalements faits'],
+  ['bikes', 'Vélos'], ['posts', 'Publications'], ['comments', 'Commentaires'], ['rides_hosted', 'Sorties organisées'],
+  ['rides_joined', 'Sorties rejointes'], ['messages_sent', 'Messages envoyés'], ['tracks', 'Parcours GPS'], ['hazards', 'Dangers signalés'],
+  ['forum_topics', 'Sujets du forum'], ['groups', 'Clubs et groupes'], ['reports_made', 'Signalements faits'],
   ['reports_against', 'Signalements reçus'], ['reports_open', 'Signalements en attente'], ['warnings', 'Avertissements'],
   ['blocked_by', 'Bloqué par'], ['blocking', 'Membres bloqués'],
 ];

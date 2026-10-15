@@ -8,8 +8,11 @@ const TITLES = {
   post: () => t('Signaler cette publication'),
   comment: () => t('Signaler ce commentaire'),
   ride: () => t('Signaler cette sortie'),
-  listing: () => t('Signaler cette annonce'),
-  gear: () => t('Signaler cet objet'),
+  forum_topic: () => t('Signaler ce sujet'),
+  forum_reply: () => t('Signaler cette réponse'),
+  group: () => t('Signaler ce club ou groupe'),
+  group_message: () => t('Signaler ce message'),
+  hazard: () => t('Signaler ce danger (faux ou abusif)'),
   chat_message: () => t('Signaler ce message'),
   avatar: (name) => t('Signaler la photo de profil de {name}', { name }),
 };
@@ -36,7 +39,7 @@ export default function ReportDialog({ target, name, onClose }) {
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/40 px-4 pb-4 sm:items-center" onClick={onClose}>
       <form onSubmit={send} onClick={(e) => e.stopPropagation()} className="card w-full max-w-sm space-y-3">
-        <h2 className="font-bold text-stone-800">{TITLES[target.type]?.(name)}</h2>
+        <h2 className="font-bold text-stone-800">{TITLES[target.type]?.(name) || t('Signaler')}</h2>
         {target.type === 'conversation' && (
           <p className="text-xs text-stone-500">{t('Les 15 derniers messages de cette conversation seront transmis à l’équipe de modération.')}</p>
         )}

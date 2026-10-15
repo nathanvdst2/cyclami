@@ -18,6 +18,7 @@ import VerifiedBadge from '../components/VerifiedBadge.jsx';
 const REACTIONS = ['❤️', '😂', '😮', '😢', '👍', '🚴'];
 import { useDraft } from '../lib/persist.js';
 import MessageInput from '../components/MessageInput.jsx';
+import { levelInfo } from '../data/constants.js';
 
 // Séparateur de jour dans une conversation : « Aujourd’hui », « Hier » ou la date complète.
 function dayLabel(at) {
@@ -226,7 +227,7 @@ function Conversation({ other, draft, go }) {
               ? <span className="block text-xs font-semibold text-teal-600">{otherTyping === 'voice' ? t('enregistre un vocal…') : t('écrit…')}</span>
               : lastSeen
               ? <Presence lastSeen={lastSeen} className="block" />
-              : <span className="block text-xs text-stone-500">{t('avec {pets} · voir le profil', { pets: other.pets.map((p) => p.name).join(', ') })}</span>}
+              : <span className="block text-xs text-stone-500">{[levelInfo(other.level)?.label, t('voir le profil')].filter(Boolean).join(' · ')}</span>}
           </span>
         </button>
         <UserActions user={other} conversation onBlocked={() => go('messages')} />
