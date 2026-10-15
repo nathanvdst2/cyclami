@@ -4,7 +4,8 @@
 
 Cyclami est un site gratuit (installable sur téléphone) pour trouver des cyclistes de ton niveau
 près de chez toi et organiser des sorties ensemble, en Belgique et en France, en français,
-néerlandais et anglais. Adresse prévue : **https://cyclami.com**.
+néerlandais et anglais. Adresse : **https://cyclami.netlify.app** (un nom de domaine pourra être
+ajouté plus tard, voir section F).
 
 ---
 
@@ -16,10 +17,10 @@ néerlandais et anglais. Adresse prévue : **https://cyclami.com**.
 4. [Mise en ligne pas à pas (guide débutant)](#mise-en-ligne-pas-à-pas-guide-débutant)
    - [A. Créer la base de données Supabase](#a-créer-la-base-de-données-supabase)
    - [B. Créer le site sur Netlify](#b-créer-le-site-sur-netlify)
-   - [C. Acheter et brancher le nom de domaine](#c-acheter-et-brancher-le-nom-de-domaine)
-   - [D. Les e-mails avec Brevo](#d-les-e-mails-avec-brevo)
-   - [E. Devenir administrateur](#e-devenir-administrateur)
-   - [F. Sauvegardes](#f-sauvegardes)
+   - [C. Les e-mails avec Brevo](#c-les-e-mails-avec-brevo)
+   - [D. Devenir administrateur](#d-devenir-administrateur)
+   - [E. Sauvegardes](#e-sauvegardes)
+   - [F. Plus tard : un nom de domaine (facultatif)](#f-plus-tard--un-nom-de-domaine-facultatif)
 5. [Récapitulatif des variables et secrets](#récapitulatif-des-variables-et-secrets)
 6. [Dépannage](#dépannage)
 
@@ -126,8 +127,8 @@ node tests/reserved-avatar.test.mjs         # photo de profil réservée
 
 ## Mise en ligne pas à pas (guide débutant)
 
-Compte une heure ou deux, plus l'attente de la propagation du domaine. Tout est gratuit sauf le nom
-de domaine (environ 10 à 15 € par an). Il te faut :
+Compte une heure ou deux. Tout est gratuit : le site tourne sur `https://cyclami.netlify.app`
+(un nom de domaine payant pourra s'ajouter plus tard, section F). Il te faut :
 
 - un compte **GitHub** avec ce dépôt (https://github.com) ;
 - un compte **Supabase** (https://supabase.com, « Start your project », connexion avec GitHub possible) ;
@@ -174,15 +175,14 @@ de domaine (environ 10 à 15 € par an). Il te faut :
 
 4. **Adresses autorisées pour la connexion**
    - **Authentication** → **URL Configuration** :
-     - *Site URL* : `https://cyclami.com` (ton domaine) ;
-     - *Redirect URLs* → **Add URL** : `https://cyclami.com/**`, `https://www.cyclami.com/**`,
-       `https://<ton-site>.netlify.app/**` (l'adresse donnée par Netlify à l'étape B) et
-       `http://localhost:5173/**` (développement). **Save**.
+     - *Site URL* : `https://cyclami.netlify.app` (l'adresse Netlify de l'étape B) ;
+     - *Redirect URLs* → **Add URL** : `https://cyclami.netlify.app/**` et `http://localhost:5173/**`
+       (développement). **Save**.
 
 5. **Connexion avec Google (facultatif)**
    - https://console.cloud.google.com → crée un projet `Cyclami` → **APIs & Services** →
-     **OAuth consent screen** (type *External*, nom `Cyclami`, e-mail d'assistance, domaine
-     `cyclami.com`) → enregistre, puis **Publish app**.
+     **OAuth consent screen** (type *External*, nom `Cyclami`, e-mail d'assistance, page d'accueil
+     `https://cyclami.netlify.app`) → enregistre, puis **Publish app**.
    - **APIs & Services** → **Credentials** → **Create credentials** → **OAuth client ID** →
      *Application type* **Web application** → *Authorized redirect URIs* → **Add URI** :
      `https://abcdefghijklmnop.supabase.co/auth/v1/callback` (ton *Project URL* + `/auth/v1/callback`)
@@ -204,107 +204,77 @@ de domaine (environ 10 à 15 € par an). Il te faut :
    |---|---|---|
    | `VITE_SUPABASE_URL` | *Project URL* de Supabase (étape A2) | oui |
    | `VITE_SUPABASE_PUBLISHABLE_KEY` | *Publishable key* `sb_publishable_…` (étape A2) | oui |
-   | `SITE_URL` | `https://cyclami.com` (ton domaine, sans `/` à la fin) | conseillé |
-   | `BREVO_API_KEY` | clé API Brevo (étape D4) — coche **Contains secret values** | pour les e-mails |
-   | `SENDER_EMAIL` | `noreply@cyclami.com` (expéditeur validé chez Brevo, étape D3) | pour les e-mails |
+   | `SITE_URL` | `https://cyclami.netlify.app` (adresse du site, sans `/` à la fin) | conseillé |
+   | `BREVO_API_KEY` | clé API Brevo (étape C3) — coche **Contains secret values** | pour les e-mails |
+   | `SENDER_EMAIL` | adresse expéditeur validée chez Brevo (étape C2), ex. `ton.adresse@gmail.com` | pour les e-mails |
    | `SENDER_NAME` | `Cyclami` | non (défaut : Cyclami) |
-   | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | mêmes valeurs que les `VITE_…` | non (reprises des `VITE_…` sinon) |
-   | `SUPABASE_AUTH_HOOK_SECRET` | secret `v1,whsec_…` du Send Email Hook (étape D6) | non |
+   | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | mêmes valeurs que les `VITE_…` : lues par les fonctions `/api/*` et la fonction edge d’aperçu des liens partagés (qui reprennent les `VITE_…` si elles sont absentes) | non |
+   | `SUPABASE_AUTH_HOOK_SECRET` | secret `v1,whsec_…` du Send Email Hook (étape C5) | non |
 
 4. **Deploy**. Après 1 à 2 minutes, le site est en ligne sur `https://<nom-au-hasard>.netlify.app`.
-   Pour un nom plus joli : **Project configuration** → **General** → **Change project name**.
-5. À chaque envoi sur la branche `main` de GitHub, Netlify reconstruit le site tout seul.
+5. **Choisir l'adresse `cyclami.netlify.app`** : **Project configuration** (*Site configuration*) →
+   **General** → **Project details** → **Change project name** (*Change site name*) → tape `cyclami` →
+   **Save**. Le site répond alors sur `https://cyclami.netlify.app`. Si le nom est déjà pris, choisis-en
+   un autre (ex. `cyclami-be`) et utilise cette adresse partout où ce guide écrit `cyclami.netlify.app`
+   (variable `SITE_URL`, Supabase étape A4, et la commande SQL de la section F, étape 6, pour la base).
+6. À chaque envoi sur la branche `main` de GitHub, Netlify reconstruit le site tout seul.
    ⚠️ Après avoir **ajouté ou modifié une variable**, relance une construction :
    **Deploys** → **Trigger deploy** → **Deploy project** (ou *Clear cache and deploy*).
-6. Rien à configurer pour **Netlify Blobs** (cache des lieux, clé des notifications push) : c'est
+7. Rien à configurer pour **Netlify Blobs** (cache des lieux, clé des notifications push) : c'est
    automatique. Les notifications push fonctionnent dès le premier abonnement d'un membre.
 
-### C. Acheter et brancher le nom de domaine
-
-1. **Acheter le domaine** (`cyclami.com`, ou `cyclami.be` / `cyclami.fr`) :
-   - le plus simple : directement chez Netlify → **Domains** (menu de l'équipe) → **Register a domain** ;
-     la configuration est alors automatique, passe à l'étape 4 ;
-   - ou chez un bureau d'enregistrement (OVHcloud, Gandi, Combell, one.com, Cloudflare Registrar…).
-2. Netlify → ton projet → **Domain management** → **Add a domain** → tape `cyclami.com` →
-   **Verify** → **Add domain**.
-3. **Utiliser Netlify DNS** (recommandé : HTTPS et sous-domaines automatiques, et c'est là que tu
-   ajouteras les enregistrements Brevo) : à côté du domaine, **Options** → **Set up Netlify DNS** →
-   suis l'assistant jusqu'à la liste de **4 serveurs de noms** (`dns1.p0X.nsone.net`, …).
-   Chez ton bureau d'enregistrement, remplace les serveurs de noms (*nameservers* / *serveurs DNS*)
-   par ces 4 adresses. La propagation prend de quelques minutes à 48 h.
-4. **HTTPS** : **Domain management** → section **HTTPS** → **Verify DNS configuration** puis
-   **Provision certificate** (souvent automatique). Le certificat Let's Encrypt se renouvelle tout seul.
-5. **www** : ajoute aussi `www.cyclami.com` (Netlify le propose). Garde `cyclami.com` comme
-   **Primary domain** : `www` et l'adresse `*.netlify.app` redirigent vers lui (règles aussi présentes
-   dans `public/_redirects` — à adapter si ton domaine est différent).
-6. Retourne dans Supabase → **Authentication** → **URL Configuration** et vérifie *Site URL* et
-   *Redirect URLs* (étape A4) avec le domaine final.
-7. **Si ton domaine n'est pas `cyclami.com`** : change-le dans la variable Netlify `SITE_URL`, dans
-   `public/_redirects`, `public/robots.txt`, `index.html` (balises `og:`), la constante `SITE` de
-   `netlify/edge-functions/share.js` et `.github/workflows/site-check.yml` ; et dans la base
-   l'adresse d'appel des e-mails (Supabase → **SQL Editor**) :
-   `update private.settings set value = 'https://mon-domaine.be/api/notify' where key = 'notify_url';`
-8. Pour vérifier : onglet **Actions** de GitHub → **« Contrôle du site »** → **Run workflow**.
-
-### D. Les e-mails avec Brevo
+### C. Les e-mails avec Brevo
 
 Deux sortes d'e-mails partent par Brevo (offre gratuite : 300 e-mails par jour) :
 les **e-mails de connexion** (confirmation d'inscription, mot de passe oublié) envoyés par Supabase en
 **SMTP**, et les **notifications** (nouveau message, sortie…) envoyées par la fonction `/api/notify`
-avec l'**API** Brevo.
+avec l'**API** Brevo. Sans nom de domaine, on utilise simplement une adresse e-mail existante
+(par exemple une adresse Gmail) comme expéditeur.
 
 1. **Créer le compte** sur https://www.brevo.com (*Sign up free*), remplis le profil (Brevo peut
    demander quelques jours de vérification du compte avant d'envoyer).
-2. **Authentifier le domaine** (indispensable pour ne pas finir en indésirables) :
-   - Brevo → menu en haut à droite (ton nom) → **Senders, Domains & Dedicated IPs** → onglet
-     **Domains** → **Add a domain** → `cyclami.com` → choisis l'authentification **manuelle**
-     (« Authenticate the domain yourself »).
-   - Brevo affiche des enregistrements DNS : un **TXT** `brevo-code:…`, deux **CNAME** DKIM
-     (`brevo1._domainkey`, `brevo2._domainkey`) et un **TXT** DMARC (`_dmarc`,
-     `v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com`).
-   - Pour **chacun** : Netlify → **Domains** (menu de l'équipe) → `cyclami.com` → **DNS settings**
-     (ou *Domain management* → *Options* → *Go to DNS panel*) → **Add new record** → recopie
-     *Record type*, *Name* (sans `.cyclami.com` à la fin, Netlify l'ajoute) et *Value* exactement
-     comme Brevo les donne → **Save**.
-   - Retour dans Brevo → **Authenticate this email domain**. Si c'est refusé, attends 1 heure (propagation)
-     et réessaie. Les quatre lignes doivent passer au vert.
-3. **Expéditeur** : Brevo → **Senders, Domains & Dedicated IPs** → **Senders** → **Add a sender** :
-   *From name* `Cyclami`, *From email* `noreply@cyclami.com`. Le domaine étant authentifié, l'adresse
-   est validée sans boîte mail (si Brevo demande un code, utilise une adresse qui reçoit vraiment les
-   e-mails, par exemple `contact@cyclami.com` avec une redirection gratuite type ImprovMX).
-4. **Clé API** (pour les notifications) : Brevo → menu en haut à droite → **SMTP & API** → onglet
+2. **Vérifier l'adresse expéditeur** : Brevo → menu en haut à droite (ton nom) → **Senders, Domains &
+   Dedicated IPs** (*Expéditeurs, domaines et IP dédiées*) → onglet **Senders** (*Expéditeurs*) →
+   **Add a sender** : *From name* `Cyclami`, *From email* = ton adresse (ex. `ton.adresse@gmail.com`)
+   → Brevo envoie un **code** à cette adresse → recopie-le pour la valider.
+   > ⚠️ Avec une adresse gratuite (Gmail, Outlook…), Brevo peut **réécrire l'expéditeur** (l'e-mail
+   > part alors d'une adresse technique de Brevo, avec ton adresse en « répondre à »), et une partie
+   > des e-mails peut arriver dans les **indésirables**. C'est normal tant que le site n'a pas son
+   > propre domaine : la solution définitive est d'authentifier un domaine (section F).
+3. **Clé API** (pour les notifications) : Brevo → menu en haut à droite → **SMTP & API** → onglet
    **API Keys** → **Generate a new API key** → nom `Netlify` → copie la clé (`xkeysib-…`, affichée une
    seule fois). Mets-la à **deux** endroits :
    - Netlify → **Environment variables** → `BREVO_API_KEY` (cocher *Contains secret values*), et
-     `SENDER_EMAIL` = `noreply@cyclami.com` → puis **Trigger deploy** ;
+     `SENDER_EMAIL` = l'adresse validée à l'étape 2 → puis **Trigger deploy** ;
    - GitHub → **Settings** → **Secrets and variables** → **Actions** → **New repository secret** →
      `BREVO_API_KEY` → puis **Actions** → « Base de données Supabase » → **Run workflow** : la base
      reçoit ainsi la clé partagée et commence à envoyer les notifications.
    - Brevo → **Security** → **Authorised IPs** : si le blocage des adresses IP inconnues est actif,
      **désactive-le** (les fonctions Netlify n'ont pas d'adresse IP fixe).
-5. **SMTP pour Supabase** (e-mails de connexion) : Brevo → **SMTP & API** → onglet **SMTP** →
+4. **SMTP pour Supabase** (e-mails de connexion) : Brevo → **SMTP & API** → onglet **SMTP** →
    **Generate a new SMTP key** → nom `Supabase` → copie la clé. Note aussi le **Login** affiché
    (`xxxx@smtp-brevo.com`). Puis Supabase → **Authentication** → **Emails** → onglet **SMTP Settings** →
    active **Enable Custom SMTP** :
-   - *Sender email* `noreply@cyclami.com`, *Sender name* `Cyclami` ;
+   - *Sender email* = l'adresse validée à l'étape 2, *Sender name* `Cyclami` ;
    - *Host* `smtp-relay.brevo.com`, *Port* `587` ;
    - *Username* = le **Login** Brevo, *Password* = la **clé SMTP** → **Save changes**.
    - Conseillé : **Authentication** → **Rate Limits** → augmente *Rate limit for sending emails*
      (par ex. 100 par heure), et vérifie dans **Sign In / Providers** → **Email** que
      *Confirm email* est activé.
-6. **E-mails de connexion aux couleurs de Cyclami, en FR / NL / EN (facultatif)** :
+5. **E-mails de connexion aux couleurs de Cyclami, en FR / NL / EN (facultatif)** :
    - Supabase → **Authentication** → **Hooks** → **Add hook** → **Send Email hook** → type **HTTPS** →
-     *URL* `https://cyclami.com/api/auth-email` → **Generate secret** → copie le secret (`v1,whsec_…`).
+     *URL* `https://cyclami.netlify.app/api/auth-email` (ton adresse Netlify) → **Generate secret** →
+     copie le secret (`v1,whsec_…`).
    - Netlify → variable `SUPABASE_AUTH_HOOK_SECRET` = ce secret → **Trigger deploy**, puis, une fois
      le site reconstruit, **Create hook** dans Supabase.
    - Teste avec « mot de passe oublié ». Si les e-mails n'arrivent plus, désactive le hook : Supabase
-     reprend alors l'envoi par SMTP (étape 5).
-7. **Suivi** : Brevo → **Transactional** → **Logs** montre chaque e-mail envoyé ; la page
+     reprend alors l'envoi par SMTP (étape 4).
+6. **Suivi** : Brevo → **Transactional** → **Logs** montre chaque e-mail envoyé ; la page
    **Administration** du site affiche les crédits restants du jour.
 
-### E. Devenir administrateur
+### D. Devenir administrateur
 
-Le compte **`srlvma.ai@gmail.com`** devient automatiquement **administrateur** (fondateur), grâce à
+Le compte **`nathanbarbaraytb@gmail.com`** devient automatiquement **administrateur** (fondateur), grâce à
 `supabase/schema.sql` :
 
 - un déclencheur sur les comptes (`promote_founder`) le nomme administrateur **dès que l'adresse
@@ -317,7 +287,7 @@ Le compte **`srlvma.ai@gmail.com`** devient automatiquement **administrateur** (
 
 Concrètement :
 
-1. Une fois le site en ligne (étapes A à D), inscris-toi sur le site avec `srlvma.ai@gmail.com`
+1. Une fois le site en ligne (étapes A à C), inscris-toi sur le site avec `nathanbarbaraytb@gmail.com`
    (ou **Continuer avec Google** avec ce compte).
 2. Clique sur le lien de confirmation reçu par e-mail (inutile avec Google).
 3. Déconnecte-toi puis reconnecte-toi : **Administration** apparaît dans le menu du compte.
@@ -329,7 +299,7 @@ confirmation jamais reçu) : Supabase → **Authentication** → **Users** → v
 
 ```sql
 insert into public.admins (user_id, role)
-select id, 'admin' from auth.users where lower(email) = 'srlvma.ai@gmail.com'
+select id, 'admin' from auth.users where lower(email) = 'nathanbarbaraytb@gmail.com'
 on conflict (user_id) do update set role = 'admin';
 ```
 
@@ -347,7 +317,7 @@ on conflict (user_id) do update set role = 'admin';
 
 Les **modérateurs** se nomment depuis le site : Administration → Membres.
 
-### F. Sauvegardes
+### E. Sauvegardes
 
 - L'offre gratuite de Supabase ne garde pas de sauvegarde téléchargeable : la GitHub Action
   **« Sauvegarde base de données »** (`.github/workflows/backup.yml`) sauvegarde **chaque nuit** la base
@@ -369,6 +339,50 @@ Les **modérateurs** se nomment depuis le site : Administration → Membres.
   Supabase → **Storage** → bucket `photos` → télécharger, ou passer à l'offre Pro de Supabase
   (sauvegardes quotidiennes incluses).
 
+### F. Plus tard : un nom de domaine (facultatif)
+
+Le site fonctionne très bien sur `https://cyclami.netlify.app`. Un nom de domaine à toi
+(`cyclami.be`, `cyclami.fr`, `cyclami.com`… environ 10 à 15 € par an) rend l'adresse plus facile à
+retenir et, surtout, permet des **e-mails fiables** envoyés depuis ton domaine.
+
+1. **Acheter le domaine** : le plus simple, directement chez Netlify → **Domains** (menu de l'équipe)
+   → **Register a domain** (configuration automatique) ; ou chez un bureau d'enregistrement
+   (OVHcloud, Gandi, Combell, one.com, Cloudflare Registrar…).
+2. Netlify → ton projet → **Domain management** → **Add a domain** → tape le domaine → **Verify** →
+   **Add domain**.
+3. **Utiliser Netlify DNS** (recommandé : HTTPS automatique, et c'est là que tu ajouteras les
+   enregistrements Brevo) : à côté du domaine, **Options** → **Set up Netlify DNS** → suis l'assistant
+   jusqu'à la liste de **4 serveurs de noms** (`dns1.p0X.nsone.net`, …). Chez ton bureau
+   d'enregistrement, remplace les serveurs de noms (*nameservers*) par ces 4 adresses. La propagation
+   prend de quelques minutes à 48 h.
+4. **HTTPS** : **Domain management** → section **HTTPS** → **Verify DNS configuration** puis
+   **Provision certificate** (souvent automatique, renouvelé tout seul).
+5. **www** : ajoute aussi `www.` + ton domaine (Netlify le propose) et garde le domaine nu comme
+   **Primary domain** : `www` et `cyclami.netlify.app` redirigent alors vers lui.
+6. **Mettre l'adresse à jour partout** :
+   - Netlify → variable `SITE_URL` = `https://ton-domaine.be` → **Trigger deploy** ;
+   - Supabase → **Authentication** → **URL Configuration** : *Site URL* et *Redirect URLs* (étape A4) ;
+   - Supabase → **Authentication** → **Hooks** : URL du Send Email Hook, si tu l'utilises ;
+   - la base (adresse d'appel des e-mails et du push) : Supabase → **SQL Editor** →
+     `update private.settings set value = 'https://ton-domaine.be/api/notify' where key = 'notify_url';`
+   - dans le code : `public/_redirects`, `public/robots.txt`, `index.html` (balises `og:`), la constante
+     `SITE` de `netlify/edge-functions/share.js` et `.github/workflows/site-check.yml`.
+7. **Authentifier le domaine chez Brevo** (e-mails qui n'arrivent plus en indésirables) :
+   - Brevo → **Senders, Domains & Dedicated IPs** → onglet **Domains** → **Add a domain** → ton domaine
+     → authentification **manuelle** (« Authenticate the domain yourself »).
+   - Brevo affiche des enregistrements DNS : un **TXT** `brevo-code:…`, deux **CNAME** DKIM
+     (`brevo1._domainkey`, `brevo2._domainkey`) et un **TXT** DMARC (`_dmarc`,
+     `v=DMARC1; p=none; rua=mailto:rua@dmarc.brevo.com`).
+   - Pour **chacun** : Netlify → **Domains** → ton domaine → **DNS settings** → **Add new record** →
+     recopie *Record type*, *Name* (sans le domaine à la fin, Netlify l'ajoute) et *Value* exactement
+     comme Brevo les donne → **Save**.
+   - Retour dans Brevo → **Authenticate this email domain** (si c'est refusé, attends 1 h et réessaie).
+   - Ajoute l'expéditeur `noreply@ton-domaine.be` (**Senders** → **Add a sender** ; validé sans boîte
+     mail puisque le domaine est authentifié), puis mets cette adresse dans la variable Netlify
+     `SENDER_EMAIL` et dans Supabase (**SMTP Settings** → *Sender email*).
+8. Pour vérifier : change `SITE` dans `.github/workflows/site-check.yml`, puis onglet **Actions** →
+   **« Contrôle du site »** → **Run workflow**.
+
 ---
 
 ## Récapitulatif des variables et secrets
@@ -380,9 +394,9 @@ Les **modérateurs** se nomment depuis le site : Administration → Membres.
 | `VITE_SUPABASE_URL` | `https://abcdefghijklmnop.supabase.co` | adresse de la base (site) |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_…` | clé publique (site) |
 | `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` | idem | fonctions (facultatif, sinon reprises des `VITE_…`) |
-| `SITE_URL` | `https://cyclami.com` | liens dans les e-mails (défaut : `https://cyclami.com`) |
+| `SITE_URL` | `https://cyclami.netlify.app` | liens dans les e-mails (défaut : `https://cyclami.netlify.app`) |
 | `BREVO_API_KEY` 🔐 | `xkeysib-…` | envoi des e-mails ; dérive aussi la clé partagée avec la base |
-| `SENDER_EMAIL` | `noreply@cyclami.com` | expéditeur (domaine authentifié chez Brevo) |
+| `SENDER_EMAIL` | `ton.adresse@gmail.com` | expéditeur validé chez Brevo (plus tard : `noreply@` ton domaine) |
 | `SENDER_NAME` | `Cyclami` | nom affiché (défaut : Cyclami) |
 | `SUPABASE_AUTH_HOOK_SECRET` 🔐 | `v1,whsec_…` | e-mails de connexion personnalisés (facultatif) |
 
@@ -403,9 +417,10 @@ les variables Netlify ont la priorité. Ne jamais y mettre de secret.
 |---|---|
 | Page blanche, console : « configuration Supabase manquante » | `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` absentes au moment de la construction : ajoute-les dans Netlify puis **Trigger deploy**. |
 | La connexion Google renvoie vers une mauvaise adresse | Supabase → Authentication → URL Configuration : *Site URL* et *Redirect URLs* (étape A4). |
-| Les e-mails de confirmation n'arrivent pas | Supabase → Authentication → Emails → SMTP Settings (étape D5) ; Brevo → Transactional → Logs ; regarde les indésirables. |
-| Les notifications par e-mail ne partent pas | Secret GitHub `BREVO_API_KEY` présent et action « Base de données Supabase » relancée ; mêmes clés sur Netlify et GitHub ; `SENDER_EMAIL` sur un domaine authentifié ; Netlify → **Logs** → **Functions** → `notify`. |
+| Les e-mails de confirmation n'arrivent pas | Supabase → Authentication → Emails → SMTP Settings (étape C4) ; Brevo → Transactional → Logs ; regarde les indésirables. |
+| Les notifications par e-mail ne partent pas | Secret GitHub `BREVO_API_KEY` présent et action « Base de données Supabase » relancée ; mêmes clés sur Netlify et GitHub ; `SENDER_EMAIL` validée chez Brevo ; Netlify → **Logs** → **Functions** → `notify`. |
 | `/api/notify` répond 401 | La clé Brevo de Netlify et celle du secret GitHub sont différentes : remets la même aux deux endroits, relance l'action et redéploie. |
 | Brevo refuse : « unrecognised IP address » | Brevo → Security → Authorised IPs → désactive le blocage. |
-| Le site n'est pas encore en HTTPS | Domain management → HTTPS → *Verify DNS configuration* ; attends la propagation des serveurs de noms. |
+| L'adresse `cyclami.netlify.app` est déjà prise | Netlify → **Project configuration** → **General** → **Change project name** (*Site configuration → Change site name*), choisis un autre nom, puis mets à jour `SITE_URL`, les adresses de Supabase (étape A4) et `notify_url` (voir section F, étape 6). |
+| Le domaine (section F) n'est pas encore en HTTPS | Domain management → HTTPS → *Verify DNS configuration* ; attends la propagation des serveurs de noms. |
 | L'action « Base de données Supabase » échoue à la connexion | Vérifie `SUPABASE_DB_URL` : adresse **Session pooler**, port 5432, `[YOUR-PASSWORD]` remplacé (sans crochets). |

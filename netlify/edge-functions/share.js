@@ -343,6 +343,9 @@ ${lines.join('\n')}
   return new Response(xml, { headers: { 'content-type': 'application/xml; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
 }
 
+// Type d'aperçu demandé à la base (share_preview) pour chaque préfixe d'adresse : une sortie s'appelle « b » en base.
+const PREVIEW_KIND = { s: 'b', f: 'f', g: 'g', p: 'p' };
+
 export default async (request, context) => {
   const url = new URL(request.url);
   const site = siteUrl();
@@ -361,10 +364,10 @@ export default async (request, context) => {
     return new Response(await res.text(), { status: 404, headers: res.headers });
   }
   if (!p) {
-    // sortie terminée, sujet du forum, club ou groupe, profil : seulement l'aperçu du lien
+    // sujet du forum, club ou groupe (et sortie, profil si la base les décrit) : seulement l'aperçu du lien
     const m = path.match(/^\/([sfgp])\/([0-9a-f-]{36})$/i);
     if (!m) return res;
-    p = await rpc('share_preview', { p_kind: m[1], p_id: m[2].toLowerCase() });
+    p = await rpc('share_preview', { p_kind: PREVIEW_KIND[m[1].toLowerCase()], p_id: m[2].toLowerCase() });
     if (!p?.title) return res;
     // pages réservées aux membres ; un profil n'a jamais de photo dans son aperçu (seul le prénom est public)
     p = { title: p.title, description: p.description, image: m[1].toLowerCase() === 'p' ? null : p.image, canonical: false };

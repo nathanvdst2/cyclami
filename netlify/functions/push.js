@@ -44,7 +44,7 @@ async function vapidAuthorization(endpoint, jwk) {
   const { d, x, y, kty, crv } = jwk;
   const key = await crypto.subtle.importKey('jwk', { d, x, y, kty, crv }, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']);
   const head = b64u(enc(JSON.stringify({ typ: 'JWT', alg: 'ES256' })));
-  const contact = env('SENDER_EMAIL') || `contact@${new URL(env('SITE_URL', 'https://cyclami.com')).hostname}`;
+  const contact = env('SENDER_EMAIL') || 'contact@cyclami.netlify.app';
   const body = b64u(enc(JSON.stringify({
     aud: new URL(endpoint).origin, exp: Math.floor(Date.now() / 1000) + 12 * 3600, sub: `mailto:${contact}`,
   })));

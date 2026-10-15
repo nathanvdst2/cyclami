@@ -32,7 +32,7 @@ async function fetchOverpass(lat, lng) {
   // le premier serveur qui répond gagne ; 25 s max par serveur
   const data = await Promise.any(OVERPASS_MIRRORS.map(async (url) => {
     const res = await fetch(url, {
-      method: 'POST', body, headers: { 'User-Agent': 'Cyclami (https://cyclami.com)' }, signal: AbortSignal.timeout(25000),
+      method: 'POST', body, headers: { 'User-Agent': 'Cyclami (https://cyclami.netlify.app)' }, signal: AbortSignal.timeout(25000),
     });
     if (!res.ok) throw new Error(`overpass ${res.status}`);
     const out = await res.json();

@@ -36,11 +36,10 @@ export default {
   'Itinéraires & parcours': 'Routes & parcours',
   'Sécurité routière': 'Verkeersveiligheid',
   'Mécanique & entretien': 'Mechaniek & onderhoud',
-  'Débutants': 'Beginners',
-  'Entraide entre cyclistes': 'Fietsers helpen elkaar',
   'Pose tes questions, partage tes astuces et aide les autres cyclistes.': 'Stel je vragen, deel je tips en help andere fietsers.',
   'Tout': 'Alles',
   'Reste bienveillant. Pour une douleur ou une blessure, le forum ne remplace pas l’avis d’un médecin.': 'Blijf vriendelijk. Bij pijn of een blessure vervangt het forum het advies van een arts niet.',
   'Titre (ex : Quel braquet pour débuter en côte ?)': 'Titel (bv.: Welke versnelling om te beginnen met klimmen?)',
   'Sorties & rendez-vous': 'Ritten & afspraken',
+  'Débutants & entraide': 'Beginners & hulp',
 };

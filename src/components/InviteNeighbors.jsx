@@ -10,7 +10,7 @@ const townOf = (city) => String(city || '').replace(/\s*\d{4,5}\s*$/, '').replac
 // Page vide : « Sois le premier à … », inviter des cyclistes, ou passer dire bonjour dans le tchat général.
 export default function InviteNeighbors({ go, text, shareText }) {
   const { currentUser, actions } = useApp();
-  // lien de parrainage personnel (cyclami.com/?p=…)
+  // lien de parrainage personnel (<adresse du site>/?p=…)
   const [code, setCode] = useState(null);
   useEffect(() => { actions.referral.stats().then((s) => setCode(s?.code || null)).catch(() => {}); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [copied, setCopied] = useState(false);

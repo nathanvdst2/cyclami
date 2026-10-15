@@ -21,8 +21,7 @@ export const FORUM_CATEGORIES = [
   { id: 'itineraires', emoji: '🗺️', label: t('Itinéraires & parcours') },
   { id: 'securite', emoji: '🦺', label: t('Sécurité routière') },
   { id: 'mecanique', emoji: '🔧', label: t('Mécanique & entretien') },
-  { id: 'debutants', emoji: '🌱', label: t('Débutants') },
-  { id: 'entraide', emoji: '🤝', label: t('Entraide entre cyclistes') },
+  { id: 'entraide', emoji: '🌱', label: t('Débutants & entraide') },
 ];
 const categoryOf = (id) => FORUM_CATEGORIES.find((c) => c.id === id) || FORUM_CATEGORIES[0];
 
@@ -84,7 +83,7 @@ function TopicList({ go, back }) {
       )}
 
       <div className="space-y-2">
-        {topics && !query && ['all', 'debutants'].includes(category) && (
+        {topics && !query && ['all', 'entraide'].includes(category) && (
           <ExampleTopic onCreate={() => go('forum', { new: true, category: category === 'all' ? 'general' : category })} />
         )}
         {topics?.map((topic) => {

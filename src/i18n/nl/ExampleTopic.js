@@ -12,6 +12,6 @@ export default {
   'Préviens l’organisateur en t’inscrivant que tu débutes, la plupart adaptent l’allure. Si tu es du côté de Namur, on fait une sortie tranquille le dimanche matin à 22 km/h, tu es la bienvenue !': 'Laat de organisator bij je inschrijving weten dat je beginner bent, de meesten passen het tempo aan. Als je in de buurt van Namen woont: wij rijden zondagochtend een rustige rit aan 22 km/u, je bent welkom!',
   'Le contexte : ton niveau, ton vélo, ce que tu as déjà essayé': 'De context: je niveau, je fiets, wat je al geprobeerd hebt',
   'Je débute : comment suivre un groupe sans me faire lâcher dans les côtes ?': 'Ik ben beginner: hoe volg ik een groep zonder gelost te worden op de hellingen?',
-  'Débutants': 'Beginners',
   'Bonjour à tous ! Je roule seul depuis trois mois sur un vélo de route d’occasion, environ 50 km à 22 km/h de moyenne. J’aimerais rejoindre des sorties de groupe, mais j’ai peur de ralentir tout le monde dans les montées.\n\nComment avez-vous fait à vos débuts ? Allure, braquet, alimentation… Merci pour vos conseils !': 'Hallo allemaal! Ik rij sinds drie maanden alleen op een tweedehands koersfiets, zo’n 50 km aan gemiddeld 22 km/u. Ik zou graag aansluiten bij groepsritten, maar ik ben bang dat ik iedereen ophoud bergop.\n\nHoe hebben jullie het aangepakt in het begin? Tempo, versnellingen, voeding… Bedankt voor jullie tips!',
+  'Débutants & entraide': 'Beginners & hulp',
 };

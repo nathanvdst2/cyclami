@@ -527,6 +527,8 @@ export function AppProvider({ children }) {
     const today = new Date().toLocaleDateString('fr-CA');
     try { if (localStorage.getItem(key) === today) return; } catch { /* stockage indisponible */ }
     subscribePush().catch(() => {});
+    // rappels des sorties du lendemain (au cas où la tâche quotidienne de la base n'est pas active)
+    supabase.rpc('check_my_reminders').then(() => {}, () => {});
     supabase.rpc('claim_daily_xp').then(({ data: r, error }) => {
       if (error) return;
       try { localStorage.setItem(key, today); } catch { /* ignore */ }
@@ -1066,6 +1068,8 @@ export function AppProvider({ children }) {
         }));
       }),
       remove: (id) => attempt(async () => { check(await supabase.from('ride_tracks').delete().eq('id', id)); }),
+      // kilomètres suivis au GPS par des membres : { userId: km }
+      distances: async (ids) => (ids.length ? check(await supabase.rpc('rider_distances', { p_ids: ids })) || {} : {}),
       // mes totaux : { count, km, hours }
       totals: async () => {
         const rows = check(await supabase.from('ride_tracks').select('distance_m, duration_s').eq('user_id', me).limit(5000)) || [];

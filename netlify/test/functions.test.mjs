@@ -103,7 +103,7 @@ assert.equal(sent.body.sender.email, 'noreply@test.fr');
 assert.equal(sent.body.sender.name, 'Cyclami');
 assert.deepEqual(sent.body.tags, ['cyclami-ride_join']);
 assert.ok(!sent.body.htmlContent.includes('<script>') && sent.body.htmlContent.includes('&lt;b&gt;'), 'contenu échappé');
-assert.ok(sent.body.htmlContent.includes('https://cyclami.com/'), 'lien vers le site (SITE_URL par défaut)');
+assert.ok(sent.body.htmlContent.includes('https://cyclami.netlify.app/'), 'lien vers le site (SITE_URL par défaut)');
 assert.ok(sent.body.htmlContent.includes('Ouvrir Cyclami'), 'bouton en français par défaut');
 assert.ok(sent.body.htmlContent.includes('#0f766e'), 'couleurs Cyclami');
 r = await notifyReq(SECRET, { ...mail, lang: 'nl', from: 'club@autre-domaine.com' });
@@ -140,7 +140,7 @@ async function hook(payload, { key = HOOK_KEY, age = 0 } = {}) {
 }
 const signup = {
   user: { email: 'dora@x.fr', user_metadata: { name: 'Dora' } },
-  email_data: { token: '123456', token_hash: 'abc', email_action_type: 'signup', redirect_to: 'https://cyclami.com', site_url: 'https://cyclami.com' },
+  email_data: { token: '123456', token_hash: 'abc', email_action_type: 'signup', redirect_to: 'https://cyclami.netlify.app', site_url: 'https://cyclami.netlify.app' },
 };
 brevoCalls.length = 0;
 assert.equal((await hook(signup, { key: Buffer.from('mauvaise-cle-du-crochet-supabase').toString('base64') })).status, 401, 'signature refusée');
@@ -150,7 +150,7 @@ r = await hook(signup);
 assert.equal(r.status, 200, 'e-mail de confirmation envoyé');
 assert.equal(brevoCalls[0].body.to[0].email, 'dora@x.fr');
 assert.equal(brevoCalls[0].body.subject, 'Confirme ton adresse e-mail');
-assert.ok(brevoCalls[0].body.htmlContent.includes('https://x.supabase.co/auth/v1/verify?token=abc&amp;type=signup&amp;redirect_to=https%3A%2F%2Fcyclami.com'), 'lien de confirmation');
+assert.ok(brevoCalls[0].body.htmlContent.includes('https://x.supabase.co/auth/v1/verify?token=abc&amp;type=signup&amp;redirect_to=https%3A%2F%2Fcyclami.netlify.app'), 'lien de confirmation');
 assert.ok(brevoCalls[0].body.textContent.includes('123456'), 'code dans la version texte');
 r = await hook({ user: { email: 'eva@x.fr', user_metadata: { lang: 'nl' } }, email_data: { ...signup.email_data, email_action_type: 'recovery' } });
 assert.equal(brevoCalls[1].body.subject, 'Kies een nieuw wachtwoord', 'e-mail en néerlandais');

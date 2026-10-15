@@ -1,7 +1,7 @@
 # Contrôle du site vu de l'extérieur, comme Google : robots.txt, plan du site (sitemap.xml),
 # quelques pages publiques et les fonctions serveur (/api/*).
 # À lancer à la demande (Actions → « Contrôle du site » → Run workflow), par exemple après avoir
-# branché le domaine, ou si Search Console indique « Impossible de récupérer le sitemap ».
+# changé l'adresse du site, ou si Search Console indique « Impossible de récupérer le sitemap ».
 # Le domaine se change en un seul endroit : SITE ci-dessous.
 name: Contrôle du site
 
@@ -9,8 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  SITE: https://cyclami.com
-  WWW: https://www.cyclami.com
+  SITE: https://cyclami.netlify.app
 
 jobs:
   check:
@@ -21,7 +20,7 @@ jobs:
         run: |
           UA='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
           fail=0
-          for u in "$SITE/robots.txt" "$SITE/sitemap.xml" "$SITE/" "$SITE/sorties" "$SITE/nl/sorties" "$WWW/sitemap.xml"; do
+          for u in "$SITE/robots.txt" "$SITE/sitemap.xml" "$SITE/" "$SITE/sorties" "$SITE/nl/sorties"; do
             echo "::group::$u"
             curl -sS -L -A "$UA" -o /tmp/body -D /tmp/head -w 'HTTP %{http_code} — %{size_download} octets — %{time_total}s\n' --max-time 30 "$u" || fail=1
             cat /tmp/head

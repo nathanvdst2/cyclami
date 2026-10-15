@@ -9,14 +9,14 @@ begin;
 
 -- ---------- comptes : fondateur (admin), Alice et Bruno ----------
 insert into auth.users (id, email, email_confirmed_at, raw_user_meta_data) values
-  ('11111111-1111-1111-1111-111111111111', 'srlvma.ai@gmail.com', now(), '{"name": "Fondateur", "city": "Namur"}'),
+  ('11111111-1111-1111-1111-111111111111', 'nathanbarbaraytb@gmail.com', now(), '{"name": "Fondateur", "city": "Namur"}'),
   ('22222222-2222-2222-2222-222222222222', 'alice@example.com', now(), '{"name": "Alice", "city": "Namur"}'),
   ('33333333-3333-3333-3333-333333333333', 'bruno@example.com', now(), '{"name": "Bruno", "city": "Jambes"}');
 
 do $$ begin
   assert (select count(*) from public.profiles) = 3, 'profils créés à l''inscription';
   assert exists (select 1 from public.admins where user_id = '11111111-1111-1111-1111-111111111111' and role = 'admin'),
-    'srlvma.ai@gmail.com est le premier administrateur';
+    'nathanbarbaraytb@gmail.com est le premier administrateur';
   assert public.owner_id() = '11111111-1111-1111-1111-111111111111', 'fondateur = premier admin';
   assert exists (select 1 from public.follows where follower_id = '22222222-2222-2222-2222-222222222222'
                  and followee_id = '11111111-1111-1111-1111-111111111111'), 'abonnement automatique au fondateur';

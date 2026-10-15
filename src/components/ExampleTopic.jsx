@@ -27,7 +27,7 @@ export default function ExampleTopic({ onCreate }) {
             <span className="rounded-full bg-teal-500 px-2 py-0.5 text-xs font-bold text-white">📌 {t('Exemple')}</span>
             {t('Je débute : comment suivre un groupe sans me faire lâcher dans les côtes ?')}
           </span>
-          <span className="block truncate text-xs text-stone-500">{t('Débutants')} · Thomas</span>
+          <span className="block truncate text-xs text-stone-500">{t('Débutants & entraide')} · Thomas</span>
         </span>
         <span className="flex shrink-0 items-center gap-1 text-sm text-stone-500"><MessageSquare size={14} /> {replies.length}</span>
       </button>

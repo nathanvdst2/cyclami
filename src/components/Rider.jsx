@@ -75,7 +75,7 @@ export function BikeList({ bikes, onOpenPhoto }) {
 }
 
 // Statistiques d'un cycliste : sorties organisées et rejointes, kilomètres suivis au GPS (si disponibles).
-// Les chiffres viennent de member_achievements() ; pour soi, les km viennent de ses propres suivis GPS.
+// Les chiffres viennent de member_achievements() ; les km de rider_distances().
 export function RiderStats({ userId, mine = false, go }) {
   const { actions } = useApp();
   const [stats, setStats] = useState(null);
@@ -83,10 +83,10 @@ export function RiderStats({ userId, mine = false, go }) {
   useEffect(() => {
     let alive = true;
     actions.achievements(userId).then((s) => alive && setStats(s || {})).catch(() => alive && setStats({}));
-    if (mine) actions.tracks.totals().then((x) => alive && setKm(x?.km ?? null)).catch(() => {});
+    actions.tracks.distances([userId]).then((d) => alive && d?.[userId] != null && setKm(Number(d[userId]))).catch(() => {});
     return () => { alive = false; };
   }, [userId, mine]); // eslint-disable-line react-hooks/exhaustive-deps
-  const kmShown = km ?? stats?.km_tracked ?? null;
+  const kmShown = km;
   const items = [
     ['🗺️', stats?.rides_hosted, t('sorties organisées')],
     ['🚴', stats?.rides_joined, t('sorties rejointes')],

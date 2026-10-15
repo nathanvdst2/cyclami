@@ -50,7 +50,7 @@ const og = `<div style="width:1200px;height:630px;position:relative;overflow:hid
     <span style="background:#10b981;color:#fff;padding:10px 22px;border-radius:999px">VTT / gravel</span>
     <span style="background:#fff;color:#0f766e;padding:10px 22px;border-radius:999px;border:3px solid #0f766e">Loisir</span>
   </div>
-  <div style="position:absolute;right:56px;bottom:40px;font-weight:700;font-size:24px;color:#0f766e">cyclami.com · Belgique &amp; France</div>
+  <div style="position:absolute;right:56px;bottom:40px;font-weight:700;font-size:24px;color:#0f766e">Gratuit · Belgique &amp; France</div>
 </div>`;
 
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});

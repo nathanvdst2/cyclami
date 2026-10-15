@@ -8,7 +8,7 @@ export const env = (name, fallback = '') => {
   const v = globalThis.Netlify?.env?.get?.(name) ?? process.env[name];
   return v == null || v === '' ? fallback : String(v);
 };
-export const siteUrl = () => env('SITE_URL', 'https://cyclami.com').replace(/\/+$/, '');
+export const siteUrl = () => env('SITE_URL', 'https://cyclami.netlify.app').replace(/\/+$/, '');
 export const supabaseUrl = () => env('SUPABASE_URL', env('VITE_SUPABASE_URL')).replace(/\/+$/, '');
 export const supabaseKey = () => env('SUPABASE_PUBLISHABLE_KEY', env('VITE_SUPABASE_PUBLISHABLE_KEY'));
 // Clé Brevo sans espaces ni retour à la ligne parasites (copier-coller), comme dans la GitHub Action.

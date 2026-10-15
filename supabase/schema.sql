@@ -712,13 +712,13 @@ alter table public.admins add column if not exists role text not null default 'a
 alter table public.admins drop constraint if exists admins_role_check;
 alter table public.admins add constraint admins_role_check check (role in ('admin', 'moderator'));
 
--- Premier administrateur (fondateur) de Cyclami : le compte srlvma.ai@gmail.com, dès que son adresse
+-- Premier administrateur (fondateur) de Cyclami : le compte nathanbarbaraytb@gmail.com, dès que son adresse
 -- e-mail est confirmée et tant que le site n'a aucun administrateur (personne d'autre ne peut l'obtenir
 -- en s'inscrivant avec cette adresse sans pouvoir la confirmer).
 create or replace function public.promote_founder()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  if lower(coalesce(new.email, '')) = 'srlvma.ai@gmail.com' and new.email_confirmed_at is not null
+  if lower(coalesce(new.email, '')) = 'nathanbarbaraytb@gmail.com' and new.email_confirmed_at is not null
      and not exists (select 1 from public.admins where role = 'admin') then
     insert into public.admins (user_id, role) values (new.id, 'admin') on conflict (user_id) do update set role = 'admin';
   end if;
@@ -731,7 +731,7 @@ create trigger after_auth_user_founder
 
 insert into public.admins (user_id, role)
 select id, 'admin' from auth.users
-where lower(email) = 'srlvma.ai@gmail.com' and email_confirmed_at is not null
+where lower(email) = 'nathanbarbaraytb@gmail.com' and email_confirmed_at is not null
   and not exists (select 1 from public.admins where role = 'admin')
 order by created_at limit 1
 on conflict (user_id) do update set role = 'admin';
@@ -2713,6 +2713,11 @@ returns jsonb language sql stable security definer set search_path = public as $
                        || member_count || ' membre' || case when member_count > 1 then 's' else '' end
                        || coalesce(' · ' || nullif(city, ''), '') || ' — Groupe Cyclami.')
       from public.groups where id = p_id and hidden_at is null)
+    -- profil : seul le prénom est public (ni ville ni photo)
+    when 'p' then (select jsonb_build_object(
+        'title', '🚴 ' || name || ' sur Cyclami',
+        'description', 'Cycliste sur Cyclami : trouve des cyclistes de ton niveau et roulez ensemble.')
+      from public.profiles where id = p_id and level is not null)
   end;
 $$;
 revoke execute on function public.share_preview(text, uuid) from public;

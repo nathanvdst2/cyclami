@@ -1,4 +1,4 @@
-// Parrainage : lien personnel cyclami.com/?p=<code>. Le code est gardé 30 jours sur l'appareil du visiteur,
+// Parrainage : lien personnel <site>/?p=<code>. Le code est gardé 30 jours sur l'appareil du visiteur,
 // puis transmis à la base après son inscription (voir claim_referral).
 const KEY = 'cyclami:referral';
 const CODE_RE = /^[0-9a-f]{10}$/;

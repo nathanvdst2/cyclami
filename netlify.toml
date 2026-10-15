@@ -25,7 +25,7 @@
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Strict-Transport-Security = "max-age=31536000"
     # position (carte, suivi GPS), caméra et micro (vérification du profil, messages vocaux) : ce site uniquement
     Permissions-Policy = "geolocation=(self), camera=(self), microphone=(self), payment=(), usb=(), interest-cohort=()"
     Cross-Origin-Opener-Policy = "same-origin-allow-popups"
