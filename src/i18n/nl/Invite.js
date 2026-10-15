@@ -6,7 +6,7 @@ export default {
   'Copier le lien': 'Link kopiëren',
   'Lien copié !': 'Link gekopieerd!',
   'Partager mon lien': 'Mijn link delen',
-  'Tu es Ambassadeur d’Cyclami !': 'Je bent Ambassadeur van Cyclami!',
+  'Tu es Ambassadeur de Cyclami !': 'Je bent Ambassadeur van Cyclami!',
   'Badge « Ambassadeur » : {n} / {total} amis inscrits': 'Badge « Ambassadeur »: {n} / {total} vrienden ingeschreven',
   'Un ami compte dès qu’il a présenté son animal.': 'Een vriend telt mee zodra hij zijn dier heeft voorgesteld.',
   'compté': 'telt mee',

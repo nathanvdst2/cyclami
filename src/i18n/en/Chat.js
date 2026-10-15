@@ -2,7 +2,7 @@
 export default {
   'Tchat indisponible pour le moment.': 'Chat unavailable right now.',
   'Tchat général': 'General chat',
-  'Ouvert à tous les membres d’Cyclami. Reste bienveillant : pas de pub, pas de vente d’animaux, pas d’infos personnelles. Un message déplacé ? Signale-le avec le drapeau.': 'Open to all Cyclami members. Be kind: no ads, no selling animals, no personal details. Inappropriate message? Report it with the flag.',
+  'Ouvert à tous les membres de Cyclami. Reste bienveillant : pas de pub, pas de vente d’animaux, pas d’infos personnelles. Un message déplacé ? Signale-le avec le drapeau.': 'Open to all Cyclami members. Be kind: no ads, no selling animals, no personal details. Inappropriate message? Report it with the flag.',
   'Voir les messages plus anciens': 'See older messages',
   'Personne n’a encore écrit. Lance la conversation 👋': 'Nobody has written yet. Start the conversation 👋',
   'Écrire à tout le monde…': 'Write to everyone…',

@@ -26,7 +26,7 @@ export default {
   'Réagir {emoji}': 'Reageer {emoji}',
   'Réactions': 'Reacties',
   'Tchat général': 'Algemene chat',
-  'Discute avec tous les membres d’Cyclami': 'Praat met alle leden van Cyclami',
+  'Discute avec tous les membres de Cyclami': 'Praat met alle leden van Cyclami',
   '{name} enregistre un message vocal…': '{name} neemt een spraakbericht op…',
   'enregistre un vocal…': 'neemt een spraakbericht op…',
   'écrit…': 'typt…',

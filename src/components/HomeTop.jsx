@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { CalendarDays, LocateFixed, MapPin, Plus, Users } from 'lucide-react';
 import { useApp } from '../context/AppContext.jsx';
-import PetAvatar from './PetAvatar.jsx';
+import UserAvatar from './UserAvatar.jsx';
+import { levelInfo, rideType } from '../data/constants.js';
 import { weatherAt } from '../lib/weather.js';
 import { distanceKm, formatDistance } from '../utils/geo.js';
 import { locale, t } from '../i18n/index.js';
@@ -9,7 +10,6 @@ import { locale, t } from '../i18n/index.js';
 // Haut de l'accueil : bonjour, météo de la prochaine heure et les deux actions principales.
 export function WelcomeHero({ go, locMsg, onLocate }) {
   const { currentUser } = useApp();
-  const pet = currentUser.pets[0];
   const [weather, setWeather] = useState(null);
   useEffect(() => {
     const c = currentUser.coords;
@@ -22,11 +22,11 @@ export function WelcomeHero({ go, locMsg, onLocate }) {
   return (
     <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-teal-500 via-teal-500 to-emerald-500 p-4 text-white shadow-md sm:p-5">
       <div className="flex items-center gap-3">
-        {pet && <PetAvatar pet={pet} size="lg" />}
+        <UserAvatar user={currentUser} size="lg" className="ring-2 ring-white/60" />
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-extrabold leading-tight sm:text-2xl">{hello} 👋</h1>
           <p className="text-sm text-teal-50">
-            {pet ? t('{pet} a envie de se dégourdir les pattes !', { pet: pet.name }) : t('Prêt pour une sortie ?')}
+            {t('Prêt à rouler ? 🚴')}
           </p>
         </div>
         {weather && (
@@ -38,15 +38,16 @@ export function WelcomeHero({ go, locMsg, onLocate }) {
       </div>
       {weather && (
         <p className="mt-2 text-sm font-semibold text-white/95">
-          {rainy ? t('🌧️ Pluie probable ({n} %) : prévois un imperméable… ou une sortie courte.', { n: weather.rain })
-            : weather.temp >= 27 ? t('🥵 Il fait chaud : sortie tôt ou tard, à l’ombre, avec de l’eau.')
-              : weather.temp <= 0 ? t('🥶 Il gèle : attention au sel sur les trottoirs, rince les pattes au retour.')
-                : t('Temps idéal pour une sortie 🚴')}
+          {rainy ? t('🌧️ Pluie probable ({n} %) : prends un coupe-vent… ou attends l’éclaircie.', { n: weather.rain })
+            : weather.wind != null && weather.wind >= 35 ? t('💨 Gros vent ({n} km/h) : pars face au vent, tu l’auras dans le dos au retour.', { n: weather.wind })
+              : weather.temp >= 27 ? t('🥵 Il fait chaud : roule tôt ou tard, et emporte deux bidons.')
+                : weather.temp <= 2 ? t('🥶 Risque de verglas : prudence dans les virages, couvre bien les mains et les pieds.')
+                  : t('Temps idéal pour rouler 🚴')}
         </p>
       )}
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <button className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-[#fffaf5] px-2 py-2.5 text-[13px] font-bold text-[#c2410c] shadow-sm active:scale-[0.98] sm:text-sm" onClick={() => go('tracker')}>
-          📍 {t('Démarrer une sortie')}
+        <button className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-white px-2 py-2.5 text-[13px] font-bold text-teal-700 shadow-sm active:scale-[0.98] sm:text-sm" onClick={() => go('tracker')}>
+          📍 {t('Suivi GPS')}
         </button>
         <button className="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-white/20 px-2 py-2.5 text-[13px] font-bold text-white ring-1 ring-white/50 active:scale-[0.98] sm:text-sm" onClick={() => go('rides', { create: Date.now() })}>
           <Plus size={15} /> {t('Organiser une sortie')}
@@ -67,16 +68,16 @@ export function WelcomeHero({ go, locMsg, onLocate }) {
 export function QuickTiles({ go, badges = {} }) {
   // [page, emoji, libellé court affiché, nom complet (lecteurs d'écran, info-bulle), ton]
   const tiles = [
-    ['chat', '💬', t('Tchat'), t('Tchat général')],
-    ['emergency', '🚑', t('Véto'), t('Urgence véto'), 'red'],
-    ['hazards', '⚠️', t('Dangers'), t('Dangers du quartier')],
-    ['lost', '🚨', t('Perdus'), t('Animaux perdus')],
-    ['sitting', '🏠', t('Garde'), t('Garde entre voisins')],
-    ['groups', '👥', t('Groupes'), t('Groupes')],
+    ['hazards', '⚠️', t('Dangers'), t('Dangers sur la route'), 'red'],
+    ['tracker', '📍', t('GPS'), t('Suivi GPS')],
+    ['groups', '👥', t('Clubs'), t('Clubs et groupes')],
     ['forum', '🗂️', t('Forum'), t('Forum')],
-    ['gear', '🎁', t('Matériel'), t('Matériel entre voisins')],
-    ['games', '🎮', t('Jeux'), t('Jeux')],
+    ['chat', '💬', t('Tchat'), t('Tchat général')],
+    ['leaderboard', '🏆', t('Classement'), t('Niveau et classement')],
+    ['feed', '📸', t('Fil'), t('Fil d’actualité')],
+    ['rides', '🗓️', t('Sorties'), t('Toutes les sorties')],
     ['invite', '💌', t('Inviter'), t('Inviter des amis')],
+    ['rider', '🚲', t('Mes vélos'), t('Mon profil cycliste et mes vélos')],
   ];
   return (
     <nav className="grid grid-cols-5 gap-2" aria-label={t('Raccourcis')}>
@@ -109,15 +110,15 @@ export function NearbyRides({ go }) {
   return (
     <section className="space-y-2">
       <div className="flex items-baseline justify-between">
-        <h2 className="text-lg font-extrabold text-stone-800">🌳 {t('Sorties près de chez toi')}</h2>
+        <h2 className="text-lg font-extrabold text-stone-800">🗺️ {t('Sorties près de chez toi')}</h2>
         <button className="text-sm font-semibold text-teal-600" onClick={() => go('rides')}>{t('Tout voir')}</button>
       </div>
       {list.length === 0 ? (
         <button className="card flex w-full items-center gap-3 border-2 border-dashed border-teal-200 text-left !ring-0" onClick={() => go('rides', { create: Date.now() })}>
-          <span className="text-3xl">🦮</span>
+          <span className="text-3xl">🚴</span>
           <span className="flex-1 text-sm text-stone-600">
             <strong className="block text-stone-800">{t('Aucune sortie prévue autour de toi')}</strong>
-            {t('Organise la première : les voisins sont prévenus et peuvent s’inscrire.')}
+            {t('Organise la première : les cyclistes du coin sont prévenus et peuvent s’inscrire.')}
           </span>
           <Plus className="shrink-0 text-teal-600" />
         </button>
@@ -132,7 +133,10 @@ export function NearbyRides({ go }) {
                 <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-teal-600">
                   <CalendarDays size={12} /> {d.toLocaleDateString(locale(), { weekday: 'short', day: 'numeric', month: 'short' })} · {d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' })}
                 </div>
-                <div className="line-clamp-2 font-bold text-stone-800">{w.title}</div>
+                <div className="line-clamp-2 font-bold text-stone-800">{rideType(w.type).emoji} {w.title}</div>
+                <div className="truncate text-xs font-semibold text-teal-700">
+                  {[levelInfo(w.level)?.label, w.distanceKm && `${w.distanceKm} km`, w.avgSpeed && `${w.avgSpeed} km/h`].filter(Boolean).join(' · ')}
+                </div>
                 <div className="truncate text-xs text-stone-500">📍 {w.place}{w.km != null && ` · ${formatDistance(w.km)}`}</div>
                 <div className="flex items-center gap-1 text-xs text-stone-500">
                   <Users size={12} /> {w.participants.length}/{w.maxParticipants}

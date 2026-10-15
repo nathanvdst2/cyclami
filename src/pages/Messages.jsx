@@ -48,14 +48,14 @@ export default function Messages({ go, params }) {
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-teal-100 text-2xl">💬</span>
         <span className="min-w-0 flex-1">
           <span className="block font-bold text-stone-800">{t('Tchat général')}</span>
-          <span className="block truncate text-sm text-stone-500">{t('Discute avec tous les membres d’Cyclami')}</span>
+          <span className="block truncate text-sm text-stone-500">{t('Discute avec tous les membres de Cyclami')}</span>
         </span>
       </button>
       {conversations.length === 0 && (
         <EmptyState name="messages-vide">
           {t('Pas encore de conversation.')}{' '}
           <button className="font-semibold text-teal-600" onClick={() => go('discover')}>
-            {t('Trouve un compagnon de sortie')}
+            {t('Trouve des cyclistes de ton niveau')}
           </button>
         </EmptyState>
       )}

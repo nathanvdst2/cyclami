@@ -3,8 +3,8 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  // Chemins relatifs : le build fonctionne sur Vercel, Netlify ou GitHub Pages sans réglage.
-  base: '/', // adresses partagées (/b/…, /a/…) : les fichiers sont toujours à la racine
+  // adresses partagées (/b/…, /g/…) et pages en /nl, /en : les fichiers sont toujours servis depuis la racine
+  base: '/',
   build: {
     rollupOptions: {
       output: {

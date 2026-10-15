@@ -1,15 +1,13 @@
 import { useState } from 'react';
-import { BellRing, Download, Eye, Languages, LogOut, Pencil, Plus, ShieldCheck, Stethoscope, Trash2 } from 'lucide-react';
+import { BellRing, Download, Eye, Languages, LogOut, Pencil, Plus, ShieldCheck, Trash2 } from 'lucide-react';
 import { useApp } from '../context/AppContext.jsx';
-import { AVAILABILITY_SLOTS } from '../data/constants.js';
-import PetBadge from '../components/PetBadge.jsx';
+import { MAX_BIKES } from '../data/constants.js';
+import { BikeCard, RiderChips, RiderStats } from '../components/Rider.jsx';
 import InstallApp from '../components/InstallApp.jsx';
 import LevelCard from '../components/LevelCard.jsx';
 import EmailPrefs from '../components/EmailPrefs.jsx';
 import AvatarPicker from '../components/AvatarPicker.jsx';
 import { t, LANGS, getLang, setLang } from '../i18n/index.js';
-import { isBirthday } from '../utils/age.js';
-import { illu } from '../lib/illustrations.js';
 import SupportCyclami from '../components/SupportCyclami.jsx';
 import FeedbackButton from '../components/Feedback.jsx';
 import { useDraft } from '../lib/persist.js';
@@ -19,7 +17,6 @@ export default function Profile({ go }) {
   const adminId = Object.keys(staffRoles).find((id) => staffRoles[id] === 'admin');
   const [form, setForm] = useDraft('profile', {
     name: currentUser.name, city: currentUser.city, bio: currentUser.bio || '',
-    availability: currentUser.availability || [],
   });
   const [status, setStatus] = useState(null);
   const [error, setError] = useState(null);
@@ -34,11 +31,6 @@ export default function Profile({ go }) {
     if (typeof Notification !== 'undefined') setNotifPermission(Notification.permission);
   };
 
-  const toggleSlot = (s) => setForm({
-    ...form,
-    availability: form.availability.includes(s) ? form.availability.filter((x) => x !== s) : [...form.availability, s],
-  });
-
   const run = async (fn) => {
     setError(null);
     const err = await fn();
@@ -49,13 +41,13 @@ export default function Profile({ go }) {
   const save = async (e) => {
     e.preventDefault();
     setStatus('saving');
-    const err = await run(() => actions.updateProfile(form));
+    const err = await run(() => actions.updateProfile({ name: form.name, city: form.city, bio: form.bio }));
     setStatus(err ? null : 'saved');
     if (!err) setTimeout(() => setStatus(null), 1500);
   };
 
   const deleteAccount = async () => {
-    const answer = window.prompt(t('Cette action est définitive : ton profil, tes animaux, tes photos et tes messages seront supprimés.\n\nÉcris SUPPRIMER pour confirmer.'));
+    const answer = window.prompt(t('Cette action est définitive : ton profil, tes vélos, tes photos et tes messages seront supprimés.\n\nÉcris SUPPRIMER pour confirmer.'));
     if (answer?.trim().toUpperCase() !== t('SUPPRIMER')) return;
     await run(() => actions.deleteAccount());
   };
@@ -85,15 +77,42 @@ export default function Profile({ go }) {
         </button>
       )}
 
-      {currentUser.pets.filter((p) => isBirthday(p.birthDate)).map((p) => (
-        <section key={p.id} className="card flex items-center gap-3 ring-2 ring-pink-200">
-          <img src={illu('anniversaire')} alt="" className="h-20 w-20 shrink-0 object-contain" />
-          <div>
-            <div className="font-extrabold text-stone-800">{t('Joyeux anniversaire {name} ! 🎂', { name: p.name })}</div>
-            <div className="text-sm text-stone-500">{t('Partage une photo de la fête avec le quartier dans le fil.')}</div>
-          </div>
-        </section>
-      ))}
+      <section className="card space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-lg font-bold text-stone-800">🚴 {t('Mon profil cycliste')}</h2>
+          <button className="btn-ghost !px-3" onClick={() => go('rider')} aria-label={t('Modifier mon profil cycliste')}><Pencil size={16} /> {t('Modifier')}</button>
+        </div>
+        <RiderChips user={currentUser} />
+        {currentUser.availability.length > 0 && (
+          <p className="text-xs text-stone-500">🕒 {t('Dispo : {slots}', { slots: currentUser.availability.map((a) => t(a)).join(', ') })}</p>
+        )}
+        <RiderStats userId={currentUser.id} mine go={go} />
+      </section>
+
+      <section className="card space-y-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-stone-800">🚲 {t('Mes vélos')}</h2>
+          {currentUser.bikes.length < MAX_BIKES && (
+            <button className="btn-ghost" onClick={() => go('rider', { bikeId: 'new' })}><Plus size={16} /> {t('Ajouter')}</button>
+          )}
+        </div>
+        {currentUser.bikes.length === 0 && (
+          <p className="text-sm text-stone-500">{t('Ajoute ton vélo avec une photo : +15 XP, et les autres cyclistes savent avec qui ils roulent.')}</p>
+        )}
+        {currentUser.bikes.map((b) => (
+          <BikeCard key={b.id} bike={b} actions={(
+            <>
+              <button className="rounded-lg p-2 text-stone-500 hover:bg-emerald-50" onClick={() => go('rider', { bikeId: b.id })} aria-label={t('Modifier')}>
+                <Pencil size={16} />
+              </button>
+              <button className="rounded-lg p-2 text-red-500 hover:bg-red-50" aria-label={t('Supprimer')}
+                onClick={() => window.confirm(t('Supprimer {name} ?', { name: b.name })) && run(() => actions.deleteBike(b.id))}>
+                <Trash2 size={16} />
+              </button>
+            </>
+          )} />
+        ))}
+      </section>
 
       <button className={`card flex w-full items-center gap-3 text-left ${currentUser.verifiedAt ? '' : 'ring-2 ring-green-200'}`} onClick={() => go('verify')}>
         <ShieldCheck className="shrink-0 text-green-600" size={26} />
@@ -159,54 +178,14 @@ export default function Profile({ go }) {
         </label>
         <label className="block text-sm font-semibold text-stone-600">
           {t('Présentation')}
-          <textarea className="input mt-1 font-normal" rows="2" maxLength={500} placeholder={t('Tes parcs préférés, tes habitudes de sortie…')} value={form.bio} onChange={set('bio')} />
+          <textarea className="input mt-1 font-normal" rows="2" maxLength={500} placeholder={t('Tes parcours préférés, ton club, tes objectifs…')} value={form.bio} onChange={set('bio')} />
         </label>
-        <div>
-          <div className="mb-1 text-sm font-semibold text-stone-600">{t('Disponibilités pour promener')}</div>
-          <div className="flex flex-wrap gap-2">
-            {AVAILABILITY_SLOTS.map((s) => {
-              const on = form.availability.includes(s);
-              return (
-                <button type="button" key={s} onClick={() => toggleSlot(s)}
-                  className={`chip ${on ? 'bg-teal-500 text-white ring-teal-500' : 'bg-white text-stone-600 ring-emerald-200'}`}>
-                  {t(s)}
-                </button>
-              );
-            })}
-          </div>
-        </div>
         <button className="btn-primary" disabled={status === 'saving'}>
           {status === 'saving' ? t('Enregistrement…') : status === 'saved' ? t('Enregistré ✔') : t('Enregistrer')}
         </button>
       </form>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
-
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-stone-800">{t('Mes animaux')}</h2>
-        <button className="btn-ghost" onClick={() => go('pet')}><Plus size={16} /> {t('Ajouter')}</button>
-      </div>
-      {currentUser.pets.map((p) => (
-        <div key={p.id} className="card flex items-start justify-between gap-2">
-          <button type="button" className="min-w-0 flex-1 text-left" onClick={() => go('animal', { petId: p.id })}>
-            <PetBadge pet={p} />
-          </button>
-          <div className="flex shrink-0 gap-1">
-            <button className="rounded-lg p-2 text-stone-500 hover:bg-emerald-50" onClick={() => go('health', { petId: p.id })} aria-label={t('Carnet de santé')} title={t('Carnet de santé')}>
-              <Stethoscope size={16} />
-            </button>
-            <button className="rounded-lg p-2 text-stone-500 hover:bg-emerald-50" onClick={() => go('pet', { petId: p.id })} aria-label={t('Modifier')}>
-              <Pencil size={16} />
-            </button>
-            {currentUser.pets.length > 1 && (
-              <button className="rounded-lg p-2 text-red-500 hover:bg-red-50" aria-label={t('Supprimer')}
-                onClick={() => window.confirm(t('Supprimer {name} ?', { name: p.name })) && run(() => actions.deletePet(p.id))}>
-                <Trash2 size={16} />
-              </button>
-            )}
-          </div>
-        </div>
-      ))}
 
       {blockedIds.size > 0 && (
         <div className="card space-y-2">
@@ -274,7 +253,7 @@ function ExportData() {
   return (
     <div className="card space-y-2">
       <div className="flex items-center gap-2 font-bold text-stone-800"><Download size={18} className="text-teal-500" /> {t('Mes données')}</div>
-      <p className="text-sm text-stone-600">{t('Télécharge une copie de tout ce qui te concerne sur Cyclami : profil, animaux, publications, messages, sorties, annonces… (fichier JSON).')}</p>
+      <p className="text-sm text-stone-600">{t('Télécharge une copie de tout ce qui te concerne sur Cyclami : profil, vélos, publications, messages, sorties… (fichier JSON).')}</p>
       <button className="btn-ghost" disabled={busy} onClick={run}><Download size={16} /> {busy ? t('Préparation…') : t('Télécharger mes données')}</button>
       {error && <p className="text-sm text-red-600">{error}</p>}
     </div>

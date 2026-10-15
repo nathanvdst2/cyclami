@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Camera, CheckCircle2, LocateFixed, Plus, ThumbsUp, Trash2, X } from 'lucide-react';
 import { useApp } from '../context/AppContext.jsx';
-import { HAZARD_KINDS, hazardKind, hazardLabel } from '../data/hazards.js';
+import { HAZARD_KINDS, hazardDays, hazardKind, hazardLabel } from '../data/hazards.js';
 import { MAX_INPUT_BYTES } from '../utils/image.js';
 import { distanceKm, formatDistance, timeAgo } from '../utils/geo.js';
 import ViewToggle from '../components/ViewToggle.jsx';
@@ -13,9 +13,9 @@ import QuickEdit from '../components/QuickEdit.jsx';
 
 const MapView = lazy(() => import('../components/MapView.jsx'));
 
-// Dangers du quartier : boulettes empoisonnées, chenilles processionnaires, algues bleues…
-// Les voisins à moins de 3 km sont prévenus ; une alerte expire seule, « Toujours là » la prolonge.
-export default function Hazards({ go, back, params = {} }) {
+// Dangers sur la route : nids-de-poule, travaux, gravillons, chien agressif, verglas…
+// Les cyclistes à moins de 3 km sont prévenus ; une alerte expire seule, « Toujours là » la prolonge.
+export default function Hazards({ back, params = {} }) {
   const { currentUser, actions, getUser, isStaff, isAdmin } = useApp();
   const [items, setItems] = useState(null);
   const [creating, setCreating] = usePageState('hazards:creating', false);
@@ -47,11 +47,11 @@ export default function Hazards({ go, back, params = {} }) {
         <ArrowLeft size={16} /> {t('Retour')}
       </button>
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-extrabold text-stone-800">⚠️ {t('Dangers du quartier')}</h1>
+        <h1 className="text-2xl font-extrabold text-stone-800">⚠️ {t('Dangers sur la route')}</h1>
         <button className="btn-primary shrink-0" onClick={() => setCreating(true)}><Plus size={16} /> {t('Signaler')}</button>
       </div>
       <p className="text-sm text-stone-500">
-        {t('Boulettes empoisonnées, chenilles processionnaires, algues bleues… Les membres à moins de 3 km sont prévenus tout de suite.')}
+        {t('Nids-de-poule, travaux, gravillons, chien agressif, verglas… Les cyclistes à moins de 3 km sont prévenus tout de suite.')}
       </p>
 
       {creating && <HazardForm onClose={() => setCreating(false)} onSaved={() => { setCreating(false); load(); }} />}
@@ -64,8 +64,8 @@ export default function Hazards({ go, back, params = {} }) {
       {items === null && <div className="card h-40 animate-pulse" />}
       {items && list.length === 0 && (
         <div className="card space-y-1 text-center text-stone-500">
-          <div className="text-4xl">🌳</div>
-          <p>{t('Aucun danger signalé près de chez toi. Bonnes sorties !')}</p>
+          <div className="text-4xl">🚴</div>
+          <p>{t('Aucun danger signalé près de chez toi. Bonne route !')}</p>
         </div>
       )}
 
@@ -127,14 +127,13 @@ export default function Hazards({ go, back, params = {} }) {
           </article>
         );
       })}
-      <button className="mx-auto block text-sm text-stone-500 underline" onClick={() => go('emergency')}>🚑 {t('Urgence vétérinaire : les vétos les plus proches')}</button>
     </div>
   );
 }
 
 function HazardForm({ onClose, onSaved }) {
   const { currentUser, actions } = useApp();
-  const [form, setForm, clearDraft] = useDraft('hazard', { kind: 'poison', title: '', place: '', description: '' });
+  const [form, setForm, clearDraft] = useDraft('hazard', { kind: 'nid_de_poule', title: '', place: '', description: '' });
   const [coords, setCoords, clearCoords] = useDraft('hazard:coords', currentUser.coords || null);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -193,7 +192,7 @@ function HazardForm({ onClose, onSaved }) {
       </div>
       {form.kind === 'autre' && (
         <input className="input" required minLength={3} maxLength={60} autoFocus aria-label={t('Quel danger ?')}
-          placeholder={t('Quel danger ? (ex : trou dans le sentier, fil barbelé, renard malade)')}
+          placeholder={t('Quel danger ? (ex : arbre tombé, plaque d’égout descellée, piste cyclable bloquée)')}
           value={form.title || ''} onChange={(e) => set('title', e.target.value)} />
       )}
       <div className="space-y-2">
@@ -204,7 +203,7 @@ function HazardForm({ onClose, onSaved }) {
         <Suspense fallback={<div className="h-56 animate-pulse rounded-2xl bg-emerald-100" />}>
           <MapView height="h-56" center={coords || currentUser.coords} zoom={15} onPick={pick} picked={coords} />
         </Suspense>
-        <input className="input" placeholder={t('Lieu (ex : entrée du parc, près des bancs)')} required maxLength={150}
+        <input className="input" placeholder={t('Lieu (ex : rue de la Station, descente après le pont)')} required maxLength={150}
           value={form.place} onChange={(e) => set('place', e.target.value)} />
       </div>
       <textarea className="input" rows="3" maxLength={500} placeholder={t('Ce que tu as vu (facultatif)')}
@@ -227,8 +226,9 @@ function HazardForm({ onClose, onSaved }) {
         </label>
       )}
       <p className="text-xs text-stone-500">{hazardKind(form.kind).advice}</p>
+      <p className="text-xs text-stone-400">{t('L’alerte disparaîtra toute seule dans {n} jours (ou plus tôt si les cyclistes indiquent que le danger n’est plus là).', { n: hazardDays(form.kind) })}</p>
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <button className="btn-primary w-full !bg-red-600" disabled={saving}>{saving ? t('Publication…') : t('Publier et prévenir les voisins')}</button>
+      <button className="btn-primary w-full !bg-red-600" disabled={saving}>{saving ? t('Publication…') : t('Publier et prévenir les cyclistes du coin')}</button>
     </form>
   );
 }

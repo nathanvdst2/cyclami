@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext.jsx';
 import { AMBASSADOR_AT, referralLink } from '../lib/referral.js';
 import { t } from '../i18n/index.js';
 
-// Parrainage : mon lien personnel, mes filleuls, le badge « Ambassadeur » et les quartiers les plus actifs.
+// Parrainage : mon lien personnel, mes filleuls, le badge « Ambassadeur » et les villes les plus actives.
 export default function Invite({ go, back }) {
   const { currentUser, actions } = useApp();
   const [stats, setStats] = useState(null);
@@ -17,7 +17,7 @@ export default function Invite({ go, back }) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const link = referralLink(stats?.code);
-  const message = t('Rejoins-moi sur Cyclami pour promener nos animaux ensemble 🚴 C’est gratuit :');
+  const message = t('Rejoins-moi sur Cyclami pour qu’on roule ensemble 🚴 C’est gratuit :');
   const share = async () => {
     try {
       if (navigator.share) { await navigator.share({ title: 'Cyclami', text: message, url: link }); return; }
@@ -40,7 +40,7 @@ export default function Invite({ go, back }) {
       <h1 className="text-2xl font-extrabold text-stone-800">🎁 {t('Inviter des amis')}</h1>
 
       <section className="card space-y-3 ring-2 ring-teal-200">
-        <p className="text-sm text-stone-600">{t('Plus il y a de propriétaires près de chez toi, plus il y a de sorties et d’entraide. Partage ton lien : chaque inscription t’est comptée.')}</p>
+        <p className="text-sm text-stone-600">{t('Plus il y a de cyclistes près de chez toi, plus il y a de sorties à ton niveau. Partage ton lien : chaque inscription t’est comptée.')}</p>
         <div className="flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-sm dark:bg-stone-800">
           <span className="min-w-0 flex-1 truncate font-mono text-stone-700 dark:text-stone-200" data-testid="referral-link">{stats ? link : '…'}</span>
           <button className="text-teal-600" onClick={copy} aria-label={t('Copier le lien')}><Copy size={16} /></button>
@@ -57,9 +57,9 @@ export default function Invite({ go, back }) {
           <span className="text-4xl">{ambassador ? '🌟' : '🎯'}</span>
           <div className="flex-1">
             <p className="font-bold text-stone-800">
-              {ambassador ? t('Tu es Ambassadeur d’Cyclami !') : t('Badge « Ambassadeur » : {n} / {total} amis inscrits', { n: count, total: AMBASSADOR_AT })}
+              {ambassador ? t('Tu es Ambassadeur de Cyclami !') : t('Badge « Ambassadeur » : {n} / {total} amis inscrits', { n: count, total: AMBASSADOR_AT })}
             </p>
-            <p className="text-xs text-stone-500">{t('Un ami compte dès qu’il a présenté son animal.')}</p>
+            <p className="text-xs text-stone-500">{t('Un ami compte dès qu’il a rempli son profil cycliste.')}</p>
           </div>
         </div>
         {!ambassador && (
@@ -72,8 +72,8 @@ export default function Invite({ go, back }) {
             {stats.members.map((m) => (
               <li key={m.id} className="flex items-center gap-2">
                 <button className="font-semibold text-stone-800 hover:underline" onClick={() => go('user', { userId: m.id })}>{m.name}</button>
-                <span className={`text-xs ${m.has_pet ? 'text-green-700' : 'text-stone-400'}`}>
-                  {m.has_pet ? `✓ ${t('compté')}` : t('n’a pas encore présenté son animal')}
+                <span className={`text-xs ${m.counted ? 'text-green-700' : 'text-stone-400'}`}>
+                  {m.counted ? `✓ ${t('compté')}` : t('n’a pas encore rempli son profil cycliste')}
                 </span>
               </li>
             ))}
@@ -82,10 +82,10 @@ export default function Invite({ go, back }) {
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-lg font-bold text-stone-800">🏆 {t('Les quartiers les plus actifs')}</h2>
+        <h2 className="text-lg font-bold text-stone-800">🏆 {t('Les villes les plus actives')}</h2>
         <p className="text-xs text-stone-500">{t('Ces 30 derniers jours : membres actifs, nouveaux venus et sorties organisées.')}</p>
         {ranking === null && <div className="card h-24 animate-pulse" />}
-        {ranking?.length === 0 && <p className="text-sm text-stone-500">{t('Pas encore assez de membres pour un classement : invite tes voisins !')}</p>}
+        {ranking?.length === 0 && <p className="text-sm text-stone-500">{t('Pas encore assez de membres pour un classement : invite tes amis cyclistes !')}</p>}
         {ranking?.map((r, i) => (
           <div key={r.city} className={`card flex items-center gap-3 !p-3 text-sm ${r.city.trim().toLowerCase() === myTown ? 'ring-2 ring-teal-300' : ''}`}>
             <span className="w-7 text-center text-lg font-extrabold text-stone-400">{['🥇', '🥈', '🥉'][i] || i + 1}</span>

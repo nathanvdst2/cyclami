@@ -6,7 +6,7 @@ export default {
   'Copier le lien': 'Copy link',
   'Lien copié !': 'Link copied!',
   'Partager mon lien': 'Share my link',
-  'Tu es Ambassadeur d’Cyclami !': 'You are an Cyclami Ambassador!',
+  'Tu es Ambassadeur de Cyclami !': 'You are an Cyclami Ambassador!',
   'Badge « Ambassadeur » : {n} / {total} amis inscrits': '« Ambassador » badge: {n} / {total} friends joined',
   'Un ami compte dès qu’il a présenté son animal.': 'A friend counts as soon as they’ve introduced their pet.',
   'compté': 'counted',

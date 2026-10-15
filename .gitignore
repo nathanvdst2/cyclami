@@ -2,3 +2,10 @@ node_modules
 dist
 .DS_Store
 .claude/worktrees/
+# configuration locale (jamais sur GitHub)
+.env.local
+.env.*.local
+# dossiers de Netlify CLI (netlify dev / netlify link)
+.netlify
+# captures d'écran des tests
+shots

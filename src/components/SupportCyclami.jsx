@@ -48,7 +48,7 @@ export function DonationSettings() {
   return (
     <form onSubmit={save} className="card space-y-2">
       <div className="flex items-center gap-2 font-bold text-stone-800"><Heart size={18} className="text-pink-500" /> {t('Dons pour le site')}</div>
-      <p className="text-xs text-stone-500">{t('Crée un lien de paiement chez Stripe (Payment Links), Ko-fi, Liberapay ou PayPal, puis colle-le ici. Laisse vide pour masquer le bouton.')}</p>
+      <p className="text-xs text-stone-500">{t('Crée un lien de paiement chez Stripe (Payment Links), Ko-fi, Liberapay ou PayPal, puis colle-le ici. Sans lien, le bouton est masqué.')}</p>
       <label className="block text-sm text-stone-600">{t('Lien pour un don ponctuel')}
         <input className="input mt-1" type="url" placeholder="https://…" value={form.once} onChange={(e) => setForm((f) => ({ ...f, once: e.target.value }))} />
       </label>

@@ -150,7 +150,7 @@ function GroupForm({ go, back, initial = null, onSaved }) {
         <input className="input" maxLength={80} placeholder={t('Ville ou quartier')} value={form.city} onChange={(e) => set('city', e.target.value)} />
         <textarea className="input" rows="5" maxLength={1000} placeholder={t('Présente le groupe : club ou bande d’amis, route ou VTT, niveau, jours de sortie…')}
           value={form.description} onChange={(e) => set('description', e.target.value)} />
-        {!initial && <p className="text-xs text-stone-500">📍 {t('Le groupe est placé à ta position approximative, pour que les voisins le trouvent.')}</p>}
+        {!initial && <p className="text-xs text-stone-500">📍 {t('Le groupe est placé à ta position approximative, pour que les cyclistes du coin le trouvent.')}</p>}
       </section>
       {error && <p className="text-sm text-red-600">{error}</p>}
       {!initial && <CooldownNote kind="group" />}

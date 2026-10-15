@@ -12,7 +12,7 @@ export default {
   'Des gestes et un code, tirés au hasard au moment même, s’affichent : fais les gestes et dis le code à voix haute.': 'Gebaren en een code, op dat moment willekeurig gekozen, verschijnen: maak de gebaren en zeg de code hardop.',
   'Une personne de l’équipe regarde la vidéo et la compare à ton profil. Aucune reconnaissance faciale automatique.': 'Iemand van het team bekijkt de video en vergelijkt hem met je profiel. Geen automatische gezichtsherkenning.',
   'Ta vidéo est privée : seule l’administration peut la voir. Elle est supprimée dès la décision. Aucune pièce d’identité n’est demandée. Facultatif : tu peux utiliser Cyclami sans être vérifié.': 'Je video is privé: alleen de beheerders kunnen ze zien. Ze wordt verwijderd zodra er beslist is. Er wordt geen identiteitsbewijs gevraagd. Optioneel: je kunt Cyclami gebruiken zonder geverifieerd te zijn.',
-  'J’accepte que ma vidéo soit enregistrée et regardée par l’équipe d’Cyclami pour vérifier mon profil, puis supprimée.': 'Ik ga ermee akkoord dat mijn video wordt opgenomen en bekeken door het team van Cyclami om mijn profiel te verifiëren, en daarna wordt verwijderd.',
+  'J’accepte que ma vidéo soit enregistrée et regardée par l’équipe de Cyclami pour vérifier mon profil, puis supprimée.': 'Ik ga ermee akkoord dat mijn video wordt opgenomen en bekeken door het team van Cyclami om mijn profiel te verifiëren, en daarna wordt verwijderd.',
   'Ouvrir la caméra': 'Camera openen',
   'Dis à voix haute :': 'Zeg hardop:',
   'Place ton visage dans le cadre, bien éclairé, sans lunettes de soleil. Les consignes apparaissent pendant l’enregistrement.': 'Plaats je gezicht in het kader, goed verlicht, zonder zonnebril. De instructies verschijnen tijdens de opname.',

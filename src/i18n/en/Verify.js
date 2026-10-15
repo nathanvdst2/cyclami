@@ -12,7 +12,7 @@ export default {
   'Des gestes et un code, tirés au hasard au moment même, s’affichent : fais les gestes et dis le code à voix haute.': 'Gestures and a code, picked at random on the spot, appear: make the gestures and say the code out loud.',
   'Une personne de l’équipe regarde la vidéo et la compare à ton profil. Aucune reconnaissance faciale automatique.': 'A team member watches the video and compares it with your profile. No automatic facial recognition.',
   'Ta vidéo est privée : seule l’administration peut la voir. Elle est supprimée dès la décision. Aucune pièce d’identité n’est demandée. Facultatif : tu peux utiliser Cyclami sans être vérifié.': 'Your video is private: only the administrators can see it. It is deleted as soon as a decision is made. No ID document is requested. Optional: you can use Cyclami without being verified.',
-  'J’accepte que ma vidéo soit enregistrée et regardée par l’équipe d’Cyclami pour vérifier mon profil, puis supprimée.': 'I agree that my video is recorded and watched by the Cyclami team to verify my profile, then deleted.',
+  'J’accepte que ma vidéo soit enregistrée et regardée par l’équipe de Cyclami pour vérifier mon profil, puis supprimée.': 'I agree that my video is recorded and watched by the Cyclami team to verify my profile, then deleted.',
   'Ouvrir la caméra': 'Open the camera',
   'Dis à voix haute :': 'Say out loud:',
   'Place ton visage dans le cadre, bien éclairé, sans lunettes de soleil. Les consignes apparaissent pendant l’enregistrement.': 'Put your face in the frame, well lit, without sunglasses. The instructions appear during the recording.',

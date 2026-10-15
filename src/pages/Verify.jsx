@@ -155,7 +155,7 @@ export default function Verify({ back }) {
           </div>
           <label className="flex items-start gap-2 text-sm text-stone-700">
             <input type="checkbox" className="mt-0.5 accent-teal-500" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-            {t('J’accepte que ma vidéo soit enregistrée et regardée par l’équipe d’Cyclami pour vérifier mon profil, puis supprimée.')}
+            {t('J’accepte que ma vidéo soit enregistrée et regardée par l’équipe de Cyclami pour vérifier mon profil, puis supprimée.')}
           </label>
           <button className="btn-primary w-full" disabled={!consent} onClick={openCamera}><Camera size={16} /> {t('Ouvrir la caméra')}</button>
         </section>

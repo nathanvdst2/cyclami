@@ -130,7 +130,7 @@ const DOCS = {
       ['En cas de problème', [
         'Utilise « Bloquer » pour ne plus être contacté par quelqu’un.',
         'Utilise « Signaler » pour prévenir l’équipe d’un comportement inapproprié ou dangereux.',
-        'Signale les dangers de la route (nid-de-poule, travaux, chien agressif…) pour prévenir les autres cyclistes.',
+        'Signale les dangers de la route (nid-de-poule, travaux, gravillons, route fermée…) pour prévenir les autres cyclistes.',
         'En cas d’accident ou de danger, appelle le 112.',
       ]],
     ],

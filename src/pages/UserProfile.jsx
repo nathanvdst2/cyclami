@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Footprints, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Bike, MessageCircle, X } from 'lucide-react';
 import { useApp } from '../context/AppContext.jsx';
 import { compatibility, distanceKm, formatDistance } from '../utils/geo.js';
 import UserAvatar from '../components/UserAvatar.jsx';
 import AvatarPicker from '../components/AvatarPicker.jsx';
-import PetBadge from '../components/PetBadge.jsx';
-import PetPhotos from '../components/PetPhotos.jsx';
+import { BikeList, RiderChips, RiderStats } from '../components/Rider.jsx';
 import PostCard from '../components/PostCard.jsx';
 import UserActions from '../components/UserActions.jsx';
 import RideCard from '../components/RideCard.jsx';
@@ -21,11 +20,12 @@ import Presence, { OnlineDot } from '../components/Presence.jsx';
 import AdminMemberPanel, { AdminProfileEdit } from '../components/AdminMemberPanel.jsx';
 import FollowButton from '../components/FollowButton.jsx';
 
-// Profil public d'un membre : ses animaux, ses sorties à venir et ses publications.
+// Profil public d'un membre : son profil cycliste, ses vélos, ses sorties à venir et ses publications.
 export default function UserProfile({ go, back, params }) {
   const { currentUser, getUser, rides, posts, blockedIds, actions, isAdmin } = useApp();
   const user = getUser(params.userId);
   const [loading, setLoading] = useState(!user);
+  const [photo, setPhoto] = useState(null); // photo de vélo affichée en grand
 
   // Membre éloigné, pas encore chargé : on va le chercher.
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function UserProfile({ go, back, params }) {
 
   const isMe = user.id === currentUser.id;
   const km = !isMe && user.coords && currentUser.coords ? distanceKm(currentUser.coords, user.coords) : null;
-  const score = isMe ? null : Math.max(0, ...user.pets.map((p) => compatibility(currentUser.pets[0], p)));
+  const score = isMe || !user.level ? null : compatibility(currentUser, user);
   const userRides = rides
     .filter((w) => w.participants.includes(user.id) && new Date(w.date).getTime() > Date.now() - 3600_000)
     .sort((a, b) => a.date.localeCompare(b.date));
@@ -82,8 +82,9 @@ export default function UserProfile({ go, back, params }) {
           </div>
           {!isMe && <UserActions user={user} onBlocked={() => go('discover')} />}
         </div>
-        {score != null && user.pets.length > 0 && currentUser.pets[0] && (
-          <p className="text-sm font-semibold text-green-700">{t('{score}% compatible avec {name}', { score, name: currentUser.pets[0].name })}</p>
+        <RiderChips user={user} />
+        {score != null && (
+          <p className="text-sm font-semibold text-green-700">{t('{score}% compatible avec toi pour rouler ensemble', { score })}</p>
         )}
         <FollowStats userId={user.id} go={go} isMe={isMe} />
         {user.bio && <p className="whitespace-pre-line text-stone-700">{user.bio}</p>}
@@ -102,11 +103,9 @@ export default function UserProfile({ go, back, params }) {
           <div className="flex gap-2">
             <button className="btn-primary flex-1" onClick={() => go('messages', {
               userId: user.id,
-              draft: t('Salut {name} ! Ça te dirait une sortie entre {myPet} et {pets} ? 🚴', {
-                name: user.name, myPet: currentUser.pets[0]?.name || t('mon animal'), pets: user.pets.map((p) => p.name).join(' & '),
-              }),
+              draft: t('Salut {name} ! Ça te dirait d’aller rouler ensemble ? 🚴', { name: user.name }),
             })}>
-              <Footprints size={16} /> {t('Proposer une sortie')}
+              <Bike size={16} /> {t('Proposer une sortie')}
             </button>
             <button className="btn-ghost" onClick={() => go('messages', { userId: user.id })} aria-label={t('Message')}>
               <MessageCircle size={16} />
@@ -115,18 +114,20 @@ export default function UserProfile({ go, back, params }) {
         )}
       </section>
 
+      <section className="card space-y-2">
+        <h2 className="font-bold text-stone-800">📊 {t('Statistiques')}</h2>
+        <RiderStats userId={user.id} mine={isMe} go={isMe ? go : undefined} />
+      </section>
+
       <LevelCard user={user} go={go} mine={isMe} />
       <Recommendations userId={user.id} go={go} />
 
-      <h2 className="text-lg font-bold text-stone-800">{user.pets.length > 1 ? t('Ses animaux') : t('Son animal')}</h2>
-      {user.pets.map((p) => (
-        <div key={p.id} className="card">
-          <PetPhotos pet={p} onOpen={() => go('animal', { petId: p.id, userId: user.id })} />
-          <button type="button" className="block w-full text-left" onClick={() => go('animal', { petId: p.id, userId: user.id })}>
-            <PetBadge pet={p} />
-          </button>
-        </div>
-      ))}
+      {user.bikes.length > 0 && (
+        <section className="space-y-2">
+          <h2 className="text-lg font-bold text-stone-800">🚲 {isMe ? t('Mes vélos') : user.bikes.length > 1 ? t('Ses vélos') : t('Son vélo')}</h2>
+          <BikeList bikes={user.bikes} onOpenPhoto={setPhoto} />
+        </section>
+      )}
 
       {userRides.length > 0 && (
         <>
@@ -140,6 +141,13 @@ export default function UserProfile({ go, back, params }) {
           <h2 className="text-lg font-bold text-stone-800">{t('Publications')}</h2>
           {userPosts.map((p) => <PostCard key={p.id} post={p} go={go} />)}
         </>
+      )}
+
+      {photo && (
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setPhoto(null)}>
+          <button className="absolute right-4 top-4 rounded-full bg-white/20 p-2 text-white" onClick={() => setPhoto(null)} aria-label={t('Fermer')}><X size={20} /></button>
+          <img src={photo} alt="" className="max-h-full max-w-full rounded-2xl object-contain" />
+        </div>
       )}
     </div>
   );

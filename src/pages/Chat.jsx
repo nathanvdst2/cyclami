@@ -222,7 +222,7 @@ export default function Chat({ go, back }) {
           )}
         </div>
         <p className="text-sm text-stone-500">
-          {t('Ouvert à tous les membres d’Cyclami. Reste bienveillant : pas de pub, pas de vente d’animaux, pas d’infos personnelles. Un message déplacé ? Signale-le avec le drapeau.')}
+          {t('Ouvert à tous les membres de Cyclami. Reste bienveillant : pas de pub, pas d’arnaques, pas d’infos personnelles. Un message déplacé ? Signale-le avec le drapeau.')}
         </p>
       </div>
 

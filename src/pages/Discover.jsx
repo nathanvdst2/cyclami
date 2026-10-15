@@ -1,10 +1,8 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
-import { Footprints, Search, X, MessageCircle, SlidersHorizontal } from 'lucide-react';
+import { Bike, Search, X, MessageCircle, SlidersHorizontal } from 'lucide-react';
 import { useApp } from '../context/AppContext.jsx';
-import { SIZES } from '../data/constants.js';
-import SpeciesSelect from '../components/SpeciesSelect.jsx';
-import { compatibility, distanceKm, formatDistance, fuzz } from '../utils/geo.js';
-import PetBadge from '../components/PetBadge.jsx';
+import { DISCIPLINES, LEVELS, levelInfo, levelRank } from '../data/constants.js';
+import { compatibilityDetails, distanceKm, formatDistance, fuzz } from '../utils/geo.js';
 import UserActions from '../components/UserActions.jsx';
 import ViewToggle from '../components/ViewToggle.jsx';
 import LevelBadge from '../components/LevelBadge.jsx';
@@ -17,28 +15,29 @@ import { preloadPlaces } from '../lib/places.js';
 import FeedbackButton from '../components/Feedback.jsx';
 import InviteNeighbors from '../components/InviteNeighbors.jsx';
 import UserAvatar from '../components/UserAvatar.jsx';
+import { RiderChips } from '../components/Rider.jsx';
 import { NearbyRides, QuickTiles, WelcomeHero } from '../components/HomeTop.jsx';
 
 const MapView = lazy(() => import('../components/MapView.jsx'));
 
-const DISTANCES = [2, 5, 10, 25, null];
+const DISTANCES = [5, 10, 25, 50, null];
+const SPEED_GAPS = [2, 4, null];
+const DEFAULT_FILTERS = { discipline: 'all', level: 'near', speedGap: null, maxKm: 25, sort: 'match' };
 
+// Accueil : trouver des cyclistes de son niveau près de chez soi (liste ou carte).
 export default function Discover({ go }) {
   const { currentUser, users, blockedIds, actions } = useApp();
-  const [myPetId, setMyPetId] = useState(currentUser.pets[0].id);
-  const [filters, setFilters] = usePageState('discover:filters', { species: 'all', size: 'all', maxKm: null, sameEnergy: false });
+  const [filters, setFilters] = usePageState('discover:filters', DEFAULT_FILTERS);
   const [showFilters, setShowFilters] = usePageState('discover:showFilters', false);
   const [locMsg, setLocMsg] = useState(null);
   const [view, setView] = usePageState('discover:view', 'list');
   const [search, setSearch] = useState('');
   const [searching, setSearching] = useState(false);
   const [searchIds, setSearchIds] = useState(null); // null = pas de recherche en cours
-  const [lostAlerts, setLostAlerts] = useState([]);
-  useEffect(() => { actions.lost.list().then(setLostAlerts); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [hazards, setHazards] = useState([]);
-  useEffect(() => { actions.hazards.list().then(setHazards); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // dangers à moins de 3 km (boulettes, chenilles…) : bandeau rouge en haut
-  const hazardsNearby = hazards.filter((h) => currentUser.coords && distanceKm(currentUser.coords, { lat: h.lat, lng: h.lng }) <= 3);
+  useEffect(() => { actions.hazards.list().then(setHazards).catch(() => {}); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // dangers à moins de 5 km (travaux, route fermée, nids-de-poule…) : bandeau rouge en haut
+  const hazardsNearby = hazards.filter((h) => currentUser.coords && distanceKm(currentUser.coords, { lat: h.lat, lng: h.lng }) <= 5);
   // lieux de la carte préchargés en arrière-plan : la carte s'affiche aussitôt ouverte
   useEffect(() => {
     if (!currentUser.coords) return undefined;
@@ -46,34 +45,36 @@ export default function Discover({ go }) {
     const id = idle(() => preloadPlaces(currentUser.coords));
     return () => (window.cancelIdleCallback || clearTimeout)(id);
   }, [currentUser.coords?.lat, currentUser.coords?.lng]); // eslint-disable-line react-hooks/exhaustive-deps
-  const lostNearby = lostAlerts.filter((a) => a.owner_id !== currentUser.id
-    && (!currentUser.coords || distanceKm(currentUser.coords, { lat: a.lat, lng: a.lng }) <= 15));
-  const myPet = currentUser.pets.find((p) => p.id === myPetId) || currentUser.pets[0];
-  const setF = (k, v) => setFilters({ ...filters, [k]: v });
+  const f = { ...DEFAULT_FILTERS, ...filters };
+  const setF = (k, v) => setFilters({ ...f, [k]: v });
+  const myRank = levelRank(currentUser.level);
 
   const matching = useMemo(() => {
     const needle = search.trim().toLowerCase();
     return users
-      .filter((u) => u.id !== currentUser.id && u.pets.length > 0 && !blockedIds.has(u.id))
+      .filter((u) => u.id !== currentUser.id && u.level && !blockedIds.has(u.id))
       .filter((u) => !needle || u.name.toLowerCase().includes(needle) || searchIds?.includes(u.id))
-      .map((u) => {
-        const km = currentUser.coords && u.coords ? distanceKm(currentUser.coords, u.coords) : null;
-        const pets = u.pets.filter((p) =>
-          (filters.species === 'all' || p.species === filters.species) &&
-          (filters.size === 'all' || p.size === filters.size) &&
-          (!filters.sameEnergy || Math.abs(p.energy - myPet.energy) <= 1),
-        );
-        const score = Math.max(0, ...pets.map((p) => compatibility(myPet, p)));
-        return { user: u, km, pets, score };
+      .filter((u) => needle || f.discipline === 'all' || u.disciplines.includes(f.discipline))
+      .filter((u) => {
+        if (needle || f.level === 'all') return true;
+        if (f.level === 'near') return myRank < 0 || Math.abs(levelRank(u.level) - myRank) <= 1;
+        if (f.level === 'same') return u.level === currentUser.level;
+        return u.level === f.level;
       })
-      .filter((r) => r.pets.length > 0)
-      // les plus proches d'abord, puis les plus compatibles
-      .sort((a, b) => (a.km ?? 1e9) - (b.km ?? 1e9) || b.score - a.score);
-  }, [users, currentUser, filters, myPet, blockedIds, searchIds, search]);
-  const results = useMemo(() => matching.filter((r) => search.trim() || filters.maxKm == null || (r.km != null && r.km <= filters.maxKm)),
-    [matching, filters.maxKm, search]);
-  // personne dans le rayon choisi : le membre le plus proche, même plus loin
-  const nearestBeyond = results.length === 0 && filters.maxKm != null ? matching.find((r) => r.km != null) : null;
+      .filter((u) => needle || f.speedGap == null || !currentUser.usualSpeed || (u.usualSpeed && Math.abs(u.usualSpeed - currentUser.usualSpeed) <= f.speedGap))
+      .map((u) => {
+        const d = compatibilityDetails(currentUser, u);
+        return { user: u, km: d.km, score: d.score, details: d };
+      })
+      .sort((a, b) => (f.sort === 'distance'
+        ? (a.km ?? 1e9) - (b.km ?? 1e9) || b.score - a.score
+        : b.score - a.score || (a.km ?? 1e9) - (b.km ?? 1e9)));
+  }, [users, currentUser, f.discipline, f.level, f.speedGap, f.sort, blockedIds, searchIds, search, myRank]); // eslint-disable-line react-hooks/exhaustive-deps
+  const results = useMemo(() => matching.filter((r) => search.trim() || f.maxKm == null || (r.km != null && r.km <= f.maxKm)),
+    [matching, f.maxKm, search]);
+  // personne dans le rayon choisi : le cycliste le plus proche, même plus loin
+  const nearestBeyond = results.length === 0 && f.maxKm != null ? [...matching].filter((r) => r.km != null).sort((a, b) => a.km - b.km)[0] : null;
+  const filtered = f.discipline !== 'all' || f.level !== 'all' || f.speedGap != null || f.maxKm != null;
 
   // Recherche par prénom, y compris parmi les membres éloignés.
   const runSearch = async (e) => {
@@ -91,11 +92,11 @@ export default function Discover({ go }) {
     setLocMsg(err || t('Position mise à jour ✔'));
   };
 
-  const proposeRide = (u, pets) =>
-    go('messages', {
-      userId: u.id,
-      draft: t('Salut {name} ! Ça te dirait une sortie entre {pet} et {pets} ? 🚴', { name: u.name, pet: myPet.name, pets: pets.map((p) => p.name).join(' & ') }),
-    });
+  const proposeRide = (u) => go('messages', {
+    userId: u.id,
+    draft: t('Salut {name} ! Ça te dirait d’aller rouler ensemble ? 🚴', { name: u.name }),
+  });
+  const myLevel = levelInfo(currentUser.level);
 
   return (
     <div className="space-y-4">
@@ -107,36 +108,36 @@ export default function Discover({ go }) {
           <span className="flex-1 text-sm text-stone-700 dark:text-stone-200">
             <strong>{t(hazardsNearby.length > 1 ? '{n} dangers signalés près de chez toi' : '{n} danger signalé près de chez toi', { n: hazardsNearby.length })}</strong>
             {' : '}{[...new Set(hazardsNearby.map((h) => hazardLabel(h)))].slice(0, 2).join(', ')}.{' '}
-            {t('Regarde où avant ta sortie.')}
-          </span>
-        </button>
-      )}
-      {lostNearby.length > 0 && (
-        <button className="flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3 text-left ring-2 ring-red-200 dark:bg-stone-800" onClick={() => go('lost')}>
-          <span className="text-2xl">🚨</span>
-          <span className="flex-1 text-sm text-stone-700 dark:text-stone-200">
-            <strong>{t(lostNearby.length > 1 ? '{n} animaux perdus ou trouvés près de toi.' : '{n} animal perdu ou trouvé près de toi.', { n: lostNearby.length })}</strong>{' '}
-            {t('Ouvre l’alerte : tu l’as peut-être croisé.')}
+            {t('Regarde où avant de partir rouler.')}
           </span>
         </button>
       )}
 
-      <QuickTiles go={go} badges={{ hazards: hazardsNearby.length, lost: lostNearby.length }} />
+      <QuickTiles go={go} badges={{ hazards: hazardsNearby.length }} />
 
       <NearbyRides go={go} />
 
-      <h2 className="pt-2 text-lg font-extrabold text-stone-800">🚴 {t('Compagnons de sortie')}</h2>
+      <div className="pt-2">
+        <h2 className="text-lg font-extrabold text-stone-800">🚴 {t('Cyclistes de ton niveau')}</h2>
+        {myLevel && (
+          <p className="text-sm text-stone-500">
+            {t('Ton niveau : {level}', { level: `${myLevel.emoji} ${myLevel.label}` })}
+            {currentUser.usualSpeed ? ` · ${t('{n} km/h de moyenne', { n: currentUser.usualSpeed })}` : ''}
+            {' · '}<button className="font-semibold text-teal-600" onClick={() => go('rider')}>{t('Modifier')}</button>
+          </p>
+        )}
+      </div>
 
       {!currentUser.coords && (
         <div className="card border-l-4 border-teal-400 text-sm text-stone-600">
-          📍 {t('Active ta localisation pour voir à quelle distance sont les autres membres. Ta position est arrondie à environ 1 km : personne ne voit ton adresse.')}
+          📍 {t('Active ta localisation pour voir à quelle distance sont les autres cyclistes. Ta position est arrondie à environ 1 km : personne ne voit ton adresse.')}
         </div>
       )}
 
       <form onSubmit={runSearch} className="flex gap-2">
         <div className="relative flex-1">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
-          <input className="input pl-9" placeholder={t('Chercher un membre par son prénom…')} value={search}
+          <input className="input pl-9" placeholder={t('Chercher un cycliste par son prénom…')} value={search}
             onChange={(e) => { setSearch(e.target.value); if (!e.target.value) setSearchIds(null); }} />
           {search && (
             <button type="button" onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400" aria-label={t('Effacer')}>
@@ -148,53 +149,67 @@ export default function Discover({ go }) {
       </form>
 
       <div className="flex flex-wrap items-center gap-2">
-        {currentUser.pets.length > 1 && (
-          <select className="input w-auto" value={myPetId} onChange={(e) => setMyPetId(e.target.value)}>
-            {currentUser.pets.map((p) => <option key={p.id} value={p.id}>{t('Pour {emoji} {name}', { emoji: p.emoji, name: p.name })}</option>)}
-          </select>
-        )}
-        <button className="btn-ghost" onClick={() => setShowFilters(!showFilters)}>
+        <button className="btn-ghost" onClick={() => setShowFilters(!showFilters)} aria-expanded={showFilters}>
           <SlidersHorizontal size={16} /> {t('Filtres')}
         </button>
-        <span className="text-sm text-stone-500">{t(results.length > 1 ? '{n} membres' : '{n} membre', { n: results.length })}</span>
+        <span className="text-sm text-stone-500">{t(results.length > 1 ? '{n} cyclistes' : '{n} cycliste', { n: results.length })}</span>
         <ViewToggle view={view} setView={setView} />
       </div>
 
       {showFilters && (
         <div className="card space-y-3">
-          <FilterRow label={t('Espèce')}>
-            <SpeciesSelect className="input w-auto" value={filters.species} onChange={(v) => setF('species', v)} allLabel={t('Toutes les espèces')} aria-label={t('Espèce')} />
-          </FilterRow>
-          <FilterRow label={t('Taille')}>
-            <Chip active={filters.size === 'all'} onClick={() => setF('size', 'all')}>{t('Toutes')}</Chip>
-            {SIZES.map((s) => (
-              <Chip key={s.id} active={filters.size === s.id} onClick={() => setF('size', s.id)}>{s.label}</Chip>
+          <FilterRow label={t('Discipline')}>
+            <Chip active={f.discipline === 'all'} onClick={() => setF('discipline', 'all')}>{t('Toutes')}</Chip>
+            {DISCIPLINES.map((d) => (
+              <Chip key={d.id} active={f.discipline === d.id} onClick={() => setF('discipline', d.id)}>{d.emoji} {d.label}</Chip>
             ))}
           </FilterRow>
+          <FilterRow label={t('Niveau')}>
+            <Chip active={f.level === 'near'} onClick={() => setF('level', 'near')}>{t('Proche du mien')}</Chip>
+            <Chip active={f.level === 'same'} onClick={() => setF('level', 'same')}>{t('Le même que moi')}</Chip>
+            <Chip active={f.level === 'all'} onClick={() => setF('level', 'all')}>{t('Tous')}</Chip>
+            {LEVELS.map((l) => (
+              <Chip key={l.id} active={f.level === l.id} onClick={() => setF('level', l.id)}>{l.emoji} {l.label}</Chip>
+            ))}
+          </FilterRow>
+          {currentUser.usualSpeed ? (
+            <FilterRow label={t('Vitesse moyenne (toi : {n} km/h)', { n: currentUser.usualSpeed })}>
+              {SPEED_GAPS.map((g) => (
+                <Chip key={g ?? 'all'} active={f.speedGap === g} onClick={() => setF('speedGap', g)}>{g ? t('± {n} km/h', { n: g }) : t('Toutes')}</Chip>
+              ))}
+            </FilterRow>
+          ) : (
+            <p className="text-xs text-stone-500">
+              💨 {t('Indique ta vitesse moyenne habituelle pour trouver des cyclistes qui roulent comme toi.')}{' '}
+              <button className="font-semibold text-teal-600" onClick={() => go('rider')}>{t('Compléter mon profil')}</button>
+            </p>
+          )}
           <FilterRow label={t('Distance max')}>
             {DISTANCES.map((d) => (
-              <Chip key={d ?? 'all'} active={filters.maxKm === d} onClick={() => setF('maxKm', d)}>{d ? `${d} km` : t('Toutes')}</Chip>
+              <Chip key={d ?? 'all'} active={f.maxKm === d} onClick={() => setF('maxKm', d)}>{d ? `${d} km` : t('Toutes')}</Chip>
             ))}
           </FilterRow>
-          <label className="flex items-center gap-2 text-sm text-stone-600">
-            <input type="checkbox" className="accent-teal-500" checked={filters.sameEnergy} onChange={(e) => setF('sameEnergy', e.target.checked)} />
-            {t('Même niveau d’énergie que {name}', { name: myPet.name })}
-          </label>
+          <FilterRow label={t('Trier par')}>
+            <Chip active={f.sort === 'match'} onClick={() => setF('sort', 'match')}>🤝 {t('Compatibilité')}</Chip>
+            <Chip active={f.sort === 'distance'} onClick={() => setF('sort', 'distance')}>📍 {t('Distance')}</Chip>
+          </FilterRow>
         </div>
       )}
 
       {results.length === 0 && (
         <div className="card space-y-3 text-center text-stone-600">
-          <div className="text-4xl">🐕‍🦺</div>
+          <div className="text-4xl">🚵</div>
           <p>
-            {search ? t('Aucun membre trouvé pour « {search} ».', { search }) : (
-              filters.maxKm || filters.species !== 'all' || filters.size !== 'all' ? t('Personne pour l’instant avec ces filtres.') : t('Personne pour l’instant dans le coin.')
-            )}
+            {search ? t('Aucun cycliste trouvé pour « {search} ».', { search })
+              : filtered ? t('Personne pour l’instant avec ces filtres.') : t('Personne pour l’instant dans le coin.')}
           </p>
           {nearestBeyond && (
             <button className="btn-ghost mx-auto" onClick={() => setF('maxKm', null)}>
-              {t('Le plus proche, {name}, est à {distance} : voir tous les membres', { name: nearestBeyond.user.name, distance: formatDistance(nearestBeyond.km) })}
+              {t('Le plus proche, {name}, est à {distance} : voir tous les cyclistes', { name: nearestBeyond.user.name, distance: formatDistance(nearestBeyond.km) })}
             </button>
+          )}
+          {!search && filtered && (
+            <button className="text-sm font-semibold text-teal-600" onClick={() => setFilters({ ...DEFAULT_FILTERS, level: 'all', maxKm: null })}>{t('Retirer les filtres')}</button>
           )}
           {!search && <InviteNeighbors go={go} />}
         </div>
@@ -211,18 +226,18 @@ export default function Discover({ go }) {
             zoom={12}
             markers={[
               ...(currentUser.coords ? [{
-                id: 'me', coords: currentUser.coords, emoji: currentUser.pets[0].emoji,
-                photoUrl: currentUser.pets[0].photoUrl, highlight: true,
-                popup: <strong>{t('Toi et {name}', { name: currentUser.pets[0].name })}</strong>,
+                id: 'me', coords: currentUser.coords, emoji: '🚴', photoUrl: currentUser.avatarUrl, highlight: true,
+                popup: <strong>{t('Toi')}</strong>,
               }] : []),
-              ...results.filter((r) => r.user.coords).map(({ user, km, pets, score }) => ({
+              ...results.filter((r) => r.user.coords).map(({ user, km, score }) => ({
                 id: user.id,
                 coords: fuzz(user.coords, user.id),
-                emoji: pets[0].emoji,
-                photoUrl: pets[0].photoUrl,
+                emoji: levelInfo(user.level)?.emoji || '🚴',
+                photoUrl: user.avatarUrl,
                 popup: (
                   <div className="space-y-1 text-sm">
-                    <div className="font-bold">{user.name}<StaffBadge userId={user.id} /> · {pets.map((p) => p.name).join(', ')}</div>
+                    <div className="font-bold">{user.name}<StaffBadge userId={user.id} /></div>
+                    <RiderChips user={user} compact />
                     <div className="text-stone-500">{km != null && `${formatDistance(km)} · `}{t('{score}% compatible', { score })}</div>
                     <button className="font-semibold text-teal-600" onClick={() => go('user', { userId: user.id })}>{t('Voir le profil →')}</button>
                   </div>
@@ -231,12 +246,12 @@ export default function Discover({ go }) {
             ]}
           />
           {results.some((r) => !r.user.coords) && (
-            <p className="text-xs text-stone-500">{t('Les membres qui n’ont pas partagé leur position n’apparaissent pas sur la carte.')}</p>
+            <p className="text-xs text-stone-500">{t('Les cyclistes qui n’ont pas partagé leur position n’apparaissent pas sur la carte.')}</p>
           )}
         </Suspense>
       )}
 
-      {view === 'list' && results.map(({ user, km, pets, score }) => (
+      {view === 'list' && results.map(({ user, km, score, details }) => (
         <article key={user.id} className="card space-y-3 !p-3 sm:!p-4">
           <div className="flex items-center gap-3">
             <button onClick={() => go('user', { userId: user.id })} aria-label={user.name} className="shrink-0">
@@ -254,16 +269,25 @@ export default function Discover({ go }) {
             </div>
             <UserActions user={user} />
           </div>
+          <RiderChips user={user} />
           {user.bio && <p className="line-clamp-2 text-sm text-stone-600">{user.bio}</p>}
-          <div className="space-y-2">
-            {pets.map((p) => <PetBadge key={p.id} pet={p} onOpen={() => go('animal', { petId: p.id, userId: user.id })} />)}
-          </div>
-          {user.availability?.length > 0 && (
-            <div className="text-xs text-stone-500">🕒 {t('Dispo : {slots}', { slots: user.availability.map((a) => t(a)).join(', ') })}</div>
+          {user.bikes.length > 0 && (
+            <div className="flex gap-2 overflow-x-auto">
+              {user.bikes.slice(0, 4).map((b) => (b.photoUrl
+                ? <img key={b.id} src={b.photoUrl} alt={b.name} title={b.name} loading="lazy" className="h-14 w-20 shrink-0 rounded-xl bg-emerald-50 object-cover" />
+                : <span key={b.id} className="shrink-0 rounded-xl bg-emerald-50 px-2 py-1 text-xs text-stone-600">🚲 {b.name}</span>))}
+            </div>
+          )}
+          {(details.sharedSlots.length > 0 || user.availability?.length > 0) && (
+            <div className="text-xs text-stone-500">
+              🕒 {details.sharedSlots.length > 0
+                ? t('Dispo en même temps que toi : {slots}', { slots: details.sharedSlots.map((a) => t(a)).join(', ') })
+                : t('Dispo : {slots}', { slots: user.availability.map((a) => t(a)).join(', ') })}
+            </div>
           )}
           <div className="flex gap-2">
-            <button className="btn-primary flex-1 !py-2 text-sm" onClick={() => proposeRide(user, pets)}>
-              <Footprints size={16} /> {t('Proposer une sortie')}
+            <button className="btn-primary flex-1 !py-2 text-sm" onClick={() => proposeRide(user)}>
+              <Bike size={16} /> {t('Proposer une sortie')}
             </button>
             <button className="btn-ghost !py-2" onClick={() => go('messages', { userId: user.id })} aria-label={t('Message')}>
               <MessageCircle size={16} />
@@ -287,7 +311,7 @@ function FilterRow({ label, children }) {
 
 function Chip({ active, onClick, children }) {
   return (
-    <button onClick={onClick}
+    <button onClick={onClick} aria-pressed={active}
       className={`chip ${active ? 'bg-teal-500 text-white ring-teal-500' : 'bg-white text-stone-600 ring-emerald-200'}`}>
       {children}
     </button>

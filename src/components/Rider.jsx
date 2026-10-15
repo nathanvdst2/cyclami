@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
+import { useApp } from '../context/AppContext.jsx';
 import { DISCIPLINES, bikeKind, levelInfo } from '../data/constants.js';
-import { t } from '../i18n/index.js';
+import { locale, t } from '../i18n/index.js';
 
 // Pastilles du profil cycliste : niveau, vitesse moyenne habituelle et disciplines.
 // compact : une seule ligne (listes), sinon des pastilles (profil).
@@ -68,6 +70,41 @@ export function BikeList({ bikes, onOpenPhoto }) {
   return (
     <div className="grid gap-2 sm:grid-cols-2">
       {bikes.map((b) => <BikeCard key={b.id} bike={b} onOpenPhoto={onOpenPhoto} />)}
+    </div>
+  );
+}
+
+// Statistiques d'un cycliste : sorties organisées et rejointes, kilomètres suivis au GPS (si disponibles).
+// Les chiffres viennent de member_achievements() ; pour soi, les km viennent de ses propres suivis GPS.
+export function RiderStats({ userId, mine = false, go }) {
+  const { actions } = useApp();
+  const [stats, setStats] = useState(null);
+  const [km, setKm] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    actions.achievements(userId).then((s) => alive && setStats(s || {})).catch(() => alive && setStats({}));
+    if (mine) actions.tracks.totals().then((x) => alive && setKm(x?.km ?? null)).catch(() => {});
+    return () => { alive = false; };
+  }, [userId, mine]); // eslint-disable-line react-hooks/exhaustive-deps
+  const kmShown = km ?? stats?.km_tracked ?? null;
+  const items = [
+    ['🗺️', stats?.rides_hosted, t('sorties organisées')],
+    ['🚴', stats?.rides_joined, t('sorties rejointes')],
+    ...(kmShown != null ? [['📍', Number(kmShown).toLocaleString(locale(), { maximumFractionDigits: 0 }), t('km suivis au GPS')]] : []),
+  ];
+  return (
+    <div className={`grid gap-2 ${items.length > 2 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+      {items.map(([emoji, n, label]) => (
+        <div key={label} className="rounded-2xl bg-emerald-50 px-2 py-2 text-center dark:bg-stone-800">
+          <div className="text-lg font-extrabold text-stone-800">{emoji} {n ?? '…'}</div>
+          <div className="text-xs text-stone-500">{label}</div>
+        </div>
+      ))}
+      {mine && go && !Number(kmShown) && (
+        <button className="col-span-full text-xs font-semibold text-teal-600" onClick={() => go('tracker')}>
+          📍 {t('Suis ta prochaine sortie au GPS pour compter tes kilomètres')}
+        </button>
+      )}
     </div>
   );
 }

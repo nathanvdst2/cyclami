@@ -84,6 +84,7 @@ export default function Auth({ mode, go }) {
           <LangSwitch />
         </div>
         <h1 className="text-2xl font-extrabold text-stone-800">{t(TITLES[mode])}</h1>
+        {mode === 'signup' && <p className="text-sm text-stone-500">{t('Trouve des cyclistes de ton niveau près de chez toi et roulez ensemble. C’est gratuit.')}</p>}
         {mode === 'forgot' && <p className="text-sm text-stone-500">{t('Indique ton e-mail, on t’envoie un lien pour le réinitialiser.')}</p>}
         {mode !== 'forgot' && (
           <>
