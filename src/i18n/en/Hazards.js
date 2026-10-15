@@ -14,7 +14,7 @@ export default {
   'un membre': 'a member',
   'jusqu’au {date}': 'until {date}',
   'confirmé par {n}': 'confirmed by {n}',
-  'Confirmé': 'Confirmed',
+  'Confirmé par toi': 'Confirmed by you',
   'Toujours là': 'Still there',
   'Merci !': 'Thanks!',
   'Plus là': 'Gone',

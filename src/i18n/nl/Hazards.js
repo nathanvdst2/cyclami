@@ -14,7 +14,7 @@ export default {
   'un membre': 'een lid',
   'jusqu’au {date}': 'tot {date}',
   'confirmé par {n}': 'bevestigd door {n}',
-  'Confirmé': 'Bevestigd',
+  'Confirmé par toi': 'Door jou bevestigd',
   'Toujours là': 'Nog steeds daar',
   'Merci !': 'Bedankt!',
   'Plus là': 'Niet meer daar',

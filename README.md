@@ -393,7 +393,7 @@ retenir et, surtout, permet des **e-mails fiables** envoyés depuis ton domaine.
 |---|---|---|
 | `VITE_SUPABASE_URL` | `https://abcdefghijklmnop.supabase.co` | adresse de la base (site) |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_…` | clé publique (site) |
-| `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` | idem | fonctions (facultatif, sinon reprises des `VITE_…`) |
+| `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` | idem | fonctions `/api/*` et fonction edge d’aperçu des liens (facultatif : sinon elles lisent les `VITE_…`) |
 | `SITE_URL` | `https://cyclami.netlify.app` | liens dans les e-mails (défaut : `https://cyclami.netlify.app`) |
 | `BREVO_API_KEY` 🔐 | `xkeysib-…` | envoi des e-mails ; dérive aussi la clé partagée avec la base |
 | `SENDER_EMAIL` | `ton.adresse@gmail.com` | expéditeur validé chez Brevo (plus tard : `noreply@` ton domaine) |

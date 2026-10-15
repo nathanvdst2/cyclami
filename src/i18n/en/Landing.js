@@ -34,7 +34,6 @@ export default {
   'Cyclistes de ton niveau': 'Cyclists of your level',
   'Débutant': 'Beginner',
   'Intermédiaire': 'Intermediate',
-  'Confirmé': 'Experienced',
   'Cyclami est l’appli gratuite pour trouver des cyclistes de ton niveau près de chez toi et rouler ensemble, en Belgique et en France. Sur route, en VTT ou gravel, ou en balade à vélo électrique : fini les sorties en solo.': 'Cyclami is the free app to find cyclists of your level near you and ride together, in Belgium and France. On the road, by mountain bike or gravel bike, or on a leisurely e-bike ride: no more riding alone.',
   'Sorties de groupe sans lâchage, suivi GPS, dangers de la route signalés par les cyclistes du coin, clubs et forum.': 'No-drop group rides, GPS tracking, road hazards reported by local cyclists, clubs and a forum.',
   'Voir les sorties à venir': 'See upcoming rides',

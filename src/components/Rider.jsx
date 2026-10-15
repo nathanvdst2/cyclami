@@ -30,7 +30,7 @@ export function RiderChips({ user, compact = false, className = '' }) {
       )}
       {user.usualSpeed && (
         <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-semibold text-sky-800" title={t('Vitesse moyenne habituelle')}>
-          💨 {t('{n} km/h de moyenne', { n: user.usualSpeed })}
+          ⏱️ {t('{n} km/h de moyenne', { n: user.usualSpeed })}
         </span>
       )}
       {disciplines.map((d) => (

@@ -106,7 +106,7 @@ export default function Hazards({ back, params = {} }) {
             <div className="flex flex-wrap gap-2">
               {!mine && (
                 <button className={`btn-ghost flex-1 ${h.myVote === 'still' ? '!bg-red-50 !text-red-700' : ''}`} onClick={() => vote(h, 'still')} disabled={h.myVote === 'still'}>
-                  <ThumbsUp size={16} /> {h.myVote === 'still' ? t('Confirmé') : t('Toujours là')}
+                  <ThumbsUp size={16} /> {h.myVote === 'still' ? t('Confirmé par toi') : t('Toujours là')}
                 </button>
               )}
               <button className={`btn-ghost flex-1 ${h.myVote === 'gone' ? '!bg-green-50 !text-green-700' : ''}`} onClick={() => vote(h, 'gone')} disabled={h.myVote === 'gone'}>
