@@ -316,7 +316,7 @@ const step = async (name, fn) => {
     await shot(`FAIL-${name.replace(/[^a-z0-9]+/gi, '-')}`).catch(() => {});
   }
 };
-const tab = (name) => page.locator('nav.fixed').getByRole('button', { name, exact: true }).click();
+const tab = (name) => page.locator('nav.fixed').getByRole('button', { name, exact: typeof name === 'string' }).click();
 const menu = async (name) => {
   await page.getByRole('button', { name: 'Menu du compte' }).click();
   await page.getByRole('menuitem', { name }).first().click();
@@ -402,7 +402,7 @@ await step('fil d’actualité', async () => {
   await shot('06-feed');
 });
 await step('messages', async () => {
-  await tab('Messages');
+  await tab(/Messages/);
   await text('À demain !');
   await page.getByText('Bob').first().click();
   await text('Salut ! Tu viens samedi ?');
@@ -437,10 +437,10 @@ await step('dangers sur la route', async () => {
 await step('suivi GPS', async () => {
   await menu(/Suivi GPS/);
   await page.getByRole('button', { name: /Démarrer|Commencer|Lancer/ }).first().click();
-  // on roule vers le nord, environ 60 m par position
-  for (let i = 1; i <= 8; i += 1) {
-    await ctx.setGeolocation({ latitude: 48.861 + i * 0.00055, longitude: 2.381, accuracy: 5 });
-    await page.waitForTimeout(200);
+  // on roule vers le nord à allure de cycliste : environ 8 m par position, une position toutes les 0,3 s
+  for (let i = 1; i <= 10; i += 1) {
+    await ctx.setGeolocation({ latitude: 48.861 + i * 0.000072, longitude: 2.381, accuracy: 5 });
+    await page.waitForTimeout(300);
   }
   await shot('13-tracker');
   const stop = page.getByRole('button', { name: /Terminer|Arrêter|Stop/ }).first();
