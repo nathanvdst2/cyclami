@@ -1,4 +1,4 @@
-import { Bell, Search, Compass, Footprints, Home, MessageCircle, HandHeart, User } from 'lucide-react';
+import { Bell, Bike, Search, Compass, Home, MessageCircle, User } from 'lucide-react';
 import { useApp } from '../context/AppContext.jsx';
 import AccountMenu from './AccountMenu.jsx';
 import { t } from '../i18n/index.js';
@@ -6,9 +6,8 @@ import Brand from './Brand.jsx';
 
 const ITEMS = [
   { id: 'discover', label: t('Découvrir'), icon: Compass },
-  { id: 'rides', label: t('Sorties'), icon: Footprints },
+  { id: 'rides', label: t('Sorties'), icon: Bike },
   { id: 'feed', label: t('Fil'), icon: Home },
-  { id: 'listings', label: t('Adoptions'), icon: HandHeart },
   { id: 'messages', label: t('Messages'), icon: MessageCircle },
   { id: 'profile', label: t('Profil'), icon: User },
 ];

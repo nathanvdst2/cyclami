@@ -50,7 +50,7 @@ export default function Follows({ go, back, params }) {
         {rows?.map((r) => (
           <div key={r.id} className="card flex items-center gap-3 !p-3">
             <button className="flex min-w-0 flex-1 items-center gap-3 text-left" onClick={() => go('user', { userId: r.id })}>
-              <UserAvatar user={{ ...getUser(r.id), id: r.id, name: r.name, avatarUrl: r.avatar_url, petPhotoUrl: r.pet_photo_url }} size="md" />
+              <UserAvatar user={{ ...getUser(r.id), id: r.id, name: r.name, avatarUrl: r.avatar_url }} size="md" />
               <span className="min-w-0">
                 <span className="block truncate font-bold text-stone-800">{r.name}<StaffBadge userId={r.id} /></span>
                 {r.city && <span className="block truncate text-xs text-stone-500">{r.city}</span>}

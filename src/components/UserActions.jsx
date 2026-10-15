@@ -47,7 +47,7 @@ export default function UserActions({ user, onBlocked, conversation = false }) {
   };
 
   const deleteAccount = () => {
-    if (!window.confirm(t('Supprimer le compte de {name} ?\n\nSon profil, ses animaux, publications, messages et photos seront effacés. Contrairement au bannissement, cette adresse pourra se réinscrire.', { name: user.name }))) return;
+    if (!window.confirm(t('Supprimer le compte de {name} ?\n\nSon profil, ses vélos, publications, messages et photos seront effacés. Contrairement au bannissement, cette adresse pourra se réinscrire.', { name: user.name }))) return;
     if (!window.confirm(t('Dernière confirmation : supprimer définitivement le compte de {name} ?', { name: user.name }))) return;
     run(async () => {
       const err = await actions.admin.deleteUser(user.id, '');

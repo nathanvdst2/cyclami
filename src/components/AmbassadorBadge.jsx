@@ -5,7 +5,7 @@ import { t } from '../i18n/index.js';
 
 const cache = new Map();
 
-// « Ambassadeur » : au moins 3 amis inscrits grâce à son lien (avec un animal présenté).
+// « Ambassadeur » : au moins 3 amis inscrits grâce à son lien (avec un profil cycliste rempli).
 export default function AmbassadorBadge({ userId }) {
   const [count, setCount] = useState(cache.get(userId) ?? 0);
   useEffect(() => {

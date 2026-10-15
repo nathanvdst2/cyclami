@@ -51,13 +51,13 @@ export function setLang(lang, { reload = true } = {}) {
   try { localStorage.setItem(KEY, lang); } catch { /* ignore */ }
   current = lang;
   if (!reload) return;
-  // adresse avec une langue (/nl/adoptions) : même page dans la nouvelle langue
+  // adresse avec une langue (/nl/sorties) : même page dans la nouvelle langue
   const { pathname, search, hash } = window.location;
   if (LANG_PATH.test(pathname)) window.location.assign(`${langPath(pathname.replace(LANG_PATH, '') || '/', lang)}${search}${hash}`);
   else window.location.reload();
 }
 
-// Adresse publique dans une langue : « /adoptions » → « /nl/adoptions » (le français n'a pas de préfixe)
+// Adresse publique dans une langue : « /sorties » → « /nl/sorties » (le français n’a pas de préfixe)
 export function langPath(path, lang = current) {
   if (lang === 'fr') return path;
   return path === '/' ? `/${lang}` : `/${lang}${path}`;

@@ -39,7 +39,7 @@ export default function AvatarPicker({ className = '', withRemove = false }) {
       </label>
       {withRemove && currentUser.avatarUrl && (
         <button type="button" className="text-xs text-stone-500 underline" disabled={busy}
-          onClick={() => window.confirm(t('Retirer ta photo de profil ? La photo de ton animal sera affichée à la place.')) && run(null)}>
+          onClick={() => window.confirm(t('Retirer ta photo de profil ? Ton initiale sera affichée à la place.')) && run(null)}>
           {t('Retirer la photo')}
         </button>
       )}

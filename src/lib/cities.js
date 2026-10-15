@@ -1,5 +1,5 @@
-// Grandes villes de Belgique et de France : pages publiques « Sorties et rencontres entre chiens à … »
-// (/sorties/<ville>) et « Animaux perdus à … » (/perdus/<ville>). Aussi utilisé par le serveur
+// Grandes villes de Belgique et de France : pages publiques « Sorties vélo et cyclistes à … »
+// (/sorties/<ville>). Aussi utilisé par le serveur
 // (netlify/edge-functions/share.js). L'adresse reste la même dans les trois langues, seul le nom change.
 // [adresse, nom en français, nom en néerlandais, nom en anglais, latitude, longitude, pays]
 const LIST = [

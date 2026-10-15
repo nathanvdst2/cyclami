@@ -171,7 +171,7 @@ export function PublicRide({ go, params }) {
         <h1 className="text-2xl font-extrabold text-stone-800">{type?.emoji || '🚴'} {w.title}</h1>
         <RideBadges w={w} />
         <RideInfo w={w} />
-        {level?.hint && <p className="text-sm text-stone-500">{t('Niveau {level} : {hint}', { level: level.label, hint: level.hint })}</p>}
+        {level && <p className="text-sm text-stone-500">{t('Niveau {level} : {speed} de moyenne sur le plat.', { level: level.label, speed: level.speed })}</p>}
         {w.no_drop && <p className="text-sm text-green-700">🤝 {t('Pas de lâchage : le groupe attend tout le monde, idéal si tu débutes ou reprends.')}</p>}
         {w.description && <p className="whitespace-pre-line break-words text-stone-700">{w.description}</p>}
         {start && (

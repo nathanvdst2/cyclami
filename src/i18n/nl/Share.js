@@ -1,7 +1,6 @@
 // Traductions néerlandaises des liens partageables (ShareButton et textes de partage)
 export default {
   'Lien copié': 'Link gekopieerd',
-  'Sortie « {title} » sur Cyclami — viens avec ton compagnon !': 'Fietstocht « {title} » op Cyclami — kom mee met je viervoeter!',
   'Discussion « {title} » sur le forum Cyclami': 'Discussie « {title} » op het Cyclami-forum',
   'Rejoins le groupe « {name} » sur Cyclami {emoji}': 'Word lid van de groep « {name} » op Cyclami {emoji}',
   'Annonce Cyclami : {title}': 'Cyclami-zoekertje: {title}',

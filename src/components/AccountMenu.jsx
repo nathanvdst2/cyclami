@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  ChevronDown, Gift, Heart, LifeBuoy, LogOut, MessageSquareHeart, MessagesSquare, PawPrint, Settings, ShieldCheck, Trophy, Users,
+  Bike, ChevronDown, Gift, Heart, LifeBuoy, LogOut, MapPin, MessageSquareHeart, MessagesSquare, Settings, ShieldCheck, TriangleAlert, Trophy, Users,
+  UsersRound, ClipboardList,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext.jsx';
 import UserAvatar from './UserAvatar.jsx';
@@ -40,7 +41,7 @@ export default function AccountMenu({ go }) {
       </button>
 
       {open && (
-        <div role="menu" className="absolute right-0 z-40 mt-2 w-72 overflow-hidden rounded-2xl bg-white py-1 shadow-xl ring-1 ring-emerald-100 dark:bg-stone-900 dark:ring-stone-700">
+        <div role="menu" className="absolute right-0 z-40 mt-2 max-h-[80vh] w-72 overflow-y-auto rounded-2xl bg-white py-1 shadow-xl ring-1 ring-emerald-100 dark:bg-stone-900 dark:ring-stone-700">
           <button role="menuitem" className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-emerald-50 dark:hover:bg-stone-800"
             onClick={pick(() => go('user', { userId: currentUser.id }))}>
             <UserAvatar user={currentUser} size="md" />
@@ -51,11 +52,16 @@ export default function AccountMenu({ go }) {
           </button>
           <div className="my-1 border-t border-emerald-100 dark:border-stone-700" />
           <button role="menuitem" className={item} onClick={pick(() => go('profile'))}><Settings size={18} /> {t('Paramètres du compte')}</button>
-          <button role="menuitem" className={item} onClick={pick(() => go('pet'))}><PawPrint size={18} /> {t('Ajouter un animal')}</button>
-          <button role="menuitem" className={`${item} font-semibold !text-teal-700`} onClick={pick(() => go('invite'))}><Gift size={18} /> {t('Inviter des amis')}</button>
-          <button role="menuitem" className={item} onClick={pick(() => go('follows', { userId: currentUser.id, tab: 'followers' }))}><Users size={18} /> {t('Abonnés et abonnements')}</button>
-          <button role="menuitem" className={item} onClick={pick(() => go('leaderboard'))}><Trophy size={18} /> {t('Niveau et classement')}</button>
+          <button role="menuitem" className={item} onClick={pick(() => go('rider'))}><Bike size={18} /> {t('Mon profil cycliste et mes vélos')}</button>
+          <button role="menuitem" className={`${item} font-semibold !text-teal-700`} onClick={pick(() => go('invite'))}><Gift size={18} /> {t('Parrainage : inviter des amis')}</button>
+          <div className="my-1 border-t border-emerald-100 dark:border-stone-700" />
+          <button role="menuitem" className={item} onClick={pick(() => go('hazards'))}><TriangleAlert size={18} /> {t('Dangers sur la route')}</button>
+          <button role="menuitem" className={item} onClick={pick(() => go('tracker'))}><MapPin size={18} /> {t('Suivi GPS')}</button>
+          <button role="menuitem" className={item} onClick={pick(() => go('groups'))}><UsersRound size={18} /> {t('Clubs et groupes')}</button>
+          <button role="menuitem" className={item} onClick={pick(() => go('forum'))}><ClipboardList size={18} /> {t('Forum')}</button>
           <button role="menuitem" className={item} onClick={pick(() => go('chat'))}><MessagesSquare size={18} /> {t('Tchat général')}</button>
+          <button role="menuitem" className={item} onClick={pick(() => go('leaderboard'))}><Trophy size={18} /> {t('Niveau et classement')}</button>
+          <button role="menuitem" className={item} onClick={pick(() => go('follows', { userId: currentUser.id, tab: 'followers' }))}><Users size={18} /> {t('Abonnés et abonnements')}</button>
           {isStaff && (
             <button role="menuitem" className={item} onClick={pick(() => go('admin'))}>
               <ShieldCheck size={18} className="text-teal-600" /> {isAdmin ? t('Administration') : t('Modération')}

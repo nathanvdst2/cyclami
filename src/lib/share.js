@@ -1,23 +1,19 @@
-// Liens partageables : cyclami.com/b/<sortie>, /a/<annonce>, /f/<sujet>, /p/<alerte>, /g/<groupe>.
+// Liens partageables : cyclami.com/s/<sortie>, /f/<sujet du forum>, /g/<club ou groupe>, /p/<profil>.
 // Le serveur (netlify/edge-functions/share.js) ajoute l'aperçu (titre, image) pour WhatsApp & co.
 import { stripLang } from '../i18n/index.js';
 import { cityBySlug } from './cities.js';
 
 export const SHARE_ROUTES = {
-  b: ['rides', 'rideId'],
-  a: ['listing', 'id'],
+  s: ['rides', 'rideId'],
   f: ['forum', 'topicId'],
-  p: ['lost', 'alertId'],
   g: ['groups', 'groupId'],
+  p: ['user', 'userId'],
 };
 
 // Pages publiques (visibles sans compte, trouvables sur Google).
-export const PUBLIC_PAGES = { 'public-adoptions': '/adoptions', 'public-rides': '/sorties', 'join-shelters': '/refuges', 'public-lost': '/perdus' };
-const SHELTER_RE = /^\/refuge\/([0-9a-f-]{36})\/?$/i;
-const CITY_RE = /^\/adoptions\/([a-z0-9-]{2,60})\/?$/;
-// pages par grande ville (src/lib/cities.js) : sorties et rencontres, animaux perdus
-const TOWN_RE = /^\/(sorties|perdus)\/([a-z0-9-]{2,60})\/?$/;
-const TOWN_PAGES = { sorties: 'public-city', perdus: 'public-lost' };
+export const PUBLIC_PAGES = { 'public-rides': '/sorties' };
+// pages par grande ville (src/lib/cities.js) : sorties vélo et cyclistes
+const CITY_RE = /^\/sorties\/([a-z0-9-]{2,60})\/?$/;
 
 // « Namur », « Liège 4000 » → « namur », « liege-4000 » (adresse des pages par ville)
 export const citySlug = (city) => String(city || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -25,11 +21,8 @@ export const citySlug = (city) => String(city || '').normalize('NFD').replace(/[
 
 // Adresse d'une page de l'application (null si elle n'a pas d'adresse partageable).
 export function pathOf(page, params = {}) {
-  if (page === 'public-adoptions' && params.city) return `/adoptions/${params.city}`;
   if (page === 'public-city' && params.city) return `/sorties/${params.city}`;
-  if (page === 'public-lost' && params.city) return `/perdus/${params.city}`;
   if (PUBLIC_PAGES[page]) return PUBLIC_PAGES[page];
-  if (page === 'refuge' && params.shelterId) return `/refuge/${params.shelterId}`;
   for (const [prefix, [p, key]] of Object.entries(SHARE_ROUTES)) {
     if (p === page && params[key]) return `/${prefix}/${params[key]}`;
   }
@@ -43,12 +36,8 @@ export function routeOf(rawPath) {
   const pub = Object.keys(PUBLIC_PAGES).find((p) => PUBLIC_PAGES[p] === clean);
   if (pub) return { page: pub, params: {} };
   const city = pathname.match(CITY_RE);
-  if (city) return { page: 'public-adoptions', params: { city: city[1] } };
-  const town = pathname.match(TOWN_RE);
-  if (town) return cityBySlug(town[2]) ? { page: TOWN_PAGES[town[1]], params: { city: town[2] } } : null;
-  const shelter = pathname.match(SHELTER_RE);
-  if (shelter) return { page: 'refuge', params: { shelterId: shelter[1].toLowerCase() } };
-  const m = pathname.match(/^\/([abfpg])\/([0-9a-zA-Z-]{1,64})\/?$/);
+  if (city) return cityBySlug(city[1]) ? { page: 'public-city', params: { city: city[1] } } : null;
+  const m = pathname.match(/^\/([sfgp])\/([0-9a-zA-Z-]{1,64})\/?$/);
   if (!m) return null;
   const [page, key] = SHARE_ROUTES[m[1]];
   return { page, params: { [key]: m[2] } };

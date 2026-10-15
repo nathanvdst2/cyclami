@@ -1,17 +1,20 @@
 {
-  "name": "Cyclami — Sorties entre animaux",
+  "name": "Cyclami — Sorties à vélo entre cyclistes",
   "short_name": "Cyclami",
-  "description": "Trouve des compagnons de sortie pour ton animal près de chez toi.",
+  "description": "Trouve des cyclistes de ton niveau près de chez toi et roule ensemble.",
   "lang": "fr",
+  "dir": "ltr",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#fffbeb",
-  "theme_color": "#f97316",
+  "background_color": "#ecfdf5",
+  "theme_color": "#0f766e",
+  "categories": ["sports", "social", "lifestyle"],
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/logo-mark.svg", "sizes": "any", "type": "image/svg+xml" }
   ]
 }

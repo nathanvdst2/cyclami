@@ -1,7 +1,7 @@
-// Service worker d'Cyclami : rend l'application installable et rapide au démarrage.
-// Les données (Supabase) et les tuiles de carte ne sont jamais mises en cache ici.
-const CACHE = 'cyclami-v5';
-const SHELL = ['/', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png'];
+// Service worker de Cyclami : rend l'application installable et rapide au démarrage.
+// Les données (Supabase), les fonctions /api/* et les tuiles de carte ne sont jamais mises en cache ici.
+const CACHE = 'cyclami-v1';
+const SHELL = ['/', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png', '/logo-mark-96.webp'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)));
@@ -19,6 +19,7 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/api/')) return; // fonctions serveur : toujours en direct
 
   // Pages : réseau d'abord (pour avoir la dernière version), cache si hors ligne.
   if (request.mode === 'navigate') {

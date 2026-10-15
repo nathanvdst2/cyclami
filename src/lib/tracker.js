@@ -39,7 +39,7 @@ export function saveTrack(track) {
 // rideId : sortie de Cyclami à laquelle rattacher le suivi (facultatif)
 export const newTrack = (rideId = null) => ({
   startedAt: Date.now(), rideId, distance: 0, last: null, segments: [], rejected: 0,
-  speed: 0, maxSpeed: 0, paused: false, pausedAt: null, pausedMs: 0, received: 0, fix: null,
+  speed: 0, maxSpeed: 0, win: null, paused: false, pausedAt: null, pausedMs: 0, received: 0, fix: null,
 });
 
 // Durée en mouvement (pauses non comprises), en secondes
@@ -54,7 +54,7 @@ export const currentSpeed = (track, now = Date.now()) => (
 // Vitesse moyenne (km/h) sur la durée en mouvement
 export const averageSpeed = (distanceM, durationS) => (durationS > 0 ? (distanceM / durationS) * 3.6 : 0);
 
-export const pauseTrack = (track) => (track.paused ? track : { ...track, paused: true, pausedAt: Date.now(), last: null, speed: 0 });
+export const pauseTrack = (track) => (track.paused ? track : { ...track, paused: true, pausedAt: Date.now(), last: null, speed: 0, win: null });
 // à la reprise, le tracé repart d'un nouveau segment (la distance parcourue pendant la pause ne compte pas)
 export const resumeTrack = (track) => (track.paused
   ? { ...track, paused: false, pausedMs: (track.pausedMs || 0) + (Date.now() - track.pausedAt), pausedAt: null, last: null, rejected: 0 }
@@ -71,14 +71,14 @@ export function addPosition(track, pos) {
   track = { ...track, fix: { lat: p.lat, lng: p.lng, acc: Math.round(acc), at: Date.now() }, received: (track.received || 0) + 1 };
   if (track.paused || acc > MAX_ACCURACY_M) return track;
   // premier point (départ ou reprise) : nouveau segment
-  if (!track.last) return { ...track, last: p, speed: 0, segments: [...track.segments, [[p.lat, p.lng]]] };
+  if (!track.last) return { ...track, last: p, speed: 0, win: null, segments: [...track.segments, [[p.lat, p.lng]]] };
   const d = meters(track.last, p);
   const dt = Math.max(1, (p.t - track.last.t) / 1000);
   const kmh = (d / dt) * 3.6;
   if (kmh > MAX_SPEED_KMH) {
     // plusieurs sauts d'affilée : on repart de la nouvelle position (nouveau segment), sans compter la distance
     return track.rejected >= 2
-      ? { ...track, last: p, rejected: 0, speed: 0, segments: [...track.segments, [[p.lat, p.lng]]] }
+      ? { ...track, last: p, rejected: 0, speed: 0, win: null, segments: [...track.segments, [[p.lat, p.lng]]] }
       : { ...track, rejected: track.rejected + 1 };
   }
   // vitesse mesurée par le GPS (effet Doppler, plus fiable) si le téléphone la donne
@@ -90,16 +90,27 @@ export function addPosition(track, pos) {
     return { ...track, speed: Math.min(measured, track.speed || 0), last: { ...track.last, at: p.at } };
   }
   const speed = track.speed ? (track.speed + measured) / 2 : measured; // lissage léger
+  const distance = track.distance + d;
+  // vitesse max : vitesse lissée du GPS si le téléphone la donne, sinon moyenne sur des fenêtres
+  // d'au moins 5 s (les positions seconde par seconde donnent des pointes qui n'existent pas)
+  let { win } = track;
+  let maxSpeed = track.maxSpeed || 0;
+  if (hasGps) maxSpeed = Math.max(maxSpeed, speed);
+  if (!win) win = { t: track.last.t, d: track.distance };
+  else if (p.t - win.t >= 5000) {
+    maxSpeed = Math.max(maxSpeed, Math.min(MAX_SPEED_KMH, ((distance - win.d) / ((p.t - win.t) / 1000)) * 3.6));
+    win = { t: p.t, d: distance };
+  }
   const segments = track.segments.slice();
   segments[segments.length - 1] = [...segments[segments.length - 1], [p.lat, p.lng]];
   return {
     ...track,
-    distance: track.distance + d,
+    distance,
     last: p,
     rejected: 0,
     speed,
-    // vitesse max : sur la vitesse lissée, mesurée par le GPS ou sur au moins 2 s (évite les pointes dues au GPS)
-    maxSpeed: hasGps || dt >= 2 ? Math.max(track.maxSpeed || 0, speed) : track.maxSpeed || 0,
+    maxSpeed,
+    win,
     segments: pointCount(segments) > MAX_POINTS ? thin(segments) : segments,
   };
 }

@@ -1,34 +1,33 @@
-// Lieux utiles (OpenStreetMap) : types, cache par zone de 0,05° et préchargement.
+// Lieux utiles aux cyclistes (OpenStreetMap) : types, cache par zone de 0,05° et préchargement.
 // Séparé de la carte (Leaflet) pour pouvoir précharger les lieux avant d'ouvrir la carte.
 import { useEffect, useState } from 'react';
 import { t } from '../i18n/index.js';
 import { useApp } from '../context/AppContext.jsx';
-import { PHOTO_API } from './supabase.js';
+import { API } from './supabase.js';
 
 // Lieux utiles autour de la carte, depuis OpenStreetMap (API Overpass, gratuite).
+// Les identifiants (id) sont enregistrés en base (favoris, avis) : ne pas les changer.
 export const PLACE_KINDS = [
-  { id: 'dog_park', emoji: '🐕', label: t('Espaces chiens'), query: 'nwr["leisure"="dog_park"]' },
-  { id: 'park', emoji: '🌳', label: t('Parcs'), query: 'nwr["leisure"="park"]["name"]' },
+  { id: 'repair', emoji: '🔧', label: t('Bornes de réparation'), query: 'nwr["amenity"="bicycle_repair_station"]' },
+  { id: 'shop', emoji: '🚲', label: t('Magasins vélo'), query: 'nwr["shop"="bicycle"]' },
   { id: 'water', emoji: '💧', label: t('Points d’eau'), query: 'node["amenity"="drinking_water"]' },
-  { id: 'vet', emoji: '🩺', label: t('Vétérinaires'), query: 'nwr["amenity"="veterinary"]' },
-  { id: 'pet_shop', emoji: '🛍️', label: t('Animaleries'), query: 'nwr["shop"="pet"]' },
+  { id: 'pump', emoji: '🎈', label: t('Gonflage'), query: 'nwr["amenity"="compressed_air"]' },
 ];
 
 // Zones de 0,05° (≈ 5 km) : le service Cyclami les garde 7 jours, le téléphone 3 jours.
 export const CELL = 0.05;
 const TTL = 3 * 86400000;
 const memory = new Map(); // zone → Promise<lieux>
-const STORE = 'cyclami:places2:'; // v2 : les anciennes zones gardées sur le téléphone pouvaient être incomplètes
+const STORE = 'cyclami:places3:'; // v3 : lieux pour cyclistes (les anciennes zones gardées sur le téléphone sont effacées)
 try {
-  Object.keys(localStorage).filter((k) => k.startsWith('cyclami:places:')).forEach((k) => localStorage.removeItem(k));
+  Object.keys(localStorage).filter((k) => /^cyclami:places2?:/.test(k)).forEach((k) => localStorage.removeItem(k));
 } catch { /* stockage indisponible */ }
 
-const kindOf = (tags) => (tags.leisure === 'dog_park' ? 'dog_park'
-  : tags.leisure === 'park' ? 'park'
-    : tags.amenity === 'drinking_water' ? 'water'
-      : tags.amenity === 'veterinary' ? 'vet' : 'pet_shop');
+const kindOf = (tags) => (tags.amenity === 'bicycle_repair_station' ? 'repair'
+  : tags.shop === 'bicycle' ? 'shop'
+    : tags.amenity === 'drinking_water' ? 'water' : 'pump');
 
-// Secours si le service Cyclami n'est pas configuré (développement) : Overpass en direct.
+// Secours si le service Cyclami (/api/places) ne répond pas (développement, panne) : Overpass en direct.
 async function fetchDirect(lat, lng) {
   const around = `(around:4500,${lat},${lng})`;
   const body = `[out:json][timeout:25];(${PLACE_KINDS.map((k) => `${k.query}${around};`).join('')});out center;`;
@@ -49,11 +48,12 @@ export function loadCell(lat, lng) {
       if (saved && Date.now() - saved.at < TTL) return saved.places;
     } catch { /* stockage indisponible */ }
     let places;
-    if (PHOTO_API) {
-      const res = await fetch(`${PHOTO_API}/places?lat=${lat.toFixed(2)}&lng=${lng.toFixed(2)}`, { signal: AbortSignal.timeout?.(30000) });
-      if (!res.ok) throw new Error('places');
+    try {
+      const res = await fetch(`${API}/places?lat=${lat.toFixed(2)}&lng=${lng.toFixed(2)}`, { signal: AbortSignal.timeout?.(30000) });
+      if (!res.ok || !/json/.test(res.headers.get('content-type') || '')) throw new Error('places');
       places = await res.json();
-    } else {
+      if (!Array.isArray(places)) throw new Error('places');
+    } catch {
       places = await fetchDirect(lat.toFixed(2), lng.toFixed(2));
     }
     try { localStorage.setItem(`${STORE}${key}`, JSON.stringify({ at: Date.now(), places })); } catch { /* plein */ }

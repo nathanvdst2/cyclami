@@ -1,7 +1,7 @@
 import { levelFor } from '../utils/levels.js';
 import { t } from '../i18n/index.js';
 
-// Petite pastille « 🦮 Niv. 3 » affichée à côté des noms.
+// Petite pastille « 🚴 Niv. 3 » (niveau d'activité, points XP) affichée à côté des noms.
 export default function LevelBadge({ xp, className = '' }) {
   const l = levelFor(xp);
   return (

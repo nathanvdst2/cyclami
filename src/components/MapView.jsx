@@ -11,9 +11,9 @@ const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
 }[c]));
 
-// Marqueur rond avec la photo de l'animal, ou son emoji.
+// Marqueur rond avec la photo du membre, ou un emoji.
 function bubbleIcon({ emoji, photoUrl, highlight }) {
-  const ring = highlight ? '#c2410c' : '#ffffff';
+  const ring = highlight ? '#0f766e' : '#ffffff';
   const inner = photoUrl
     ? `<img src="${escapeHtml(photoUrl)}" style="width:100%;height:100%;object-fit:cover;border-radius:9999px" />`
     : `<span style="font-size:22px;line-height:1">${escapeHtml(emoji || '🚴')}</span>`;
@@ -22,7 +22,7 @@ function bubbleIcon({ emoji, photoUrl, highlight }) {
     iconSize: [40, 40],
     iconAnchor: [20, 20],
     popupAnchor: [0, -20],
-    html: `<div style="width:40px;height:40px;border-radius:9999px;background:#fef3c7;border:3px solid ${ring};
+    html: `<div style="width:40px;height:40px;border-radius:9999px;background:#ccfbf1;border:3px solid ${ring};
       box-shadow:0 2px 6px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;overflow:hidden">${inner}</div>`,
   });
 }
@@ -114,7 +114,7 @@ function Recenter({ center }) {
 /**
  * markers : [{ id, coords: {lat, lng}, emoji, photoUrl, highlight, popup: <ReactNode> }]
  * onPick / picked : mode « choisir un point » (formulaire de sortie)
- * places : affiche les lieux utiles (parcs, espaces chiens, points d'eau, vétos) ; onChoosePlace(lieu) optionnel
+ * places : affiche les lieux utiles aux cyclistes (bornes de réparation, magasins vélo, points d'eau, gonflage) ; onChoosePlace(lieu) optionnel
  */
 export default function MapView({ center, zoom = 13, markers = [], onPick, picked, height = 'h-80', places = false, onChoosePlace, onProposeRide, onOpenPlace, stateKey }) {
   const start = center || markers[0]?.coords || { lat: 50.6, lng: 4.6 }; // Belgique par défaut

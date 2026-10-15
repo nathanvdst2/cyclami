@@ -78,7 +78,7 @@ export default function PlaceReviews({ placeId, onRated }) {
       {editing ? (
         <div className="space-y-1">
           <Stars value={rating} onChange={setRating} size={18} />
-          <textarea className="input w-full py-1 text-xs" rows={2} maxLength={500} placeholder={t('Ton avis (facultatif) : propreté, ombre, chiens bienvenus…')}
+          <textarea className="input w-full py-1 text-xs" rows={2} maxLength={500} placeholder={t('Ton avis (facultatif) : en état de marche, accueil, horaires…')}
             value={body} onChange={(e) => setBody(e.target.value)} />
           <div className="flex gap-2 text-xs">
             <button type="button" className="font-semibold text-teal-600" onClick={save}>{t('Enregistrer')}</button>

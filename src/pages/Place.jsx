@@ -9,7 +9,7 @@ import { locale, t } from '../i18n/index.js';
 
 const MapView = lazy(() => import('../components/MapView.jsx'));
 
-// Page d'un lieu de la carte (parc, espace chiens, point d'eau, vétérinaire, animalerie).
+// Page d'un lieu de la carte (borne de réparation, magasin vélo, point d'eau, gonflage).
 export default function Place({ go, back, params }) {
   const { rides, currentUser } = useApp();
   const [favs, toggleFav] = useFavorites();
@@ -17,10 +17,10 @@ export default function Place({ go, back, params }) {
   if (!p.id || !Number.isFinite(p.lat)) {
     return <div className="card text-center text-stone-500">{t('Ce lieu n’est plus disponible.')}</div>;
   }
-  const kind = PLACE_KINDS.find((k) => k.id === p.kind) || PLACE_KINDS[1];
+  const kind = PLACE_KINDS.find((k) => k.id === p.kind) || PLACE_KINDS[0];
   const fav = favs.some((f) => f.place_id === p.id);
   const km = currentUser.coords ? distanceKm(currentUser.coords, p) : null;
-  // sorties à venir organisées à moins de 500 m
+  // sorties à venir qui partent à moins de 500 m
   const nearby = rides
     .filter((w) => w.coords && new Date(w.date) > new Date() && distanceKm(w.coords, p) <= 0.5)
     .sort((a, b) => new Date(a.date) - new Date(b.date))
@@ -42,14 +42,14 @@ export default function Place({ go, back, params }) {
         </Suspense>
         <div className="flex flex-wrap gap-2">
           <button className={fav ? 'btn-ghost' : 'btn-primary'} onClick={() => toggleFav(p)}>{fav ? `★ ${t('Dans mes favoris')}` : `☆ ${t('Ajouter aux favoris')}`}</button>
-          <button className="btn-ghost" onClick={() => go('rides', { newRideAt: { name: p.name, lat: p.lat, lng: p.lng } })}>🦮 {t('Proposer une sortie ici')}</button>
+          <button className="btn-ghost" onClick={() => go('rides', { newRideAt: { name: p.name, lat: p.lat, lng: p.lng } })}>🚴 {t('Proposer une sortie ici')}</button>
           <DirectionsButton lat={p.lat} lng={p.lng} label={p.name || kind.label} big />
         </div>
       </section>
 
       {nearby.length > 0 && (
         <section className="card space-y-2">
-          <h2 className="font-bold text-stone-800">🌳 {t('Sorties prévues ici')}</h2>
+          <h2 className="font-bold text-stone-800">🗺️ {t('Sorties qui partent d’ici')}</h2>
           {nearby.map((w) => (
             <button key={w.id} className="flex w-full items-center justify-between gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-left text-sm" onClick={() => go('rides', { rideId: w.id })}>
               <span className="min-w-0 truncate font-semibold text-stone-800">{w.title}</span>

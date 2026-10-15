@@ -1,10 +1,16 @@
-# Contrôle du site vu de l'extérieur, comme Google : robots.txt, plan du site (sitemap.xml) et quelques pages publiques.
-# À lancer à la demande (Actions → « Contrôle du site » → Run workflow), par exemple si Search Console
-# indique « Impossible de récupérer le sitemap ».
+# Contrôle du site vu de l'extérieur, comme Google : robots.txt, plan du site (sitemap.xml),
+# quelques pages publiques et les fonctions serveur (/api/*).
+# À lancer à la demande (Actions → « Contrôle du site » → Run workflow), par exemple après avoir
+# branché le domaine, ou si Search Console indique « Impossible de récupérer le sitemap ».
+# Le domaine se change en un seul endroit : SITE ci-dessous.
 name: Contrôle du site
 
 on:
   workflow_dispatch:
+
+env:
+  SITE: https://cyclami.com
+  WWW: https://www.cyclami.com
 
 jobs:
   check:
@@ -15,16 +21,16 @@ jobs:
         run: |
           UA='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
           fail=0
-          for u in https://cyclami.com/robots.txt https://cyclami.com/sitemap.xml https://cyclami.com/ https://cyclami.com/adoptions https://www.cyclami.com/sitemap.xml; do
+          for u in "$SITE/robots.txt" "$SITE/sitemap.xml" "$SITE/" "$SITE/sorties" "$SITE/nl/sorties" "$WWW/sitemap.xml"; do
             echo "::group::$u"
-            curl -sS -A "$UA" -o /tmp/body -D /tmp/head -w 'HTTP %{http_code} — %{size_download} octets — %{time_total}s\n' --max-time 30 "$u" || fail=1
+            curl -sS -L -A "$UA" -o /tmp/body -D /tmp/head -w 'HTTP %{http_code} — %{size_download} octets — %{time_total}s\n' --max-time 30 "$u" || fail=1
             cat /tmp/head
             head -c 800 /tmp/body; echo
             # texte écrit pour Google : masqué pour les visiteurs pendant le chargement ?
             if grep -q 'id="ssr"' /tmp/body; then grep -q 'js #ssr{visibility:hidden}' /tmp/body && echo "Texte pour Google : masqué ✅" || echo "Texte pour Google : VISIBLE ❌"; fi
             echo "::endgroup::"
           done
-          curl -sS -A "$UA" --max-time 30 -o /tmp/sitemap.xml -w '%{http_code}' https://cyclami.com/sitemap.xml > /tmp/code || true
+          curl -sS -A "$UA" --max-time 30 -o /tmp/sitemap.xml -w '%{http_code}' "$SITE/sitemap.xml" > /tmp/code || true
           echo "Code du plan du site : $(cat /tmp/code)"
           python3 - <<'PY' || fail=1
           import xml.etree.ElementTree as ET
@@ -36,4 +42,21 @@ jobs:
           assert locs, "aucune adresse dans le plan du site"
           PY
           [ "$(cat /tmp/code)" = 200 ] || fail=1
+          exit $fail
+
+      - name: Vérifier les fonctions Netlify
+        run: |
+          fail=0
+          # clé publique des notifications push (créée automatiquement au premier appel)
+          code=$(curl -sS -o /tmp/key -w '%{http_code}' --max-time 30 "$SITE/api/push/key" || true)
+          echo "/api/push/key → HTTP $code : $(head -c 200 /tmp/key)"
+          [ "$code" = 200 ] || fail=1
+          # lieux utiles autour de Bruxelles (OpenStreetMap)
+          code=$(curl -sS -o /tmp/places -w '%{http_code}' --max-time 60 "$SITE/api/places?lat=50.85&lng=4.35" || true)
+          echo "/api/places → HTTP $code : $(head -c 300 /tmp/places)"
+          [ "$code" = 200 ] || echo "::warning::Lieux indisponibles (OpenStreetMap surchargé ?)"
+          # sans clé partagée, l'envoi d'e-mails doit être refusé (401) — 503 : clé Brevo absente
+          code=$(curl -sS -o /tmp/notify -w '%{http_code}' --max-time 30 -X POST "$SITE/api/notify" -d '{}' || true)
+          echo "/api/notify sans clé → HTTP $code : $(cat /tmp/notify)"
+          [ "$code" = 401 ] || fail=1
           exit $fail

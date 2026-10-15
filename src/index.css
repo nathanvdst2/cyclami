@@ -23,65 +23,66 @@
   }
 }
 
-/* couleurs du logo (« Ani » bleu nuit, « grame » rose) */
-.brand-ink { color: #2b2560; }
-.brand-pink { color: #c92a63; }
+/* couleurs du logo (« Cycl » turquoise, « ami » vert) */
+.brand-ink { color: #0f766e; }
+.brand-pink { color: #10b981; }
 
 /* ------------------------------------------------------------------
    Mode sombre automatique (selon le réglage du téléphone / de l'ordinateur).
-   Les couleurs claires utilisées dans l'app sont remplacées ici, en un seul endroit.
+   Les couleurs claires utilisées dans l'app sont remplacées ici, en un seul endroit :
+   fonds vert très sombre, bordures vert-de-gris, accents turquoise clair et vert menthe.
    ------------------------------------------------------------------ */
 @media screen and (prefers-color-scheme: dark) {
   :root { color-scheme: dark; }
-  .brand-ink { color: #f5f5f4; }
-  .brand-pink { color: #f06595; }
+  .brand-ink { color: #5eead4; }
+  .brand-pink { color: #6ee7b7; }
 
   /* bulles de la carte (Leaflet) : même fond que les cartes, texte clair, champs lisibles */
-  .leaflet-popup-content-wrapper, .leaflet-popup-tip { background-color: #231f1c; color: #e7e5e4; box-shadow: 0 3px 14px rgba(0, 0, 0, .6); }
-  .leaflet-popup-content-wrapper { border: 1px solid #4a4036; }
-  .leaflet-container a.leaflet-popup-close-button { color: #a8a29e; }
-  .leaflet-popup-content .input, .leaflet-popup-content textarea { background-color: #171412; color: #f5f5f4; border-color: #4a4036; }
-  .leaflet-popup-content textarea::placeholder, .leaflet-popup-content .input::placeholder { color: #8a817a; }
-  .leaflet-bar a, .leaflet-control-attribution { background-color: #231f1c; color: #e7e5e4; border-color: #4a4036; }
-  .leaflet-control-attribution a { color: #fb923c; }
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip { background-color: #13231f; color: #dbe7e3; box-shadow: 0 3px 14px rgba(0, 0, 0, .6); }
+  .leaflet-popup-content-wrapper { border: 1px solid #2a4d44; }
+  .leaflet-container a.leaflet-popup-close-button { color: #93a8a2; }
+  .leaflet-popup-content .input, .leaflet-popup-content textarea { background-color: #0f1a17; color: #ecf5f2; border-color: #2a4d44; }
+  .leaflet-popup-content textarea::placeholder, .leaflet-popup-content .input::placeholder { color: #6b7f78; }
+  .leaflet-bar a, .leaflet-control-attribution { background-color: #13231f; color: #dbe7e3; border-color: #2a4d44; }
+  .leaflet-control-attribution a { color: #5eead4; }
 
   /* surfaces */
-  .bg-emerald-50, .to-emerald-50 { background-color: #171412; }
-  .bg-emerald-50\/90 { background-color: rgb(23 20 18 / 0.9); }
-  .bg-white, .card, .input, .btn-ghost { background-color: #231f1c; }
-  .bg-white\/90 { background-color: rgb(35 31 28 / 0.9); }
-  .bg-emerald-100 { background-color: #3a2f25; }
-  .bg-emerald-100\/60 { background-color: rgb(58 47 37 / 0.6); }
-  .bg-teal-50 { background-color: #3b2414; }
-  .bg-teal-100 { background-color: #4a2c14; }
-  .bg-stone-100 { background-color: #2f2a26; }
+  .bg-emerald-50, .to-emerald-50 { background-color: #0f1a17; }
+  .bg-emerald-50\/90 { background-color: rgb(15 26 23 / 0.9); }
+  .bg-white, .card, .input, .btn-ghost { background-color: #13231f; }
+  .bg-white\/90 { background-color: rgb(19 35 31 / 0.9); }
+  .bg-emerald-100 { background-color: #173029; }
+  .bg-emerald-100\/60 { background-color: rgb(23 48 41 / 0.6); }
+  .bg-teal-50 { background-color: #10302b; }
+  .bg-teal-100 { background-color: #134039; }
+  .bg-stone-100 { background-color: #1a2a26; }
   .bg-green-100 { background-color: rgb(20 83 45 / 0.45); }
-  .bg-stone-800 { background-color: #e7e5e4; }
-  .bg-stone-800.text-white { color: #1c1917; }
-  :root .hover\:bg-emerald-50:hover, :root .hover\:bg-teal-50:hover, :root .btn-ghost:hover { background-color: #2f2924; }
+  .bg-stone-800 { background-color: #e6f0ed; }
+  .bg-stone-800.text-white { color: #0f1a17; }
+  :root .hover\:bg-emerald-50:hover, :root .hover\:bg-teal-50:hover, :root .btn-ghost:hover { background-color: #1a2f2a; }
   :root .hover\:bg-red-50:hover { background-color: rgb(69 10 10 / 0.5); }
-  .from-emerald-100 { --tw-gradient-from: #3a2f25; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
-  .to-teal-100 { --tw-gradient-to: #4a2c14; }
-  .to-emerald-50 { --tw-gradient-to: #171412; }
+  .from-emerald-100 { --tw-gradient-from: #173029; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+  .to-teal-100 { --tw-gradient-to: #134039; }
+  .to-emerald-50 { --tw-gradient-to: #0f1a17; }
 
   /* bordures */
-  .ring-emerald-100, .card { --tw-ring-color: #3b332c; }
-  .ring-emerald-200, .btn-ghost { --tw-ring-color: #4a4036; }
-  .ring-white { --tw-ring-color: #231f1c; }
-  .border-emerald-100 { border-color: #3b332c; }
-  .border-emerald-200, .input { border-color: #4a4036; }
+  .ring-emerald-100, .card { --tw-ring-color: #1f3a33; }
+  .ring-emerald-200, .btn-ghost { --tw-ring-color: #2a4d44; }
+  .ring-white { --tw-ring-color: #13231f; }
+  .border-emerald-100 { border-color: #1f3a33; }
+  .border-emerald-200, .input { border-color: #2a4d44; }
 
   /* textes */
-  .text-stone-800 { color: #f5f5f4; }
-  .text-stone-700 { color: #e7e5e4; }
-  .text-stone-600 { color: #d6d3d1; }
-  .text-stone-500 { color: #a8a29e; }
-  .text-stone-400 { color: #8a837d; }
-  .text-stone-300 { color: #57534e; }
-  .text-teal-600, .btn-ghost { color: #fb923c; }
-  .text-teal-700 { color: #fdba74; }
-  .text-emerald-800 { color: #fcd34d; }
-  .text-emerald-700 { color: #fbbf24; }
+  .text-stone-800 { color: #ecf5f2; }
+  .text-stone-700 { color: #dbe7e3; }
+  .text-stone-600 { color: #c3d3ce; }
+  .text-stone-500 { color: #93a8a2; }
+  .text-stone-400 { color: #73877f; }
+  .text-stone-300 { color: #44574f; }
+  .text-teal-600, .btn-ghost { color: #5eead4; }
+  .text-teal-700 { color: #99f6e4; }
+  .text-emerald-800 { color: #a7f3d0; }
+  .text-emerald-700 { color: #6ee7b7; }
   .text-green-700 { color: #4ade80; }
   .text-red-600 { color: #f87171; }
   .text-red-700 { color: #fca5a5; }
@@ -91,8 +92,8 @@
   .bg-pink-50 { background-color: rgb(131 24 67 / 0.3); }
   .bg-sky-50 { background-color: rgb(12 74 110 / 0.3); }
   .ring-red-200 { --tw-ring-color: rgb(153 27 27 / 0.6); }
-  :root .hover\:text-stone-700:hover, :root .hover\:text-stone-600:hover { color: #f5f5f4; }
-  .input::placeholder { color: #78716c; }
+  :root .hover\:text-stone-700:hover, :root .hover\:text-stone-600:hover { color: #ecf5f2; }
+  .input::placeholder { color: #6b7f78; }
 }
 
 /* Point bleu « ma position » sur la carte, avec une onde qui pulse */

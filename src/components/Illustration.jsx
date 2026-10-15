@@ -1,4 +1,4 @@
-// Illustrations du chien et du chat (public/illustrations/*.webp, fond transparent).
+// Illustrations du site (public/illustrations/*.webp, fond transparent).
 import { illu } from '../lib/illustrations.js';
 const SIZES = { sm: 'h-16 w-16', md: 'h-28 w-28', lg: 'h-40 w-40', xl: 'h-52 w-52' };
 

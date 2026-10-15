@@ -1,7 +1,6 @@
 // Traductions anglaises des liens partageables (ShareButton et textes de partage)
 export default {
   'Lien copié': 'Link copied',
-  'Sortie « {title} » sur Cyclami — viens avec ton compagnon !': 'Ride “{title}” on Cyclami — come along with your companion!',
   'Discussion « {title} » sur le forum Cyclami': 'Discussion “{title}” on the Cyclami forum',
   'Rejoins le groupe « {name} » sur Cyclami {emoji}': 'Join the “{name}” group on Cyclami {emoji}',
   'Annonce Cyclami : {title}': 'Cyclami listing: {title}',

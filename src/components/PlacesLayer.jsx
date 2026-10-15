@@ -15,7 +15,7 @@ const icon = (emoji) => L.divIcon({
   iconSize: [28, 28],
   iconAnchor: [14, 14],
   popupAnchor: [0, -14],
-  html: `<div style="width:28px;height:28px;border-radius:9999px;background:#fff;border:2px solid #fdba74;box-shadow:0 1px 4px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:15px">${emoji}</div>`,
+  html: `<div style="width:28px;height:28px;border-radius:9999px;background:#fff;border:2px solid #5eead4;box-shadow:0 1px 4px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:15px">${emoji}</div>`,
 });
 const ICONS = Object.fromEntries(PLACE_KINDS.map((k) => [k.id, icon(k.emoji)]));
 // lieu favori : même emoji, bordure dorée
@@ -107,8 +107,8 @@ export default function PlacesLayer({ kinds, onChoose, onStatus, onProposeRide, 
   }, [ids, ratingsTick]);
 
   return places.map((p) => {
-    const kind = PLACE_KINDS.find((k) => k.id === p.kind) || PLACE_KINDS[1];
-    const markerIcon = (favIds.has(p.id) ? FAV_ICONS : ICONS)[p.kind] || ICONS.park;
+    const kind = PLACE_KINDS.find((k) => k.id === p.kind) || PLACE_KINDS[0];
+    const markerIcon = (favIds.has(p.id) ? FAV_ICONS : ICONS)[p.kind] || ICONS.repair;
     // 1er toucher : petite bulle ; 2e toucher (sur la bulle) : page du lieu
     if (onOpenPlace) {
       return (
@@ -142,7 +142,7 @@ export default function PlacesLayer({ kinds, onChoose, onStatus, onProposeRide, 
                 {favIds.has(p.id) ? `★ ${t('Favori')}` : `☆ ${t('Ajouter aux favoris')}`}
               </button>
               {onProposeRide && (
-                <button type="button" className="font-semibold text-teal-600" onClick={() => onProposeRide(p)}>🦮 {t('Proposer une sortie ici')}</button>
+                <button type="button" className="font-semibold text-teal-600" onClick={() => onProposeRide(p)}>🚴 {t('Proposer une sortie ici')}</button>
               )}
             </div>
             {onChoose && (

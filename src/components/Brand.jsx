@@ -1,4 +1,4 @@
-// Logo Cyclami : l'emblème (chien et chat dans le cœur) + le nom aux couleurs du logo.
+// Logo Cyclami : l'emblème + le nom aux couleurs du logo (« Cycl » turquoise foncé, « ami » vert).
 export default function Brand({ size = 'md' }) {
   const s = {
     sm: { img: 'h-6 w-6', text: 'text-sm' },
@@ -9,7 +9,7 @@ export default function Brand({ size = 'md' }) {
     <span className="inline-flex items-center gap-2">
       <img src="/logo-mark-96.webp" alt="" width="48" height="48" className={`${s.img} shrink-0 object-contain`} />
       <span className={`${s.text} font-extrabold tracking-tight`}>
-        <span className="brand-ink">Ani</span><span className="brand-pink">grame</span>
+        <span className="brand-ink">Cycl</span><span className="brand-pink">ami</span>
       </span>
     </span>
   );

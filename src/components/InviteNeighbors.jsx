@@ -7,7 +7,7 @@ import { referralLink } from '../lib/referral.js';
 // Commune seule (« Bois-de-Villers 5170 » → « Bois-de-Villers »)
 const townOf = (city) => String(city || '').replace(/\s*\d{4,5}\s*$/, '').replace(/^\d{4,5}\s*/, '').trim();
 
-// Page vide : « Sois le premier à … », inviter ses voisins, ou passer dire bonjour dans le tchat général.
+// Page vide : « Sois le premier à … », inviter des cyclistes, ou passer dire bonjour dans le tchat général.
 export default function InviteNeighbors({ go, text, shareText }) {
   const { currentUser, actions } = useApp();
   // lien de parrainage personnel (cyclami.com/?p=…)
@@ -18,7 +18,7 @@ export default function InviteNeighbors({ go, text, shareText }) {
 
   const share = async () => {
     const url = referralLink(code);
-    const message = shareText || t('Rejoins-moi sur Cyclami pour promener nos animaux ensemble 🚴');
+    const message = shareText || t('Rejoins-moi sur Cyclami pour qu’on roule ensemble 🚴');
     try {
       if (navigator.share) await navigator.share({ title: 'Cyclami', text: message, url });
       else {
@@ -34,10 +34,10 @@ export default function InviteNeighbors({ go, text, shareText }) {
   return (
     <div className="space-y-2 rounded-2xl bg-teal-50 p-3 text-center text-sm text-stone-600 ring-1 ring-teal-100 dark:bg-stone-800 dark:text-stone-300 dark:ring-stone-700">
       <p className="font-bold text-stone-800">{town ? t('Sois le premier à {town} 🚴', { town }) : t('Sois le premier dans ton quartier 🚴')}</p>
-      <p>{text || t('Cyclami vient de naître : invite tes voisins et amis qui ont un animal. Plus on est nombreux, plus il y a de sorties et d’entraide près de chez toi.')}</p>
+      <p>{text || t('Cyclami vient de naître : invite tes amis cyclistes et ton club. Plus on est nombreux, plus il y a de sorties à ton niveau près de chez toi.')}</p>
       <div className="flex flex-wrap justify-center gap-2">
         <button className="btn-primary" onClick={share}>
-          <Share2 size={16} /> {copied ? t('Lien copié !') : t('Inviter des voisins')}
+          <Share2 size={16} /> {copied ? t('Lien copié !') : t('Inviter des cyclistes')}
         </button>
         {go && (
           <button className="btn-ghost" onClick={() => go('chat')}>

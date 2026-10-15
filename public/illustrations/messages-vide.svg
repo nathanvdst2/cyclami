@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+<circle cx="120" cy="126" r="100" fill="#d1fae5"/>
+<g><rect x="34" y="62" width="112" height="72" rx="22" fill="#0f766e"/><path d="M58 130 L52 156 L84 132 Z" fill="#0f766e"/>
+<circle cx="66" cy="98" r="7" fill="#fff"/><circle cx="90" cy="98" r="7" fill="#fff"/><circle cx="114" cy="98" r="7" fill="#fff"/></g>
+<g><rect x="96" y="120" width="112" height="72" rx="22" fill="#fff" stroke="#10b981" stroke-width="5"/><path d="M178 188 L188 212 L160 190 Z" fill="#fff" stroke="#10b981" stroke-width="5" stroke-linejoin="round"/><rect x="160" y="182" width="24" height="7" fill="#fff"/>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="124" cy="164" r="12.4" stroke="#0f766e" stroke-width="4.34" fill="none"/>
+  <circle cx="158.72" cy="164" r="12.4" stroke="#0f766e" stroke-width="4.34" fill="none"/>
+  <path d="M124 164 L140.12 164 L135.16 146.64 Z M135.16 146.64 L153.76 145.4 L140.12 164 M153.76 145.4 L158.72 164" stroke="#10b981" stroke-width="3.91"/>
+  <path d="M135.16 146.64 L133.92 141.06 M129.58 140.44 L137.64 140.44 M153.76 145.4 L151.9 138.58 L158.1 137.96" stroke="#0f766e" stroke-width="3.91"/>
+  <circle cx="140.12" cy="164" r="3.1" stroke="#10b981" stroke-width="2.6"/>
+</g></g>
+</svg>

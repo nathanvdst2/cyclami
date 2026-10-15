@@ -10,7 +10,7 @@ import ReportCase from '../components/ReportCase.jsx';
 import { locale, t } from '../i18n/index.js';
 import { usePageState } from '../lib/persist.js';
 import { DonationSettings } from '../components/SupportCyclami.jsx';
-import { API, supabase } from '../lib/supabase.js';
+import { emailQuota } from '../lib/supabase.js'; // GET ${API}/email-quota (fonction Netlify)
 import AdminVerifications from '../components/AdminVerifications.jsx';
 
 // Actions du journal de modération (enregistrées en français par la base), traduites à l'affichage.
@@ -391,13 +391,6 @@ function Dashboard({ stats: s, openCount, isAdmin, setTab, verifCount = 0 }) {
       </div>
     </div>
   );
-}
-
-// Crédits d'e-mails Brevo restants (administrateurs) : { type, credits }, via la fonction Netlify /api/email-quota.
-async function emailQuota() {
-  const { data } = await supabase.auth.getSession();
-  const res = await fetch(`${API}/email-quota`, { headers: { Authorization: `Bearer ${data.session?.access_token || ''}` } });
-  return res.ok ? res.json() : null;
 }
 
 function EmailQuota() {

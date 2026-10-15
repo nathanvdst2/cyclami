@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+<circle cx="120" cy="126" r="100" fill="#d1fae5"/>
+<path d="M24 186 Q120 168 216 186" stroke="#cbd5e1" stroke-width="12" fill="none" stroke-linecap="round"/>
+<g opacity=".45"><g fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="34" cy="172" r="12.4" stroke="#14b8a6" stroke-width="3.72" fill="none"/>
+  <circle cx="68.72" cy="172" r="12.4" stroke="#14b8a6" stroke-width="3.72" fill="none"/>
+  <path d="M34 172 L50.12 172 L45.16 154.64 Z M45.16 154.64 L63.76 153.4 L50.12 172 M63.76 153.4 L68.72 172" stroke="#14b8a6" stroke-width="3.35"/>
+  <path d="M45.16 154.64 L43.92 149.06 M39.58 148.44 L47.64 148.44 M63.76 153.4 L61.9 146.58 L68.1 145.96" stroke="#14b8a6" stroke-width="3.35"/>
+  
+</g></g>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="92" cy="168" r="14" stroke="#0f766e" stroke-width="4.9" fill="none"/>
+  <circle cx="131.2" cy="168" r="14" stroke="#0f766e" stroke-width="4.9" fill="none"/>
+  <path d="M92 168 L110.2 168 L104.6 148.4 Z M104.6 148.4 L125.6 147 L110.2 168 M125.6 147 L131.2 168" stroke="#059669" stroke-width="4.41"/>
+  <path d="M104.6 148.4 L103.2 142.1 M98.3 141.4 L107.4 141.4 M125.6 147 L123.5 139.3 L130.5 138.6" stroke="#0f766e" stroke-width="4.41"/>
+  <circle cx="110.2" cy="168" r="3.5" stroke="#059669" stroke-width="2.94"/>
+</g>
+<g opacity=".45"><g fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="158" cy="172" r="12.4" stroke="#14b8a6" stroke-width="3.72" fill="none"/>
+  <circle cx="192.72" cy="172" r="12.4" stroke="#14b8a6" stroke-width="3.72" fill="none"/>
+  <path d="M158 172 L174.12 172 L169.16 154.64 Z M169.16 154.64 L187.76 153.4 L174.12 172 M187.76 153.4 L192.72 172" stroke="#14b8a6" stroke-width="3.35"/>
+  <path d="M169.16 154.64 L167.92 149.06 M163.58 148.44 L171.64 148.44 M187.76 153.4 L185.9 146.58 L192.1 145.96" stroke="#14b8a6" stroke-width="3.35"/>
+  
+</g></g>
+<g fill="#10b981"><circle cx="48" cy="96" r="14"/><circle cx="120" cy="80" r="16"/><circle cx="192" cy="96" r="14"/></g>
+<g fill="#fff"><path d="M42 96 h12 M48 90 v12" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M186 96 h12 M192 90 v12" stroke="#fff" stroke-width="4" stroke-linecap="round"/></g>
+<path transform="translate(108 70) scale(1)" fill="#fff" d="M0 6 C0 -2 12 -4 12 4 C12 -4 24 -2 24 6 C24 14 12 20 12 24 C12 20 0 14 0 6 Z"/>
+</svg>

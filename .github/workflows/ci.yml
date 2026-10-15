@@ -1,5 +1,5 @@
-# Vérifie chaque modification : le site doit se construire et toutes les pages
-# doivent s'afficher sans erreur (test dans un vrai navigateur, base simulée).
+# Vérifie chaque modification : les fonctions serveur (Netlify) passent leurs tests, le site
+# se construit et toutes les pages s'affichent sans erreur (vrai navigateur, base simulée).
 name: Vérification du site
 
 on:
@@ -11,7 +11,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -19,12 +19,16 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Tester le service photos (Cloudflare)
-        run: node cloudflare/photos-worker/test/worker.test.mjs
+      - name: Tester les fonctions Netlify (e-mails, push, lieux)
+        run: npm run test:functions
       - name: Aperçu des liens partagés
         run: node tests/share-preview.test.mjs
+      # Projet Supabase fictif : le test ne contacte jamais la vraie base (tout est simulé)
       - name: Construire le site
         run: npm run build
+        env:
+          VITE_SUPABASE_URL: https://cyclami-test.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_test
       - name: Installer Chromium
         run: npx playwright-core install --with-deps chromium
       - name: Tester la photo de profil réservée

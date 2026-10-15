@@ -44,7 +44,7 @@ export default function Leaderboard({ go, back }) {
       {error && <p className="text-sm text-red-600">{error}</p>}
       {!rows && !error && <div className="card h-40 animate-pulse" />}
       {rows?.length === 0 && (
-        <div className="card text-center text-stone-500">{period ? t('Personne n’a encore gagné de points cette semaine. Lance-toi ! 🌳') : t('Personne n’a encore gagné de points. Lance-toi ! 🌳')}</div>
+        <div className="card text-center text-stone-500">{period ? t('Personne n’a encore gagné de points cette semaine. Lance-toi ! 🚴') : t('Personne n’a encore gagné de points. Lance-toi ! 🚴')}</div>
       )}
       <div className="space-y-2">
         {rows?.map((r, i) => {

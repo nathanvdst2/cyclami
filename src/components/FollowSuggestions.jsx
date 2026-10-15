@@ -4,12 +4,13 @@ import { useApp } from '../context/AppContext.jsx';
 import UserAvatar from './UserAvatar.jsx';
 import FollowButton from './FollowButton.jsx';
 import { t } from '../i18n/index.js';
+import { levelInfo } from '../data/constants.js';
 
 const HIDDEN_KEY = 'cyclami:suggestions-hidden';
 const readHidden = () => { try { return JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]'); } catch { return []; } };
 
-// « Des membres à suivre » : proches de chez moi ou avec un animal de la même race.
-export default function FollowSuggestions({ go, title = t('Des membres à suivre') }) {
+// « Des cyclistes à suivre » : proches de chez moi, de préférence du même niveau.
+export default function FollowSuggestions({ go, title = t('Des cyclistes à suivre') }) {
   const { actions, following } = useApp();
   const [rows, setRows] = useState(null);
   const [hidden, setHidden] = useState(readHidden);
@@ -23,8 +24,11 @@ export default function FollowSuggestions({ go, title = t('Des membres à suivre
   // ceux que je viens de suivre restent affichés (bouton « Abonné ») jusqu'au prochain chargement
   const list = (rows || []).filter((r) => !hidden.includes(r.id));
   if (!list.length) return null;
-  const reason = (r) => (r.breed ? t('A aussi un {breed}', { breed: r.breed })
-    : r.km != null ? (r.km < 1 ? t('Tout près de chez toi') : t('À {km} km', { km: r.km })) : r.city);
+  const reason = (r) => {
+    const where = r.km != null ? (r.km < 1 ? t('Tout près de chez toi') : t('À {km} km', { km: r.km })) : r.city;
+    const level = levelInfo(r.level);
+    return [level && `${level.emoji} ${level.label}`, where].filter(Boolean).join(' · ');
+  };
 
   return (
     <section className="space-y-2">
@@ -36,7 +40,7 @@ export default function FollowSuggestions({ go, title = t('Des membres à suivre
               <button className="absolute right-1.5 top-1.5 text-stone-400" onClick={() => hide(r.id)} aria-label={t('Masquer')}><X size={14} /></button>
             )}
             <button className="flex flex-col items-center gap-1" onClick={() => go('user', { userId: r.id })}>
-              <UserAvatar user={{ id: r.id, name: r.name, avatarUrl: r.avatar_url, petPhotoUrl: r.pet_photo_url }} size="lg" />
+              <UserAvatar user={{ id: r.id, name: r.name, avatarUrl: r.avatar_url }} size="lg" />
               <span className="w-full truncate text-sm font-bold text-stone-800">{r.name}</span>
             </button>
             <span className="line-clamp-2 min-h-[2rem] text-xs text-stone-500">{reason(r)}</span>
