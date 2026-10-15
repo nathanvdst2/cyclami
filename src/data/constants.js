@@ -1,78 +1,51 @@
 // Listes de référence utilisées dans les formulaires et les filtres.
-// Les libellés affichés seulement sont traduits ici ; TRAITS et AVAILABILITY_SLOTS sont enregistrés
-// en base en français : on les traduit à l'affichage avec t().
+// Les identifiants (id) sont enregistrés en base ; les libellés sont traduits à l'affichage.
+// AVAILABILITY_SLOTS est enregistré en base en français : on le traduit à l'affichage avec t().
 import { t } from '../i18n/index.js';
 
-// Espèces, regroupées par famille (les identifiants sont enregistrés en base).
-export const SPECIES_GROUPS = [
-  t('Chiens & chats'),
-  t('Petits mammifères (NAC)'),
-  t('Oiseaux'),
-  t('Reptiles & amphibiens'),
-  t('Équidés & animaux de ferme'),
-  t('Autres'),
+// Types de sortie (rides.ride_type) et disciplines des cyclistes (profiles.disciplines) : mêmes valeurs.
+export const RIDE_TYPES = [
+  { id: 'route', label: t('Route'), emoji: '🚴' },
+  { id: 'vtt_gravel', label: t('VTT / gravel'), emoji: '🚵' },
+  { id: 'loisir_electrique', label: t('Loisir / électrique'), emoji: '🚲' },
+];
+export const DISCIPLINES = RIDE_TYPES;
+
+// Niveaux (profiles.level et rides.level), du plus tranquille au plus rapide.
+// speed : vitesse moyenne indicative sur le plat (km/h) ; min/max servent à suggérer un niveau.
+export const LEVELS = [
+  { id: 'debutant', label: t('Débutant'), hint: t('Je débute ou je roule tranquille'), speed: t('~15–20 km/h'), min: 8, max: 20, emoji: '🌱' },
+  { id: 'intermediaire', label: t('Intermédiaire'), hint: t('Je roule régulièrement, sans forcer'), speed: t('~20–25 km/h'), min: 20, max: 25, emoji: '🚴' },
+  { id: 'confirme', label: t('Confirmé'), hint: t('Je roule souvent et longtemps'), speed: t('~25–30 km/h'), min: 25, max: 30, emoji: '💨' },
+  { id: 'sportif', label: t('Sportif'), hint: t('Je m’entraîne et j’aime que ça roule vite'), speed: t('30 km/h et plus'), min: 30, max: 50, emoji: '⚡' },
+];
+export const LEVEL_IDS = LEVELS.map((l) => l.id);
+
+// Vélos (bikes.kind)
+export const BIKE_KINDS = [
+  { id: 'route', label: t('Vélo de route'), emoji: '🚴' },
+  { id: 'gravel', label: t('Gravel'), emoji: '🛤️' },
+  { id: 'vtt', label: t('VTT'), emoji: '🚵' },
+  { id: 'ville', label: t('Vélo de ville'), emoji: '🚲' },
+  { id: 'electrique', label: t('Vélo électrique'), emoji: '⚡' },
+  { id: 'autre', label: t('Autre vélo'), emoji: '🚲' },
 ];
 
-export const SPECIES = [
-  { id: 'chien', label: t('Chien'), emoji: '🐕', group: t('Chiens & chats') },
-  { id: 'chat', label: t('Chat'), emoji: '🐈', group: t('Chiens & chats') },
-  { id: 'lapin', label: t('Lapin'), emoji: '🐇', group: t('Petits mammifères (NAC)') },
-  { id: 'furet', label: t('Furet'), emoji: '🦦', group: t('Petits mammifères (NAC)') },
-  { id: 'chinchilla', label: t('Chinchilla'), emoji: '🐭', group: t('Petits mammifères (NAC)') },
-  { id: 'cochon_inde', label: t('Cochon d’Inde'), emoji: '🐹', group: t('Petits mammifères (NAC)') },
-  { id: 'hamster', label: t('Hamster'), emoji: '🐹', group: t('Petits mammifères (NAC)') },
-  { id: 'rat', label: t('Rat'), emoji: '🐀', group: t('Petits mammifères (NAC)') },
-  { id: 'souris', label: t('Souris'), emoji: '🐁', group: t('Petits mammifères (NAC)') },
-  { id: 'gerbille', label: t('Gerbille'), emoji: '🐭', group: t('Petits mammifères (NAC)') },
-  { id: 'octodon', label: t('Octodon (dègue)'), emoji: '🐭', group: t('Petits mammifères (NAC)') },
-  { id: 'herisson', label: t('Hérisson'), emoji: '🦔', group: t('Petits mammifères (NAC)') },
-  { id: 'perroquet', label: t('Perroquet'), emoji: '🦜', group: t('Oiseaux') },
-  { id: 'perruche', label: t('Perruche'), emoji: '🦜', group: t('Oiseaux') },
-  { id: 'canari', label: t('Canari'), emoji: '🐦', group: t('Oiseaux') },
-  { id: 'poule', label: t('Poule'), emoji: '🐔', group: t('Oiseaux') },
-  { id: 'canard', label: t('Canard'), emoji: '🦆', group: t('Oiseaux') },
-  { id: 'tortue', label: t('Tortue'), emoji: '🐢', group: t('Reptiles & amphibiens') },
-  { id: 'serpent', label: t('Serpent'), emoji: '🐍', group: t('Reptiles & amphibiens') },
-  { id: 'lezard', label: t('Lézard'), emoji: '🦎', group: t('Reptiles & amphibiens') },
-  { id: 'amphibien', label: t('Grenouille / axolotl'), emoji: '🐸', group: t('Reptiles & amphibiens') },
-  { id: 'cheval', label: t('Cheval'), emoji: '🐴', group: t('Équidés & animaux de ferme') },
-  { id: 'poney', label: t('Poney'), emoji: '🐴', group: t('Équidés & animaux de ferme') },
-  { id: 'ane', label: t('Âne'), emoji: '🫏', group: t('Équidés & animaux de ferme') },
-  { id: 'chevre', label: t('Chèvre'), emoji: '🐐', group: t('Équidés & animaux de ferme') },
-  { id: 'mouton', label: t('Mouton'), emoji: '🐑', group: t('Équidés & animaux de ferme') },
-  { id: 'cochon', label: t('Cochon (mini-pig)'), emoji: '🐖', group: t('Équidés & animaux de ferme') },
-  { id: 'poisson', label: t('Poisson'), emoji: '🐠', group: t('Autres') },
-  { id: 'autre', label: t('Autre'), emoji: '🚴', group: t('Autres') },
-];
+// Limites communes avec la base (supabase/schema.sql)
+export const SPEED_MIN = 8;
+export const SPEED_MAX = 50;
+export const MAX_BIKES = 10;
 
-export const speciesInfo = (id) => SPECIES.find((s) => s.id === id) || { id, label: id, emoji: '🚴', group: t('Autres') };
-
-// Règles des annonces (mêmes règles vérifiées par la base, voir supabase/schema.sql v10).
-export const IDENTIFIED_SPECIES = ['chien', 'chat', 'cheval', 'poney', 'ane']; // DogID, CatID, passeport équin
-export const MIN_AGE_SPECIES = ['chien', 'chat']; // 8 semaines minimum
-export const PERMIT_SPECIES = ['chien', 'chat', 'furet', 'lapin', 'cochon_inde', 'chinchilla', 'hamster', 'rat', 'souris', 'cheval', 'poney', 'ane']; // permis de détention (Wallonie)
-export const PROTECTED_HINT_SPECIES = ['perroquet', 'tortue', 'serpent', 'lezard', 'amphibien'];
-
-export const SIZES = [
-  { id: 'petit', label: t('Petit') },
-  { id: 'moyen', label: t('Moyen') },
-  { id: 'grand', label: t('Grand') },
-];
-
-export const TRAITS = [
-  'Joueur', 'Calme', 'Sociable', 'Timide', 'Énergique', 'Câlin',
-  'Curieux', 'Obéissant', 'Aime l’eau', 'Aime courir', 'Protecteur', 'Gourmand',
-];
-
-export const EMOJIS = [
-  '🐕', '🐶', '🦮', '🐕‍🦺', '🐩', '🐈', '🐱', '🐈‍⬛', '🐇', '🦦', '🐹', '🐭', '🐀', '🐁', '🦔',
-  '🦜', '🐦', '🐔', '🦆', '🐢', '🐍', '🦎', '🐸', '🐴', '🫏', '🐐', '🐑', '🐖', '🐠', '🚴',
-];
-
-export const PACES = [
-  { id: 'tranquille', label: t('Tranquille'), energy: 1 },
-  { id: 'normal', label: t('Normal'), energy: 3 },
-  { id: 'sportif', label: t('Sportif'), energy: 5 },
-];
+export const rideType = (id) => RIDE_TYPES.find((x) => x.id === id) || RIDE_TYPES[0];
+export const levelInfo = (id) => LEVELS.find((x) => x.id === id) || null;
+export const bikeKind = (id) => BIKE_KINDS.find((x) => x.id === id) || BIKE_KINDS[BIKE_KINDS.length - 1];
+// rang du niveau (0 = débutant … 3 = sportif), -1 si inconnu
+export const levelRank = (id) => LEVEL_IDS.indexOf(id);
+// niveau suggéré d'après une vitesse moyenne habituelle (km/h)
+export const levelForSpeed = (speed) => {
+  const v = Number(speed);
+  if (!v) return null;
+  return (LEVELS.find((l) => v < l.max) || LEVELS[LEVELS.length - 1]).id;
+};
 
 export const AVAILABILITY_SLOTS = ['Matin', 'Midi', 'Après-midi', 'Soir', 'Week-end'];

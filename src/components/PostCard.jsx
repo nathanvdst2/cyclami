@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Heart, Trash2 } from 'lucide-react';
 import { useApp } from '../context/AppContext.jsx';
 import { timeAgo } from '../utils/geo.js';
-import PetAvatar from './PetAvatar.jsx';
+import UserAvatar from './UserAvatar.jsx';
 import Comments from './Comments.jsx';
 import StaffBadge from './StaffBadge.jsx';
 import { ModerationBar, ReportButton } from './ModerationTools.jsx';
@@ -13,11 +13,9 @@ export default function PostCard({ post, go }) {
   const [error, setError] = useState(null);
   const author = getUser(post.authorId);
   if (!author) return null;
-  const pet = author.pets.find((p) => p.id === post.petId) || author.pets[0];
   const liked = post.likes.includes(currentUser.id);
   const mine = post.authorId === currentUser.id;
   const openAuthor = () => go('user', { userId: author.id });
-  const openPet = () => (pet ? go('animal', { petId: pet.id, userId: author.id }) : openAuthor());
 
   const run = async (fn) => {
     const err = await fn();
@@ -27,11 +25,11 @@ export default function PostCard({ post, go }) {
   return (
     <article className="card space-y-3">
       <div className="flex items-center gap-2">
-        <button onClick={openPet} aria-label={pet?.name}><PetAvatar pet={pet} size="md" className="!h-10 !w-10" /></button>
+        <button onClick={openAuthor} aria-label={author.name}><UserAvatar user={author} size="md" className="!h-10 !w-10" /></button>
         <div className="min-w-0 flex-1 text-left">
           <div className="font-bold text-stone-800">
-            <button type="button" onClick={openPet}>{pet?.name}</button>{' '}
-            <button type="button" className="font-normal text-stone-500" onClick={openAuthor}>· {author.name}</button><StaffBadge userId={author.id} />
+            <button type="button" onClick={openAuthor}>{author.name}</button><StaffBadge userId={author.id} />
+            {author.city && <span className="font-normal text-stone-500"> · {author.city}</span>}
           </div>
           <div className="text-xs text-stone-400">{timeAgo(post.createdAt)}</div>
         </div>
@@ -48,7 +46,7 @@ export default function PostCard({ post, go }) {
         <img src={post.photoUrl} alt="" loading="lazy" className="max-h-[32rem] w-full rounded-xl bg-emerald-100 object-contain" />
       ) : (
         <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 text-7xl">
-          {pet?.emoji}{post.scene}
+          {post.scene || '🚴'}
         </div>
       )}
       <p className="whitespace-pre-line break-words text-stone-700">{post.text}</p>

@@ -8,7 +8,8 @@ import CooldownNote from '../components/CooldownNote.jsx';
 import FollowSuggestions from '../components/FollowSuggestions.jsx';
 import { useDraft, usePageState } from '../lib/persist.js';
 
-const SCENES = ['🌳', '🌊', '☀️', '🍂', '❄️', '🌸', '🎾', '🦴'];
+// Décor d'une publication sans photo
+const SCENES = ['🚴', '🚵', '⛰️', '🌲', '🌅', '☀️', '🌧️', '☕'];
 
 export default function Feed({ go }) {
   const { posts: allPosts, hasMorePosts, currentUser, following, actions } = useApp();
@@ -16,8 +17,7 @@ export default function Feed({ go }) {
   const [scope, setScope] = usePageState('feed:scope', 'all');
   const posts = scope === 'following' ? allPosts.filter((p) => following.has(p.authorId) || p.authorId === currentUser.id) : allPosts;
   const [loadingMore, setLoadingMore] = useState(false);
-  const [petId, setPetId] = useState(currentUser.pets[0].id);
-  const [scene, setScene] = useDraft('post:scene', '🌳');
+  const [scene, setScene] = useDraft('post:scene', '🚴');
   const [text, setText] = useDraft('post:text', '');
   const [photoFile, setPhotoFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -42,7 +42,7 @@ export default function Feed({ go }) {
     e.preventDefault();
     if (!text.trim()) return;
     setPublishing(true);
-    const err = await actions.createPost({ petId, scene, text: text.trim(), photoFile });
+    const err = await actions.createPost({ scene, text: text.trim(), photoFile });
     setPublishing(false);
     if (err) return setError(err);
     setText('');
@@ -54,13 +54,13 @@ export default function Feed({ go }) {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-2xl font-extrabold text-stone-800">{t('Fil d’actualité')}</h1>
         <div className="flex gap-2">
-          <button className="btn-ghost" onClick={() => go('groups')}>👥 {t('Groupes')}</button>
+          <button className="btn-ghost" onClick={() => go('groups')}>👥 {t('Clubs et groupes')}</button>
           <button className="btn-ghost" onClick={() => go('forum')}>💬 {t('Forum')}</button>
         </div>
       </div>
 
       <form onSubmit={publish} className="card space-y-3">
-        <textarea className="input" rows="2" maxLength={2000} placeholder={t('Raconte ta dernière sortie…')} value={text} onChange={(e) => setText(e.target.value)} />
+        <textarea className="input" rows="2" maxLength={2000} placeholder={t('Raconte ta dernière sortie à vélo…')} value={text} onChange={(e) => setText(e.target.value)} />
         {preview && (
           <div className="relative">
             <img src={preview} alt={t('Aperçu')} className="max-h-64 w-full rounded-xl bg-emerald-100 object-contain" />
@@ -70,11 +70,6 @@ export default function Feed({ go }) {
           </div>
         )}
         <div className="flex flex-wrap items-center gap-2">
-          {currentUser.pets.length > 1 && (
-            <select className="input w-auto" value={petId} onChange={(e) => setPetId(e.target.value)}>
-              {currentUser.pets.map((p) => <option key={p.id} value={p.id}>{p.emoji} {p.name}</option>)}
-            </select>
-          )}
           <label className="btn-ghost cursor-pointer px-3" aria-label={t('Ajouter une photo')}>
             <Camera size={18} />
             <input type="file" accept="image/*" className="hidden" onChange={pickPhoto} />
