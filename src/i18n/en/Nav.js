@@ -1,10 +1,10 @@
 // Traductions anglaises de src/components/Nav.jsx
 export default {
   'Découvrir': 'Discover',
+  'Sorties': 'Rides',
   'Fil': 'Feed',
-  'Annonces': 'Listings',
   'Messages': 'Messages',
   'Profil': 'Profile',
-  'Notifications': 'Notifications',
   'Rechercher': 'Search',
+  'Notifications': 'Notifications',
 };

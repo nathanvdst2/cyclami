@@ -1,7 +1,6 @@
-// Traductions néerlandaises de components/FollowSuggestions.jsx
+// Traductions néerlandaises de src/components/FollowSuggestions.jsx
 export default {
-  'Des membres à suivre': 'Leden om te volgen',
-  'A aussi un {breed}': 'Heeft ook een {breed}',
+  'Des cyclistes à suivre': 'Fietsers om te volgen',
   'Tout près de chez toi': 'Vlak bij jou',
   'À {km} km': 'Op {km} km',
   'Masquer': 'Verbergen',

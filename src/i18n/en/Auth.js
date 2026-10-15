@@ -14,7 +14,6 @@ export default {
   'Langue': 'Language',
   'Indique ton e-mail, on t’envoie un lien pour le réinitialiser.': 'Enter your email and we’ll send you a link to reset it.',
   'Continuer avec Google': 'Continue with Google',
-  'En continuant avec Google, tu acceptes la': 'By continuing with Google, you accept the',
   'politique de confidentialité': 'privacy policy',
   'Seuls ton prénom et ton e-mail sont récupérés.': 'Only your first name and email are collected.',
   'ou avec ton e-mail': 'or with your email',
@@ -23,7 +22,6 @@ export default {
   'E-mail': 'Email',
   'Mot de passe': 'Password',
   'Mot de passe oublié ?': 'Forgotten your password?',
-  'J’accepte la': 'I accept the',
   'et j’ai lu les': 'and I’ve read the',
   'conseils de sécurité': 'safety tips',
   'Patiente…': 'Please wait…',
@@ -38,4 +36,5 @@ export default {
   'et la': 'and the',
   'En continuant avec Google, tu acceptes les': 'By continuing with Google, you accept the',
   'Ce prénom n’est pas autorisé. Choisis-en un autre.': 'This name isn’t allowed. Please choose another one.',
+  'Trouve des cyclistes de ton niveau près de chez toi et roulez ensemble. C’est gratuit.': 'Find cyclists of your level near you and ride together. It’s free.',
 };

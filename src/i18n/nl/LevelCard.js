@@ -2,6 +2,7 @@
 export default {
   'Niveau {n}': 'Niveau {n}',
   'encore {n} XP pour « {name} »': 'nog {n} XP voor “{name}”',
+  'Classement': 'Klassement',
   'Badges': 'Badges',
   'Pas encore de badge.': 'Nog geen badge.',
   'Comment gagner des points ?': 'Hoe verdien je punten?',

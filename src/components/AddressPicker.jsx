@@ -57,7 +57,7 @@ export default function AddressPicker({ value, onChange, center, required = fals
   return (
     <div className="space-y-2">
       <div className="flex gap-2">
-        <input className="input" placeholder={t('Chercher un parc, une adresse…')} value={query}
+        <input className="input" placeholder={t('Chercher une adresse, un lieu…')} value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); search(); } }} />
         <button type="button" className="btn-ghost px-3" onClick={search} disabled={searching} aria-label={t('Chercher')}><Search size={16} /></button>

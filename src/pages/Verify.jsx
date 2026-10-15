@@ -144,7 +144,7 @@ export default function Verify({ back }) {
       )}
       {step === 'intro' && (
         <section className="card space-y-3">
-          <p className="text-sm text-stone-600">{t('Le badge « Profil vérifié » montre aux autres membres qu’une vraie personne se cache derrière ton profil. Ça rassure avant une première sortie ou une garde.')}</p>
+          <p className="text-sm text-stone-600">{t('Le badge « Profil vérifié » montre aux autres membres qu’une vraie personne se cache derrière ton profil. Ça rassure avant une première sortie ensemble.')}</p>
           <ol className="list-decimal space-y-1 pl-5 text-sm text-stone-700">
             <li>{t('Tu te filmes une quinzaine de secondes avec la caméra de ton téléphone, dans l’appli.')}</li>
             <li>{t('Des gestes et un code, tirés au hasard au moment même, s’affichent : fais les gestes et dis le code à voix haute.')}</li>

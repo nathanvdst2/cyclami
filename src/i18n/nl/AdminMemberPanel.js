@@ -8,11 +8,8 @@ export default {
   'Position (≈ 1 km)': 'Locatie (≈ 1 km)',
   'Confidentiel : à utiliser seulement pour la sécurité et la modération. Cette consultation est notée dans le journal.': 'Vertrouwelijk: alleen gebruiken voor beveiliging en moderatie. Deze raadpleging wordt in het logboek genoteerd.',
   'Adresses IP récentes': 'Recente IP-adressen',
-  'Aucune session active enregistrée.': 'Geen actieve sessie geregistreerd.',
   'Recherche du fournisseur…': 'Provider opzoeken…',
   'Fournisseur et localisation indisponibles': 'Provider en locatie niet beschikbaar',
-  'Fournisseur : {isp}': 'Provider: {isp}',
-  'Fuseau horaire : {tz}': 'Tijdzone: {tz}',
   'Voir la zone sur la carte (approximative)': 'Zone op de kaart bekijken (bij benadering)',
   'Dernière activité': 'Laatste activiteit',
   'masqué': 'verborgen',
@@ -32,7 +29,6 @@ export default {
   'Localisation approximative': 'Geschatte locatie',
   'Organisation': 'Organisatie',
   'Aucune adresse IP enregistrée récemment.': 'Geen recent IP-adres geregistreerd.',
-  // libellés des compteurs et des caractéristiques de l'appareil (passés à t() dynamiquement)
   'Commentaires': 'Reacties',
   'Sorties organisées': 'Georganiseerde fietstochten',
   'Sorties rejointes': 'Fietstochten meegedaan',
@@ -59,4 +55,8 @@ export default {
   'Modifier ce profil (administrateur)': 'Dit profiel wijzigen (beheerder)',
   'Ville': 'Stad',
   'Retirer sa photo de profil': 'Profielfoto verwijderen',
+  'Vélos': 'Fietsen',
+  'Parcours GPS': 'Gps-ritten',
+  'Dangers signalés': 'Gemelde gevaren',
+  'Clubs et groupes': 'Clubs en groepen',
 };

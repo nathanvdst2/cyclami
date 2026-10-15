@@ -2,7 +2,6 @@
 export default {
   'Image trop lourde (25 Mo maximum).': 'Image too large (25 MB maximum).',
   'Fil d’actualité': 'News feed',
-  'Raconte ta dernière sortie…': 'Tell us about your last ride…',
   'Aperçu': 'Preview',
   'Retirer la photo': 'Remove photo',
   'Ajouter une photo': 'Add a photo',
@@ -14,4 +13,6 @@ export default {
   'Tout le monde': 'Everyone',
   'Mes abonnements': 'Following',
   'Rien ici pour l’instant : abonne-toi à des membres depuis leur profil pour voir leurs publications.': 'Nothing here yet: follow members from their profile to see their posts.',
+  'Clubs et groupes': 'Clubs and groups',
+  'Raconte ta dernière sortie à vélo…': 'Tell us about your last bike ride…',
 };

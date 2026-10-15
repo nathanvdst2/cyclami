@@ -14,9 +14,14 @@ import { emailQuota } from '../lib/supabase.js'; // GET ${API}/email-quota (fonc
 import AdminVerifications from '../components/AdminVerifications.jsx';
 
 // Actions du journal de modération (enregistrées en français par la base), traduites à l'affichage.
+const ACTIONS = {
+  avertissement: t('avertissement'), bannissement: t('bannissement'), 'fin de suspension': t('fin de suspension'),
+  masquage: t('masquage'), réaffichage: t('réaffichage'), retrait: t('retrait'), 'signalement traité': t('signalement traité'),
+  'suppression du compte': t('suppression du compte'), 'consultation des données personnelles': t('consultation des données personnelles'),
+};
 const actionLabel = (action) => {
   const m = /^suspension (\d+) j$/.exec(action || '');
-  return m ? t('suspension {n} j', { n: m[1] }) : t(action);
+  return m ? t('suspension {n} j', { n: m[1] }) : ACTIONS[action] || action;
 };
 
 // Tableau de bord du super-utilisateur. Toutes les actions sont vérifiées par la base :

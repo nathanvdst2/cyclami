@@ -1,9 +1,23 @@
-// Traductions néerlandaises de components/AccountMenu.jsx
+// Traductions néerlandaises de src/components/AccountMenu.jsx
 export default {
   'Menu du compte': 'Accountmenu',
   'Voir mon profil': 'Mijn profiel bekijken',
   'Paramètres du compte': 'Accountinstellingen',
-  'Abonnés et abonnements': 'Volgers en gevolgd',
+  'Mon profil cycliste et mes vélos': 'Mijn fietsprofiel en mijn fietsen',
+  'Parrainage : inviter des amis': 'Peterschap: vrienden uitnodigen',
+  'Dangers sur la route': 'Gevaren op de weg',
+  'Suivi GPS': 'Gps-tracking',
+  'Clubs et groupes': 'Clubs en groepen',
+  'Forum': 'Forum',
+  'Tchat général': 'Algemene chat',
   'Niveau et classement': 'Niveau en klassement',
+  'Abonnés et abonnements': 'Volgers en gevolgd',
+  'Administration': 'Beheer',
+  'Modération': 'Moderatie',
+  'Langue': 'Taal',
+  'Donner mon avis / signaler un bug': 'Mijn mening geven / een bug melden',
+  'Soutenir Cyclami': 'Steun Cyclami',
+  'Conseils de sécurité': 'Veiligheidstips',
+  'Se déconnecter': 'Afmelden',
   'Inviter des amis': 'Vrienden uitnodigen',
 };

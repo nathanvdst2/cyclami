@@ -1,16 +1,17 @@
 // Traductions anglaises de src/components/ExampleTopic.jsx
 export default {
-  'Même souci avec ma border ! Ce qui a marché chez nous : s’arrêter net dès que la laisse se tend, et repartir seulement quand elle revient à côté. Les deux premières semaines sont longues, mais ça paie.': 'Same problem with my border collie! What worked for us: stop dead as soon as the lead goes tight, and only set off again when she comes back beside you. The first two weeks are long, but it pays off.',
-  'Je conseille aussi un harnais avec anneau devant plutôt qu’un collier : il tire beaucoup moins et c’est plus doux pour sa nuque. Et des sorties plus courtes mais plus souvent au début.': 'I’d also suggest a front-clip harness rather than a collar: he pulls much less and it’s gentler on his neck. And shorter but more frequent rides at first.',
-  'Nous avons pris deux séances avec une éducatrice canine en méthode positive, ça nous a beaucoup aidés. Si tu es du côté de Namur, je peux t’envoyer son contact en message privé.': 'We had two sessions with a positive-reinforcement dog trainer, which helped us a lot. If you’re near Namur, I can send you her details in a private message.',
   'Un titre clair qui résume la question': 'A clear title that sums up the question',
   'La bonne catégorie, pour être lu par les bonnes personnes': 'The right category, so the right people read it',
-  'Le contexte : âge, race, ce qui a déjà été essayé': 'The context: age, breed, what has already been tried',
   'Une question précise, à laquelle on peut répondre': 'A precise question that people can answer',
   'Des réponses bienveillantes, basées sur l’expérience': 'Kind replies based on experience',
   'Exemple': 'Example',
-  'Mon chiot de 6 mois tire en laisse : vos astuces ?': 'My 6-month-old puppy pulls on the lead: any tips?',
-  'Bonjour à tous ! Mon chiot, un berger australien de 6 mois, tire très fort en laisse dès qu’il voit un autre chien. On a essayé les friandises, sans grand succès.\n\nComment avez-vous fait avec le vôtre ? Harnais, méthode, cours d’éducation… Merci pour vos conseils !': 'Hi everyone! My puppy, a 6-month-old Australian Shepherd, pulls really hard on the lead as soon as he sees another dog. We tried treats, without much success.\n\nHow did you manage with yours? Harness, method, training classes… Thanks for your advice!',
   'Ce sujet n’est pas réel : il montre une question bien posée et des réponses utiles.': 'This topic isn’t real: it shows a well-asked question and helpful replies.',
   'Poser ma question': 'Ask my question',
+  'J’étais exactement dans ton cas l’an dernier ! Commence par des sorties « pas de lâchage » de niveau débutant : le groupe attend tout le monde au sommet des côtes. Et reste dans les roues, on se fatigue beaucoup moins à l’abri.': 'I was in exactly the same boat last year! Start with beginner “no-drop” rides: the group waits for everyone at the top of the climbs. And stay on a wheel, you tire far less when you’re sheltered.',
+  'Dans les côtes, mouline : petit plateau, grand pignon, et garde une cadence régulière plutôt que de te mettre en danseuse dès le pied. Mange un petit quelque chose toutes les 45 minutes, même sans faim.': 'On climbs, spin: small chainring, big sprocket, and keep a steady cadence rather than getting out of the saddle at the bottom. Eat a little something every 45 minutes, even if you’re not hungry.',
+  'Préviens l’organisateur en t’inscrivant que tu débutes, la plupart adaptent l’allure. Si tu es du côté de Namur, on fait une sortie tranquille le dimanche matin à 22 km/h, tu es la bienvenue !': 'Tell the organiser you’re a beginner when you sign up, most of them adjust the pace. If you’re around Namur, we do an easy ride on Sunday mornings at 22 km/h, you’re very welcome!',
+  'Le contexte : ton niveau, ton vélo, ce que tu as déjà essayé': 'The context: your level, your bike, what you’ve already tried',
+  'Je débute : comment suivre un groupe sans me faire lâcher dans les côtes ?': 'I’m a beginner: how do I keep up with a group without getting dropped on the climbs?',
+  'Débutants': 'Beginners',
+  'Bonjour à tous ! Je roule seul depuis trois mois sur un vélo de route d’occasion, environ 50 km à 22 km/h de moyenne. J’aimerais rejoindre des sorties de groupe, mais j’ai peur de ralentir tout le monde dans les montées.\n\nComment avez-vous fait à vos débuts ? Allure, braquet, alimentation… Merci pour vos conseils !': 'Hi everyone! I’ve been riding alone for three months on a second-hand road bike, about 50 km at a 22 km/h average. I’d love to join group rides, but I’m afraid of slowing everyone down on the climbs.\n\nHow did you manage when you started? Pace, gearing, food… Thanks for your advice!',
 };

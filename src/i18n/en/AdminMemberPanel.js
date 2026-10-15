@@ -8,11 +8,8 @@ export default {
   'Position (≈ 1 km)': 'Location (≈ 1 km)',
   'Confidentiel : à utiliser seulement pour la sécurité et la modération. Cette consultation est notée dans le journal.': 'Confidential: use only for security and moderation. This lookup is recorded in the log.',
   'Adresses IP récentes': 'Recent IP addresses',
-  'Aucune session active enregistrée.': 'No active session recorded.',
   'Recherche du fournisseur…': 'Looking up provider…',
   'Fournisseur et localisation indisponibles': 'Provider and location unavailable',
-  'Fournisseur : {isp}': 'Provider: {isp}',
-  'Fuseau horaire : {tz}': 'Time zone: {tz}',
   'Voir la zone sur la carte (approximative)': 'View the area on the map (approximate)',
   'Dernière activité': 'Last activity',
   'masqué': 'hidden',
@@ -32,7 +29,6 @@ export default {
   'Localisation approximative': 'Approximate location',
   'Organisation': 'Organisation',
   'Aucune adresse IP enregistrée récemment.': 'No IP address recorded recently.',
-  // libellés des compteurs et des caractéristiques de l'appareil (passés à t() dynamiquement)
   'Commentaires': 'Comments',
   'Sorties organisées': 'Rides organised',
   'Sorties rejointes': 'Rides joined',
@@ -59,4 +55,8 @@ export default {
   'Modifier ce profil (administrateur)': 'Edit this profile (administrator)',
   'Ville': 'City',
   'Retirer sa photo de profil': 'Remove their profile photo',
+  'Vélos': 'Bikes',
+  'Parcours GPS': 'GPS rides',
+  'Dangers signalés': 'Reported hazards',
+  'Clubs et groupes': 'Clubs and groups',
 };

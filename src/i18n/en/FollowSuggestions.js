@@ -1,7 +1,6 @@
-// Traductions anglaises de components/FollowSuggestions.jsx
+// Traductions anglaises de src/components/FollowSuggestions.jsx
 export default {
-  'Des membres à suivre': 'Members to follow',
-  'A aussi un {breed}': 'Also has a {breed}',
+  'Des cyclistes à suivre': 'Cyclists to follow',
   'Tout près de chez toi': 'Very close to you',
   'À {km} km': '{km} km away',
   'Masquer': 'Hide',

@@ -2,10 +2,8 @@
 export default {
   'Tchat indisponible pour le moment.': 'Chat momenteel niet beschikbaar.',
   'Tchat général': 'Algemene chat',
-  'Ouvert à tous les membres de Cyclami. Reste bienveillant : pas de pub, pas de vente d’animaux, pas d’infos personnelles. Un message déplacé ? Signale-le avec le drapeau.': 'Open voor alle leden van Cyclami. Blijf vriendelijk: geen reclame, geen verkoop van dieren, geen persoonlijke gegevens. Een ongepast bericht? Meld het met het vlaggetje.',
   'Voir les messages plus anciens': 'Oudere berichten bekijken',
   'Personne n’a encore écrit. Lance la conversation 👋': 'Nog niemand heeft geschreven. Begin het gesprek 👋',
-  'Écrire à tout le monde…': 'Schrijf naar iedereen…',
   'Ton message': 'Je bericht',
   'Réponse à un message plus ancien': 'Antwoord op een ouder bericht',
   'Photo partagée dans le tchat': 'Foto gedeeld in de chat',
@@ -22,4 +20,5 @@ export default {
   '{a} et {b} écrivent…': '{a} en {b} typen…',
   '{name} enregistre un message vocal…': '{name} neemt een spraakbericht op…',
   '{name} est en train d’écrire…': '{name} is aan het typen…',
+  'Ouvert à tous les membres de Cyclami. Reste bienveillant : pas de pub, pas d’arnaques, pas d’infos personnelles. Un message déplacé ? Signale-le avec le drapeau.': 'Open voor alle leden van Cyclami. Blijf vriendelijk: geen reclame, geen oplichting, geen persoonlijke gegevens. Een ongepast bericht? Meld het met het vlaggetje.',
 };

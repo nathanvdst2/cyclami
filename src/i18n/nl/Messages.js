@@ -2,16 +2,13 @@
 export default {
   'Messages': 'Berichten',
   'Pas encore de conversation.': 'Nog geen gesprekken.',
-  'Trouve un compagnon de sortie': 'Vind een fietsmaatje',
   'Image trop lourde (25 Mo maximum).': 'Afbeelding te groot (maximaal 25 MB).',
   'Impossible d’envoyer un message à ce membre.': 'Je kunt dit lid geen bericht sturen.',
   'Retour': 'Terug',
-  'avec {pets} · voir le profil': 'met {pets} · profiel bekijken',
   'Dis bonjour à {name} et propose une sortie': 'Zeg hallo tegen {name} en stel een fietstocht voor',
   'Premier rendez-vous dans un lieu public, et ne partage pas ton adresse.': 'Spreek de eerste keer af op een openbare plek en deel je adres niet.',
   'Conseils': 'Tips',
   'Photo': 'Foto',
-  'Vu {time}': 'Gezien om {time}',
   '{name} est en train d’écrire…': '{name} is aan het typen…',
   'Aperçu': 'Voorbeeld',
   'Retirer la photo': 'Foto verwijderen',
@@ -30,4 +27,6 @@ export default {
   '{name} enregistre un message vocal…': '{name} neemt een spraakbericht op…',
   'enregistre un vocal…': 'neemt een spraakbericht op…',
   'écrit…': 'typt…',
+  'Trouve des cyclistes de ton niveau': 'Vind fietsers van jouw niveau',
+  'voir le profil': 'profiel bekijken',
 };

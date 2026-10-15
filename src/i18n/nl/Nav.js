@@ -1,10 +1,10 @@
 // Traductions néerlandaises de src/components/Nav.jsx
 export default {
   'Découvrir': 'Ontdekken',
+  'Sorties': 'Fietstochten',
   'Fil': 'Tijdlijn',
-  'Annonces': 'Zoekertjes',
   'Messages': 'Berichten',
   'Profil': 'Profiel',
-  'Notifications': 'Notificaties',
   'Rechercher': 'Zoeken',
+  'Notifications': 'Notificaties',
 };

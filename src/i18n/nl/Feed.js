@@ -2,7 +2,6 @@
 export default {
   'Image trop lourde (25 Mo maximum).': 'Afbeelding te groot (maximaal 25 MB).',
   'Fil d’actualité': 'Tijdlijn',
-  'Raconte ta dernière sortie…': 'Vertel over je laatste fietstocht…',
   'Aperçu': 'Voorbeeld',
   'Retirer la photo': 'Foto verwijderen',
   'Ajouter une photo': 'Foto toevoegen',
@@ -14,4 +13,6 @@ export default {
   'Tout le monde': 'Iedereen',
   'Mes abonnements': 'Wie ik volg',
   'Rien ici pour l’instant : abonne-toi à des membres depuis leur profil pour voir leurs publications.': 'Nog niets hier: volg leden via hun profiel om hun berichten te zien.',
+  'Clubs et groupes': 'Clubs en groepen',
+  'Raconte ta dernière sortie à vélo…': 'Vertel over je laatste fietstocht…',
 };

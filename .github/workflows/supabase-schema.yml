@@ -1,6 +1,8 @@
 # Applique automatiquement supabase/schema.sql à la base Supabase
 # à chaque modification du fichier sur main (le script peut être relancé sans risque).
 # Nécessite le secret GitHub SUPABASE_DB_URL (chaîne de connexion « Session pooler »).
+# Facultatif : secret BREVO_API_KEY (e-mails et notifications push), variable de dépôt SITE_URL
+# (adresse du site, https://cyclami.com par défaut).
 name: Base de données Supabase
 
 on:
@@ -50,6 +52,8 @@ jobs:
             psql -v ON_ERROR_STOP=1 -q --single-transaction -f supabase/schema.sql
             echo "✅ Passage $run réussi"
           done
+          # vérifications fonctionnelles (profil, vélos, sorties, rappels, pages publiques…), annulées à la fin
+          psql -v ON_ERROR_STOP=1 -q -f supabase/test/checks.sql
 
       - name: Vérifier la présence du secret
         id: secret
@@ -68,6 +72,8 @@ jobs:
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          # adresse publique du site (variable de dépôt GitHub, facultative)
+          SITE_URL: ${{ vars.SITE_URL }}
         # Le mot de passe peut contenir @, :, / ou # : on découpe l'adresse nous-mêmes
         # (au dernier @) au lieu de laisser psql l'interpréter.
         # Instruction par instruction (pas de transaction unique) : chaque verrou ne dure que
@@ -112,7 +118,21 @@ jobs:
             echo "::warning::Essai $attempt interrompu (table occupée ?), nouvel essai dans 20 s"
             sleep 20
           done
-          # e-mails : clé partagée avec le service Cloudflare, dérivée de la clé Brevo
+          # e-mails et notifications push : la base appelle la fonction Netlify du site (<SITE_URL>/api/notify,
+          # et /api/push pour le téléphone)
+          SITE=$(printf '%s' "${SITE_URL:-https://cyclami.com}" | tr -d '[:space:]')
+          SITE=${SITE%/}
+          case "$SITE" in
+            https://*) ;;
+            *) echo "::error::Variable SITE_URL invalide (attendu https://…) : $SITE"; exit 1 ;;
+          esac
+          psql -v ON_ERROR_STOP=1 -q -v url="$SITE/api/notify" <<'SQL'
+          insert into private.settings (key, value) values ('notify_url', :'url')
+          on conflict (key) do update set value = excluded.value;
+          SQL
+          echo "✅ Adresse des notifications : $SITE/api/notify"
+          # clé partagée avec la fonction Netlify, dérivée de la clé Brevo (la fonction fait le même calcul :
+          # sha256 de « cyclami-notify:<clé Brevo> »)
           KEY=$(printf '%s' "$BREVO_API_KEY" | tr -d '[:space:]')
           if [ -n "$KEY" ]; then
             NOTIFY_SECRET=$(printf 'cyclami-notify:%s' "$KEY" | sha256sum | cut -d' ' -f1)

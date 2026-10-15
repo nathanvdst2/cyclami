@@ -22,7 +22,7 @@ create table if not exists public.profiles (
   created_at timestamptz not null default now()
 );
 
--- Vélos des membres (10 au plus par membre, voir « Profil cycliste et vélos » en fin de script)
+-- Vélos des membres (10 au plus par membre, voir version 98)
 create table if not exists public.bikes (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references public.profiles (id) on delete cascade,
@@ -67,7 +67,7 @@ create table if not exists public.rides (
   distance_km numeric(5,1) check (distance_km between 1 and 400),
   elevation_m integer check (elevation_m between 0 and 8000),     -- dénivelé positif
   no_drop boolean not null default false,                         -- « pas de lâchage » : le groupe attend tout le monde
-  -- tracé simplifié (le fichier GPX n'est pas gardé) ; météo et vent sont calculés par le navigateur
+  -- tracé simplifié (le fichier GPX n'est pas conservé) ; météo et vent sont calculés par le navigateur
   route jsonb check (public.is_valid_route(route)),
   max_participants int not null default 5 check (max_participants between 2 and 50),
   description text not null default '' check (char_length(description) <= 1000),
@@ -126,7 +126,7 @@ create table if not exists public.reports (
 -- ---------- Fonctions et déclencheurs ---------------------------------
 
 -- Crée le profil automatiquement à l'inscription (nom et ville passés en métadonnées).
--- Avec Google, on ne garde que le prénom (premier mot du nom complet).
+-- Avec Google, on ne conserve que le prénom (premier mot du nom complet).
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 declare
@@ -1790,7 +1790,7 @@ create trigger after_outbox_deliver
   after insert on private.email_outbox
   for each row execute function private.deliver_email();
 
--- Nettoyage : on ne garde que 30 jours de journal.
+-- Nettoyage : on ne conserve que 30 jours de journal.
 delete from private.email_outbox where created_at < now() - interval '30 days';
 
 -- =====================================================================
@@ -2149,7 +2149,7 @@ create or replace function public.log_client_error(p_message text, p_stack text,
 returns void language plpgsql security definer set search_path = public as $$
 begin
   if coalesce(trim(p_message), '') = '' then return; end if;
-  -- garde-fou : au plus 500 nouvelles erreurs distinctes par heure
+  -- protection : au plus 500 nouvelles erreurs distinctes par heure
   if (select count(*) from public.client_errors where first_at > now() - interval '1 hour') >= 500 then return; end if;
   insert into public.client_errors (message, stack, page, user_agent, last_user)
   values (left(p_message, 500), left(coalesce(p_stack, ''), 3000), left(coalesce(p_page, ''), 40), left(coalesce(p_agent, ''), 300),
@@ -2745,7 +2745,7 @@ create table if not exists private.member_activity (
 );
 
 -- Adresse IP du visiteur, transmise par la passerelle de Supabase dans les en-têtes de la requête
--- (« cf-connecting-ip » posé par Cloudflare, sinon la première adresse de « x-forwarded-for »).
+-- (« cf-connecting-ip » posé par la passerelle de Supabase, sinon la première adresse de « x-forwarded-for »).
 create or replace function private.client_ip()
 returns text language sql stable as $$
   select nullif(trim(coalesce(
@@ -2777,7 +2777,7 @@ begin
   insert into private.member_ips (user_id, ip) values (auth.uid(), addr)
   on conflict (user_id, ip) do update set last_seen = now()
     where private.member_ips.last_seen < now() - interval '5 minutes';
-  -- on garde les 20 adresses les plus récentes
+  -- on conserve les 20 adresses les plus récentes
   delete from private.member_ips m where m.user_id = auth.uid() and m.ip not in (
     select ip from private.member_ips where user_id = auth.uid() order by last_seen desc limit 20);
 end $$;
@@ -2970,7 +2970,7 @@ begin
   insert into private.member_devices (user_id, device_key, user_agent, info)
   values (auth.uid(), md5(ua || coalesce(info ->> 'platform', '') || coalesce(info ->> 'screen', '')), ua, info)
   on conflict (user_id, device_key) do update set info = excluded.info, last_seen = now();
-  -- on garde les 10 appareils les plus récents
+  -- on conserve les 10 appareils les plus récents
   delete from private.member_devices d where d.user_id = auth.uid() and d.device_key not in (
     select device_key from private.member_devices where user_id = auth.uid() order by last_seen desc limit 10);
 end $$;
@@ -3555,7 +3555,7 @@ grant execute on function public.mod_remove_avatar(uuid, uuid) to authenticated;
 -- =====================================================================
 -- Version 72 : dons pour soutenir le site (ponctuels ou mensuels)
 --   Les paiements passent par un service externe (Stripe, Ko-fi, Liberapay, PayPal…) : Cyclami ne
---   voit ni ne garde aucune donnée bancaire. L'administrateur colle les deux liens dans l'administration.
+--   voit ni ne conserve aucune donnée bancaire. L'administrateur colle les deux liens dans l'administration.
 -- =====================================================================
 create or replace function public.donation_links()
 returns jsonb language sql stable security definer set search_path = public, private as $$
@@ -3655,7 +3655,7 @@ exception when undefined_object then
   raise notice 'publication supabase_realtime absente (base de test)';
 end $$;
 
--- le tchat ne garde que les 90 derniers jours
+-- le tchat ne conserve que les 90 derniers jours
 delete from public.chat_messages where created_at < now() - interval '90 days';
 
 -- =====================================================================
@@ -4411,7 +4411,7 @@ $$;
 revoke all on function public.referral_stats(uuid) from public, anon;
 grant execute on function public.referral_stats(uuid) to authenticated;
 
--- quartiers les plus actifs (30 derniers jours) : membres actifs, sorties organisées, nouveaux membres
+-- villes et quartiers les plus actifs (30 derniers jours) : membres actifs, sorties organisées, nouveaux membres
 create or replace function public.top_neighbourhoods()
 returns jsonb language sql stable security definer set search_path = public as $$
   with m as (

@@ -2,6 +2,7 @@
 export default {
   'Niveau {n}': 'Level {n}',
   'encore {n} XP pour « {name} »': '{n} more XP to reach “{name}”',
+  'Classement': 'Leaderboard',
   'Badges': 'Badges',
   'Pas encore de badge.': 'No badges yet.',
   'Comment gagner des points ?': 'How do I earn points?',

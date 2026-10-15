@@ -14,7 +14,6 @@ export default {
   'Langue': 'Taal',
   'Indique ton e-mail, on t’envoie un lien pour le réinitialiser.': 'Vul je e-mailadres in, dan sturen we je een link om het opnieuw in te stellen.',
   'Continuer avec Google': 'Doorgaan met Google',
-  'En continuant avec Google, tu acceptes la': 'Door verder te gaan met Google aanvaard je het',
   'politique de confidentialité': 'privacybeleid',
   'Seuls ton prénom et ton e-mail sont récupérés.': 'Alleen je voornaam en e-mailadres worden opgehaald.',
   'ou avec ton e-mail': 'of met je e-mailadres',
@@ -23,7 +22,6 @@ export default {
   'E-mail': 'E-mailadres',
   'Mot de passe': 'Wachtwoord',
   'Mot de passe oublié ?': 'Wachtwoord vergeten?',
-  'J’accepte la': 'Ik aanvaard het',
   'et j’ai lu les': 'en ik heb kennisgenomen van de',
   'conseils de sécurité': 'veiligheidstips',
   'Patiente…': 'Even geduld…',
@@ -38,4 +36,5 @@ export default {
   'et la': 'en het',
   'En continuant avec Google, tu acceptes les': 'Door verder te gaan met Google, aanvaard je de',
   'Ce prénom n’est pas autorisé. Choisis-en un autre.': 'Deze voornaam is niet toegestaan. Kies een andere.',
+  'Trouve des cyclistes de ton niveau près de chez toi et roulez ensemble. C’est gratuit.': 'Vind fietsers van jouw niveau bij jou in de buurt en rij samen. Het is gratis.',
 };

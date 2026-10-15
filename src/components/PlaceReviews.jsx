@@ -63,7 +63,7 @@ export default function PlaceReviews({ placeId, onRated }) {
     <div className="mt-1 space-y-1 border-t border-stone-100 pt-1">
       {list === null ? <div className="text-xs text-stone-400">{t('Chargement…')}</div> : (
         <div className="flex items-center gap-1 text-xs text-stone-600">
-          {list.length ? (<><Stars value={average} /> {average.toFixed(1)} · {t(list.length > 1 ? '{n} avis' : '{n} avis', { n: list.length })}</>)
+          {list.length ? (<><Stars value={average} /> {average.toFixed(1)} · {t(list.length > 1 ? '{n} avis' : 'Un avis', { n: list.length })}</>)
             : t('Pas encore d’avis')}
         </div>
       )}

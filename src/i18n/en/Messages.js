@@ -2,16 +2,13 @@
 export default {
   'Messages': 'Messages',
   'Pas encore de conversation.': 'No conversations yet.',
-  'Trouve un compagnon de sortie': 'Find a riding buddy',
   'Image trop lourde (25 Mo maximum).': 'Image too large (25 MB maximum).',
   'Impossible d’envoyer un message à ce membre.': 'You can’t send a message to this member.',
   'Retour': 'Back',
-  'avec {pets} · voir le profil': 'with {pets} · view profile',
   'Dis bonjour à {name} et propose une sortie': 'Say hi to {name} and suggest a ride',
   'Premier rendez-vous dans un lieu public, et ne partage pas ton adresse.': 'Meet in a public place the first time, and don’t share your address.',
   'Conseils': 'Tips',
   'Photo': 'Photo',
-  'Vu {time}': 'Seen {time}',
   '{name} est en train d’écrire…': '{name} is typing…',
   'Aperçu': 'Preview',
   'Retirer la photo': 'Remove photo',
@@ -30,4 +27,6 @@ export default {
   '{name} enregistre un message vocal…': '{name} is recording a voice message…',
   'enregistre un vocal…': 'recording a voice message…',
   'écrit…': 'typing…',
+  'Trouve des cyclistes de ton niveau': 'Find cyclists of your level',
+  'voir le profil': 'see profile',
 };

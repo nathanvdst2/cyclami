@@ -1,9 +1,23 @@
-// Traductions anglaises de components/AccountMenu.jsx
+// Traductions anglaises de src/components/AccountMenu.jsx
 export default {
   'Menu du compte': 'Account menu',
   'Voir mon profil': 'View my profile',
   'Paramètres du compte': 'Account settings',
-  'Abonnés et abonnements': 'Followers and following',
+  'Mon profil cycliste et mes vélos': 'My cycling profile and bikes',
+  'Parrainage : inviter des amis': 'Referrals: invite friends',
+  'Dangers sur la route': 'Road hazards',
+  'Suivi GPS': 'GPS tracking',
+  'Clubs et groupes': 'Clubs and groups',
+  'Forum': 'Forum',
+  'Tchat général': 'General chat',
   'Niveau et classement': 'Level and leaderboard',
+  'Abonnés et abonnements': 'Followers and following',
+  'Administration': 'Administration',
+  'Modération': 'Moderation',
+  'Langue': 'Language',
+  'Donner mon avis / signaler un bug': 'Give feedback / report a bug',
+  'Soutenir Cyclami': 'Support Cyclami',
+  'Conseils de sécurité': 'Safety tips',
+  'Se déconnecter': 'Log out',
   'Inviter des amis': 'Invite friends',
 };

@@ -1,17 +1,16 @@
-// Traductions anglaises de src/components/PlacesLayer.jsx
+// Traductions anglaises des lieux de la carte (lib/places.js, PlacesLayer)
 export default {
-  'Espaces chiens': 'Dog areas',
-  'Parcs': 'Parks',
+  'Bornes de réparation': 'Bike repair stations',
+  'Magasins vélo': 'Bike shops',
   'Points d’eau': 'Water points',
-  'Vétérinaires': 'Vets',
-  'Animaleries': 'Pet shops',
+  'Gonflage': 'Tyre pumps',
   'Zoome sur la carte pour voir les lieux.': 'Zoom in on the map to see places.',
   'Chargement des lieux…': 'Loading places…',
   'Lieux indisponibles pour le moment.': 'Places unavailable right now.',
+  'Voir le lieu →': 'See the place →',
   'Horaires : {hours}': 'Opening hours: {hours}',
-  'Donner rendez-vous ici →': 'Meet here →',
   'Favori': 'Favourite',
   'Ajouter aux favoris': 'Add to favourites',
   'Proposer une sortie ici': 'Suggest a ride here',
-  'Voir le lieu →': 'See the place →',
+  'Donner rendez-vous ici →': 'Meet here →',
 };

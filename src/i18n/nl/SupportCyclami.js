@@ -8,8 +8,8 @@ export default {
   'Paiement sécurisé chez notre partenaire de paiement : Cyclami ne voit jamais tes données bancaires. Un don mensuel s’arrête quand tu veux.': 'Veilige betaling bij onze betaalpartner: Cyclami ziet nooit je bankgegevens. Een maandelijkse gift stop je wanneer je wilt.',
   'Liens enregistrés.': 'Links opgeslagen.',
   'Dons pour le site': 'Giften voor de site',
-  'Crée un lien de paiement chez Stripe (Payment Links), Ko-fi, Liberapay ou PayPal, puis colle-le ici. Laisse vide pour masquer le bouton.': 'Maak een betaallink bij Stripe (Payment Links), Ko-fi, Liberapay of PayPal en plak hem hier. Laat leeg om de knop te verbergen.',
   'Lien pour un don ponctuel': 'Link voor een eenmalige gift',
   'Lien pour un don mensuel': 'Link voor een maandelijkse gift',
   'Enregistrer': 'Opslaan',
+  'Crée un lien de paiement chez Stripe (Payment Links), Ko-fi, Liberapay ou PayPal, puis colle-le ici. Sans lien, le bouton est masqué.': 'Maak een betaallink aan bij Stripe (Payment Links), Ko-fi, Liberapay of PayPal en plak hem hier. Zonder link wordt de knop verborgen.',
 };
