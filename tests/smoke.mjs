@@ -316,13 +316,13 @@ const step = async (name, fn) => {
     await shot(`FAIL-${name.replace(/[^a-z0-9]+/gi, '-')}`).catch(() => {});
   }
 };
-const tab = (name) => page.locator('nav').last().getByRole('button', { name, exact: true }).click();
+const tab = (name) => page.locator('nav.fixed').getByRole('button', { name, exact: true }).click();
 const menu = async (name) => {
   await page.getByRole('button', { name: 'Menu du compte' }).click();
   await page.getByRole('menuitem', { name }).first().click();
 };
 const home = async () => { await tab('Découvrir'); await page.getByText('Bob').first().waitFor(); };
-const text = (s, opts) => page.getByText(s, opts).first().waitFor();
+const text = (s, opts) => page.getByText(s, opts).locator('visible=true').first().waitFor();
 
 await page.goto(`${ORIGIN}/`);
 await page.getByText('Bob').first().waitFor({ timeout: 20000 }).catch(() => {});
@@ -421,7 +421,7 @@ await step('recherche', async () => {
 });
 await step('paramètres du compte', async () => {
   await tab('Profil');
-  await text('Nathan');
+  await text('Mon Canyon'); // résumé du profil cycliste et du garage
   await shot('10-profile');
 });
 await step('profil cycliste et vélos', async () => {
@@ -581,7 +581,7 @@ await step('néerlandais (connecté)', async () => {
   await p.addInitScript(([k, v]) => { localStorage.setItem(k, v); localStorage.setItem('cyclami:lang', 'nl'); }, [AUTH_KEY, JSON.stringify(session)]);
   await p.goto(`${ORIGIN}/`);
   await p.getByText('Bob').first().waitFor();
-  await p.locator('nav').last().getByRole('button').nth(1).click();
+  await p.locator('nav.fixed').getByRole('button').nth(1).click();
   await p.getByText('Tour du lac').first().waitFor();
   await shot('50-nl-rides', p);
   await c.close();
@@ -599,7 +599,7 @@ await step('modérateur (Bob) : pages principales', async () => {
   await p.addInitScript(([k, v]) => { localStorage.setItem(k, v); }, [AUTH_KEY, JSON.stringify(bobSession)]);
   await p.goto(`${ORIGIN}/`);
   await p.getByText('Nathan').first().waitFor();
-  await p.locator('nav').last().getByRole('button', { name: 'Profil', exact: true }).click();
+  await p.locator('nav.fixed').getByRole('button', { name: 'Profil', exact: true }).click();
   await p.waitForTimeout(500);
   if (await p.getByRole('button', { name: 'Supprimer mon compte' }).count()) throw new Error('bouton de suppression visible pour un modérateur');
   await shot('60-moderator-profile', p);
