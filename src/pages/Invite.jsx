@@ -72,8 +72,8 @@ export default function Invite({ go, back }) {
             {stats.members.map((m) => (
               <li key={m.id} className="flex items-center gap-2">
                 <button className="font-semibold text-stone-800 hover:underline" onClick={() => go('user', { userId: m.id })}>{m.name}</button>
-                <span className={`text-xs ${m.counted ? 'text-green-700' : 'text-stone-400'}`}>
-                  {m.counted ? `✓ ${t('compté')}` : t('n’a pas encore rempli son profil cycliste')}
+                <span className={`text-xs ${m.has_profile ? 'text-green-700' : 'text-stone-400'}`}>
+                  {m.has_profile ? `✓ ${t('compté')}` : t('n’a pas encore rempli son profil cycliste')}
                 </span>
               </li>
             ))}

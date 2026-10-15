@@ -8,7 +8,7 @@ import ConversationSnapshot from './ConversationSnapshot.jsx';
 const TYPE_LABEL = {
   user: t('Profil'), post: t('Publication'), comment: t('Commentaire'), ride: t('Sortie'), conversation: t('Conversation privée'),
   forum_topic: t('Sujet du forum'), forum_reply: t('Réponse du forum'), group: t('Club ou groupe'), group_message: t('Message de groupe'), avatar: t('Photo de profil'),
-  chat_message: t('Message du tchat général'), hazard: t('Danger signalé'),
+  chat_message: t('Message du tchat général'),
 };
 const CATEGORY_LABEL = Object.fromEntries(REPORT_CATEGORIES);
 const SERIOUS = new Set(['danger', 'harcelement', 'conduite_dangereuse']);
@@ -26,7 +26,7 @@ export default function ReportCase({ reports, memberName, member, go, onDone }) 
   const { target_type: type, target_id: targetId, reported_id: authorId } = first;
   const categories = [...new Set(reports.map((r) => r.category))];
   const canSanction = authorId && authorId !== currentUser.id && !staffRoles[authorId];
-  const isContent = ['post', 'comment', 'ride', 'forum_topic', 'forum_reply', 'group', 'group_message', 'chat_message', 'hazard'].includes(type);
+  const isContent = ['post', 'comment', 'ride', 'forum_topic', 'forum_reply', 'group', 'group_message', 'chat_message'].includes(type);
 
   const run = async (fn, { close } = {}) => {
     setBusy(true);

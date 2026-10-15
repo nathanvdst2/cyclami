@@ -2,7 +2,7 @@
 # à chaque modification du fichier sur main (le script peut être relancé sans risque).
 # Nécessite le secret GitHub SUPABASE_DB_URL (chaîne de connexion « Session pooler »).
 # Facultatif : secret BREVO_API_KEY (e-mails et notifications push), variable de dépôt SITE_URL
-# (adresse du site, https://cyclami.com par défaut).
+# (adresse du site, https://cyclami.netlify.app par défaut).
 name: Base de données Supabase
 
 on:
@@ -120,7 +120,7 @@ jobs:
           done
           # e-mails et notifications push : la base appelle la fonction Netlify du site (<SITE_URL>/api/notify,
           # et /api/push pour le téléphone)
-          SITE=$(printf '%s' "${SITE_URL:-https://cyclami.com}" | tr -d '[:space:]')
+          SITE=$(printf '%s' "${SITE_URL:-https://cyclami.netlify.app}" | tr -d '[:space:]')
           SITE=${SITE%/}
           case "$SITE" in
             https://*) ;;

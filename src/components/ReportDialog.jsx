@@ -12,7 +12,6 @@ const TITLES = {
   forum_reply: () => t('Signaler cette réponse'),
   group: () => t('Signaler ce club ou groupe'),
   group_message: () => t('Signaler ce message'),
-  hazard: () => t('Signaler ce danger (faux ou abusif)'),
   chat_message: () => t('Signaler ce message'),
   avatar: (name) => t('Signaler la photo de profil de {name}', { name }),
 };

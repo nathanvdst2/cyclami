@@ -1469,7 +1469,7 @@ create schema if not exists private;
 revoke all on schema private from public, anon, authenticated;
 create table if not exists private.settings (key text primary key, value text not null);
 insert into private.settings (key, value)
-values ('notify_url', 'https://cyclami.com/api/notify')
+values ('notify_url', 'https://cyclami.netlify.app/api/notify')
 on conflict (key) do nothing;
 -- La GitHub Action « Base de données Supabase » y écrit '<SITE_URL>/api/notify' (variable de dépôt SITE_URL)
 -- et ajoute la clé partagée 'notify_secret' (jamais dans le code). Les notifications push partent vers /api/push.
@@ -4353,7 +4353,7 @@ revoke all on function public.rider_distances(uuid[]) from public, anon;
 grant execute on function public.rider_distances(uuid[]) to authenticated;
 
 -- =====================================================================
--- Version 92 : parrainage — lien personnel (cyclami.com/?p=<code>), badge « Ambassadeur »
+-- Version 92 : parrainage — lien personnel (cyclami.netlify.app/?p=<code>), badge « Ambassadeur »
 --   à 3 filleuls qui ont rempli leur profil cycliste, et classement des villes les plus actives.
 -- =====================================================================
 alter table public.profiles add column if not exists referred_by uuid references public.profiles (id) on delete set null;

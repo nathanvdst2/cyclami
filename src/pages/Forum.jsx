@@ -15,6 +15,7 @@ import ExampleTopic from '../components/ExampleTopic.jsx';
 // Catégories (mêmes identifiants que la contrainte forum_topics.category en base, voir supabase/schema.sql)
 export const FORUM_CATEGORIES = [
   { id: 'general', emoji: '💬', label: t('Discussions générales') },
+  { id: 'sorties', emoji: '🚴', label: t('Sorties & rendez-vous') },
   { id: 'materiel', emoji: '🚲', label: t('Matériel & équipement') },
   { id: 'entrainement', emoji: '📈', label: t('Entraînement & nutrition') },
   { id: 'itineraires', emoji: '🗺️', label: t('Itinéraires & parcours') },

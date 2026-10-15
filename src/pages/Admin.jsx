@@ -354,7 +354,7 @@ function Dashboard({ stats: s, openCount, isAdmin, setTab, verifCount = 0 }) {
               {t('+{n} cette semaine', { n: s.members_7d })}
             </span>} />
           <Metric value={s.active_7d} label={t('Actifs (7 j)')} sub={s.members ? t('{p} % des membres', { p: Math.round((100 * s.active_7d) / s.members) }) : null} />
-          <Metric value={s.bikes} label={t('Vélos présentés')} />
+          <Metric value={s.riders} label={t('Profils cyclistes remplis')} sub={s.bikes != null ? t('{n} vélos présentés', { n: s.bikes }) : null} />
           <Metric value={s.online} label={t('En ligne maintenant')} />
         </div>
         {days.length > 0 && (
@@ -388,7 +388,7 @@ function Dashboard({ stats: s, openCount, isAdmin, setTab, verifCount = 0 }) {
           <h2 className="font-bold text-stone-800">{t('Sur la route')}</h2>
           <div className="grid grid-cols-2 gap-2">
             <Metric value={s.hazards_active} label={t('Dangers signalés en cours')} />
-            <Metric value={s.tracks_7d} label={t('Parcours GPS (7 j)')} />
+            <Metric value={s.km_7d} label={t('Km suivis au GPS (7 j)')} />
             <Metric value={s.groups} label={t('Clubs et groupes')} />
             <Metric value={s.reports_open} label={t('Signalements ouverts')} tab="reports" />
           </div>
