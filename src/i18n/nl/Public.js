@@ -39,4 +39,9 @@ export default {
   'Découvre les cyclistes de ton niveau autour de {city}, sur la liste ou sur la carte.': 'Ontdek fietsers van jouw niveau rond {city}, in de lijst of op de kaart.',
   'Rejoins une sortie de groupe, ou organise la tienne : une fois ou chaque semaine, avec ou sans lâchage.': 'Sluit je aan bij een groepsrit of organiseer er zelf een: eenmalig of elke week, met of zonder lossen.',
   'Toutes les sorties à venir': 'Alle komende ritten',
+  'Le tracé du parcours est visible par les membres inscrits.': 'De route van het parcours is zichtbaar voor ingeschreven leden.',
+  'Ce club ou groupe n’existe plus.': 'Deze club of groep bestaat niet meer.',
+  'Club ou groupe': 'Club of groep',
+  'Le mur du groupe, ses membres et ses sorties sont visibles après l’inscription (gratuite).': 'Het prikbord van de groep, de leden en de ritten zijn zichtbaar na je (gratis) inschrijving.',
+  'Rejoindre le groupe (inscription gratuite)': 'Word lid van de groep (gratis inschrijving)',
 };

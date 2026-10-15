@@ -1,4 +1,4 @@
-// Liens partageables : cyclami.com/s/<sortie>, /f/<sujet du forum>, /g/<club ou groupe>, /p/<profil>.
+// Liens partageables : <site>/s/<sortie>, /f/<sujet du forum>, /g/<club ou groupe>, /p/<profil>.
 // Le serveur (netlify/edge-functions/share.js) ajoute l'aperçu (titre, image) pour WhatsApp & co.
 import { stripLang } from '../i18n/index.js';
 import { cityBySlug } from './cities.js';

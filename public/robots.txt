@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://cyclami.com/sitemap.xml
+Sitemap: https://cyclami.netlify.app/sitemap.xml

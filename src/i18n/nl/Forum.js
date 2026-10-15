@@ -42,4 +42,5 @@ export default {
   'Tout': 'Alles',
   'Reste bienveillant. Pour une douleur ou une blessure, le forum ne remplace pas l’avis d’un médecin.': 'Blijf vriendelijk. Bij pijn of een blessure vervangt het forum het advies van een arts niet.',
   'Titre (ex : Quel braquet pour débuter en côte ?)': 'Titel (bv.: Welke versnelling om te beginnen met klimmen?)',
+  'Sorties & rendez-vous': 'Ritten & afspraken',
 };

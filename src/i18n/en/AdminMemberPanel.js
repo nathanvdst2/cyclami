@@ -56,7 +56,6 @@ export default {
   'Ville': 'City',
   'Retirer sa photo de profil': 'Remove their profile photo',
   'Vélos': 'Bikes',
-  'Parcours GPS': 'GPS rides',
   'Dangers signalés': 'Reported hazards',
   'Clubs et groupes': 'Clubs and groups',
 };

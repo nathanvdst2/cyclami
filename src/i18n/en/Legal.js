@@ -3,7 +3,7 @@ export default {
   'Retour': 'Back',
   'Mentions légales': 'Legal notice',
   'Éditeur du site': 'Site publisher',
-  'Cyclami est un projet édité à titre non professionnel par {name}.': 'Cyclami is a non-professional project published by {name}.',
+  'Cyclami ({site}) est un projet édité à titre non professionnel par {name}.': 'Cyclami ({site}) is a non-professional project published by {name}.',
   'Contact : {contact}': 'Contact: {contact}',
   'Hébergement': 'Hosting',
   'Responsabilité': 'Liability',

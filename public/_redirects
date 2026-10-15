@@ -1,6 +1,4 @@
-# Ancienne adresse Netlify et www → domaine principal (une seule adresse = une seule session de connexion)
-https://cyclami.netlify.app/*  https://cyclami.com/:splat  301!
-https://www.cyclami.com/*      https://cyclami.com/:splat  301!
+# Adresse du site : https://cyclami.netlify.app (pas encore de nom de domaine).
 
 # Pages publiques avec une vraie adresse (écran de connexion Google, liens partagés)
 /confidentialite   /index.html  200

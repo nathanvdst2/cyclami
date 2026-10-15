@@ -56,7 +56,6 @@ export default {
   'Ville': 'Stad',
   'Retirer sa photo de profil': 'Profielfoto verwijderen',
   'Vélos': 'Fietsen',
-  'Parcours GPS': 'Gps-ritten',
   'Dangers signalés': 'Gemelde gevaren',
   'Clubs et groupes': 'Clubs en groepen',
 };

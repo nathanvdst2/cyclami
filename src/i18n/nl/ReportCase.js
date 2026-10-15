@@ -45,5 +45,4 @@ export default {
   'Retirer la photo': 'Foto verwijderen',
   'Message du tchat général': 'Bericht in de algemene chat',
   'Club ou groupe': 'Club of groep',
-  'Danger signalé': 'Gemeld gevaar',
 };

@@ -39,4 +39,9 @@ export default {
   'Découvre les cyclistes de ton niveau autour de {city}, sur la liste ou sur la carte.': 'Discover cyclists of your level around {city}, on the list or on the map.',
   'Rejoins une sortie de groupe, ou organise la tienne : une fois ou chaque semaine, avec ou sans lâchage.': 'Join a group ride, or organise your own: once or every week, drop or no-drop.',
   'Toutes les sorties à venir': 'All upcoming rides',
+  'Le tracé du parcours est visible par les membres inscrits.': 'The route is visible to registered members.',
+  'Ce club ou groupe n’existe plus.': 'This club or group no longer exists.',
+  'Club ou groupe': 'Club or group',
+  'Le mur du groupe, ses membres et ses sorties sont visibles après l’inscription (gratuite).': 'The group’s wall, members and rides are visible once you sign up (free).',
+  'Rejoindre le groupe (inscription gratuite)': 'Join the group (free sign-up)',
 };

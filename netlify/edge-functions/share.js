@@ -18,8 +18,9 @@ const env = (name) => {
 };
 const supabaseUrl = () => String(env('SUPABASE_URL') || env('VITE_SUPABASE_URL')).replace(/\/+$/, '');
 const supabaseKey = () => String(env('SUPABASE_PUBLISHABLE_KEY') || env('VITE_SUPABASE_PUBLISHABLE_KEY'));
-// Adresse officielle du site (liens canoniques, plan du site) : une seule constante à changer.
-export const SITE = 'https://cyclami.com';
+// Adresse officielle du site (liens canoniques, og:url, plan du site) : une seule constante à changer
+// (ou la variable d'environnement SITE_URL) le jour où un nom de domaine est acheté.
+export const SITE = 'https://cyclami.netlify.app';
 const siteUrl = () => String(env('SITE_URL') || SITE).replace(/\/+$/, '');
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

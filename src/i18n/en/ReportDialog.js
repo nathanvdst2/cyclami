@@ -16,5 +16,4 @@ export default {
   'Signaler ce sujet': 'Report this topic',
   'Signaler cette réponse': 'Report this reply',
   'Signaler ce club ou groupe': 'Report this club or group',
-  'Signaler ce danger (faux ou abusif)': 'Report this hazard (false or abusive)',
 };

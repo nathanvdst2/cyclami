@@ -42,4 +42,5 @@ export default {
   'Tout': 'All',
   'Reste bienveillant. Pour une douleur ou une blessure, le forum ne remplace pas l’avis d’un médecin.': 'Be kind. For pain or an injury, the forum is no substitute for a doctor’s advice.',
   'Titre (ex : Quel braquet pour débuter en côte ?)': 'Title (e.g. Which gearing for my first climbs?)',
+  'Sorties & rendez-vous': 'Rides & meet-ups',
 };

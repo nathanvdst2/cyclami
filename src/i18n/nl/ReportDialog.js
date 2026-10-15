@@ -16,5 +16,4 @@ export default {
   'Signaler ce sujet': 'Dit onderwerp melden',
   'Signaler cette réponse': 'Deze reactie melden',
   'Signaler ce club ou groupe': 'Deze club of groep melden',
-  'Signaler ce danger (faux ou abusif)': 'Dit gevaar melden (vals of misbruik)',
 };

@@ -3,10 +3,12 @@ import { t } from '../i18n/index.js';
 
 // Textes en français (clés de traduction, voir src/i18n/nl/Legal.js) ; {name}, {address} et {contact} remplacés à l'affichage.
 // Éditeur du site (identification obligatoire, Code de droit économique belge, livre XII ; LCEN en France).
+// Adresse du site : une seule constante à changer le jour où un nom de domaine est acheté.
+const SITE = 'https://cyclami.netlify.app';
 const PUBLISHER = {
   name: '[à compléter]',
   address: '[à compléter]',
-  contact: 'contact@cyclami.com',
+  contact: '[à compléter]', // adresse e-mail de contact
 };
 
 const DOCS = {
@@ -14,7 +16,7 @@ const DOCS = {
     title: 'Mentions légales',
     sections: [
       ['Éditeur du site', [
-        'Cyclami est un projet édité à titre non professionnel par {name}.',
+        'Cyclami ({site}) est un projet édité à titre non professionnel par {name}.',
         'Adresse : {address}',
         'Contact : {contact}',
       ]],
@@ -139,7 +141,7 @@ const DOCS = {
 
 export default function Legal({ back, params }) {
   const doc = DOCS[params.doc] || DOCS.legal;
-  const vars = { name: PUBLISHER.name, address: PUBLISHER.address, contact: PUBLISHER.contact };
+  const vars = { name: PUBLISHER.name, address: PUBLISHER.address, contact: PUBLISHER.contact, site: SITE.replace(/^https:\/\//, '') };
   return (
     <div className="space-y-4 pb-8">
       <button onClick={() => back(params.back || 'landing')} className="flex items-center gap-1 text-sm text-stone-500">

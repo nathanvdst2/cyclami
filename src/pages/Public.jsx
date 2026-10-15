@@ -14,7 +14,7 @@ const MapView = lazy(() => import('../components/MapView.jsx'));
 // Pages publiques : visibles sans compte et trouvables sur Google (le serveur ajoute aussi
 // leur contenu dans la page, voir netlify/edge-functions/share.js). Seules des informations
 // publiques y figurent : sorties à venir sans organisateur ni participants, chiffres par ville, noms des clubs.
-//   PublicRides : /sorties — PublicRide : /s/<sortie> — PublicCity : /sorties/<ville>
+//   PublicRides : /sorties — PublicRide : /s/<sortie> — PublicCity : /sorties/<ville> — PublicClub : /g/<club> (sans compte)
 
 const rpc = async (name, args) => {
   const { data, error } = await supabase.rpc(name, args);
@@ -174,6 +174,7 @@ export function PublicRide({ go, params }) {
         {level && <p className="text-sm text-stone-500">{t('Niveau {level} : {speed} de moyenne sur le plat.', { level: level.label, speed: level.speed })}</p>}
         {w.no_drop && <p className="text-sm text-green-700">🤝 {t('Pas de lâchage : le groupe attend tout le monde, idéal si tu débutes ou reprends.')}</p>}
         {w.description && <p className="whitespace-pre-line break-words text-stone-700">{w.description}</p>}
+        {w.has_route && <p className="text-sm text-stone-500">🗺️ {t('Le tracé du parcours est visible par les membres inscrits.')}</p>}
         {start && (
           <Suspense fallback={<div className="h-48 animate-pulse rounded-2xl bg-emerald-100" />}>
             <MapView height="h-48" center={start} zoom={13}
@@ -297,6 +298,24 @@ export function PublicCity({ go, params, inApp }) {
       <SafetyNote />
       <CityChips cities={nearbyCities(city, 8)} go={go} title={t('Autres villes')} />
       {!inApp && <button className="btn-ghost w-full" onClick={() => go('public-rides')}>{t('Toutes les sorties à venir')}</button>}
+    </Shell>
+  );
+}
+
+// /g/<id> sans compte : aperçu d'un club ou groupe (nom, présentation, nombre de membres), le reste après l'inscription.
+export function PublicClub({ go, params }) {
+  const { data: g, error } = useData(() => rpc('share_preview', { p_kind: 'g', p_id: params.groupId }), [params.groupId]);
+  if (g === undefined && !error) return <Shell go={go}><Loading /></Shell>;
+  if (!g?.title) return <Shell go={go}><Missing text={t('Ce club ou groupe n’existe plus.')} go={go} to="public-rides" /></Shell>;
+  return (
+    <Shell go={go}>
+      <section className="card space-y-3">
+        <div className="text-xs font-semibold uppercase tracking-wide text-teal-600">{t('Club ou groupe')}</div>
+        <h1 className="text-2xl font-extrabold text-stone-800">{g.title}</h1>
+        {g.description && <p className="whitespace-pre-line break-words text-stone-700">{g.description}</p>}
+        <p className="text-sm text-stone-500">{t('Le mur du groupe, ses membres et ses sorties sont visibles après l’inscription (gratuite).')}</p>
+        <button className="btn-primary w-full" onClick={() => go('signup')}>{t('Rejoindre le groupe (inscription gratuite)')}</button>
+      </section>
     </Shell>
   );
 }
